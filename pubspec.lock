@@ -450,51 +450,42 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_map
-      sha256: "87cc8349b8fa5dccda5af50018c7374b6645334a0d680931c1fe11bce88fa5bb"
+      sha256: cc102fe5eeab1a740c321e1982706061e46259cd75115b3b3779195f21d57cc3
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.1"
+    version: "7.0.1"
   flutter_map_animations:
     dependency: "direct main"
     description:
       name: flutter_map_animations
-      sha256: e4b929632b43a7939ce07a7cdb05613abb25e1996c9767c16469d0cbb9e1c4a9
+      sha256: "826c10a551d9dbb686a8ed9ee8815b974475812c41beb4ce9fe19095fe1c5611"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.7.0"
   flutter_map_location_marker:
     dependency: "direct main"
     description:
       name: flutter_map_location_marker
-      sha256: "630e02118b84453e67c4737dadefc87ee8eb54c67bf62800ef757421a770c727"
+      sha256: fa21753e7134d8a1f0b7b979d053c5cc43126e11685fe63c4c49da7b7416e1ae
       url: "https://pub.dev"
     source: hosted
-    version: "8.1.0"
+    version: "9.0.0"
   flutter_map_marker_popup:
     dependency: "direct main"
     description:
       name: flutter_map_marker_popup
-      sha256: ec563bcbae24a18ac16815fb75ac5ab33ccba609e14db70e252a67de19c6639c
+      sha256: a7540538114b5d1627ab67b498273d66bc36090385412ae49ef215af4a2861c5
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.2"
-  flutter_map_tappable_polyline:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "86eba4a8cd65dfa818b763a6cd6c0e961f00f466"
-      resolved-ref: "86eba4a8cd65dfa818b763a6cd6c0e961f00f466"
-      url: "https://github.com/Camerash/flutter_map_tappable_polyline.git"
-    source: git
-    version: "6.0.0"
+    version: "7.0.0"
   flutter_map_tile_caching:
     dependency: "direct main"
     description:
       name: flutter_map_tile_caching
-      sha256: "24412e067317ba6f03d8568c024b400ac37bfe364719033f8048d7bca86b80d3"
+      sha256: ab4dcd37a5b6bfd1e37f5f335f17eea359e2f53e7a8e9e092f1966fdda60737b
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.1"
+    version: "9.1.0"
   flutter_platform_widgets:
     dependency: "direct main"
     description:
@@ -557,10 +548,10 @@ packages:
     dependency: "direct main"
     description:
       name: geolocator
-      sha256: "6cb9fb6e5928b58b9a84bdf85012d757fd07aab8215c5205337021c4999bad27"
+      sha256: "149876cc5207a0f5daf4fdd3bfcf0a0f27258b3fe95108fa084f527ad0568f1b"
       url: "https://pub.dev"
     source: hosted
-    version: "11.1.0"
+    version: "12.0.0"
   geolocator_android:
     dependency: transitive
     description:
@@ -589,10 +580,10 @@ packages:
     dependency: transitive
     description:
       name: geolocator_web
-      sha256: "49d8f846ebeb5e2b6641fe477a7e97e5dd73f03cbfef3fd5c42177b7300fb0ed"
+      sha256: "7a22f400d831f924a89d931ba126a10e6b8b437f31e6b9311320435f3e1571bd"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.0"
   geolocator_windows:
     dependency: transitive
     description:
@@ -901,18 +892,18 @@ packages:
     dependency: transitive
     description:
       name: objectbox
-      sha256: "9fb2810156e8f78d82ecf672c36a1aba2c1de16d7903675335e00e374bdc3ba8"
+      sha256: "70ff2a7538f6f8bb56136734d574f5bdc1cf29c50cd7207a14ea0c641ecb88ca"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "4.0.1"
   objectbox_flutter_libs:
     dependency: transitive
     description:
       name: objectbox_flutter_libs
-      sha256: dca86b2d1074110573b69cbd9afb6b67ab9d2c824704c6ac5187e546418baf9c
+      sha256: "97adc5f95d16f33c7114d56e5dec617db4300cd11ae5022134cf76fa5f30084d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "4.0.1"
   package_config:
     dependency: transitive
     description:

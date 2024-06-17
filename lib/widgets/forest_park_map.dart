@@ -8,7 +8,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
-import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/models/hazard.dart';
@@ -27,7 +26,7 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import '../providers/follow_on_location_provider.dart';
 
 class ForestParkMap extends ConsumerStatefulWidget {
-  const ForestParkMap({Key? key}) : super(key: key);
+  const ForestParkMap({super.key});
 
   @override
   ConsumerState<ForestParkMap> createState() => _ForestParkMapState();
@@ -92,7 +91,6 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
         hazard: hazard,
         rotate: true,
         alignment: Alignment.center,
-            //.add(const Offset(15, 15)),
         child: GestureDetector(
           onTap: () {
             ref.read(selectedRelationProvider.notifier).deselect();
@@ -139,17 +137,34 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
         initialCenter: kHomeCameraPosition.center,
         initialZoom: kHomeCameraPosition.zoom,
         initialRotation: kHomeCameraPosition.rotation,
-        onPositionChanged: (MapPosition position, bool hasGesture) {
-          if (position.zoom != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) =>
-                ref.read(polylineResolutionProvider.notifier)
-                    .updateZoom(position.zoom!));
-          }
+        backgroundColor: const Color(0xff53634b),
+        // lightMode
+        //     ? const Color(0xfff7f7f2)
+        //     : const Color(0xff36475c),
+        onPositionChanged: (MapCamera position, bool hasGesture) {
+          WidgetsBinding.instance.addPostFrameCallback((_) =>
+              ref.read(polylineResolutionProvider.notifier)
+                  .updateZoom(position.zoom));
           if (hasGesture) {
             ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.none);
           }
         },
         maxZoom: 22,
+        onTap: (TapPosition position, LatLng? latlng) {
+          // We clicked somewhere that is not a polyline nor hazard.
+          // Deselect both
+          if (ref
+              .read(panelPositionProvider)
+              .position == PanelPositionState.open) {
+            ref.read(panelPositionProvider.notifier).move(
+                PanelPositionState.snapped);
+          } else {
+            ref.read(selectedHazardProvider.notifier).deselect();
+            ref.read(selectedRelationProvider.notifier).deselect();
+            ref.read(panelPositionProvider.notifier).move(
+                PanelPositionState.closed);
+          }
+        },
       ),
       //TODO attribution, this one looks off
       // nonRotatedChildren: const [
@@ -160,10 +175,6 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       children: [
         TileLayer(
           tileProvider: const FMTCStore('forestPark').getTileProvider(),
-          backgroundColor: const Color(0xff53634b),
-          // lightMode
-          //     ? const Color(0xfff7f7f2)
-          //     : const Color(0xff36475c),
           urlTemplate: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
           //urlTemplate: "https://api.mapbox.com/styles/v1/ethemoose/cl5d12wdh009817p8igv5ippy/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
           // urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}@2x",
@@ -309,73 +320,72 @@ class TrailPolylineLayer extends ConsumerWidget {
         : relations.get(selectedRelationID);
     final polylineResolution = ref.watch(polylineResolutionProvider);
 
-    return TappablePolylineLayer(
-      // Will only render visible polylines, increasing performance
-      polylineCulling: true,
-      polylines: trails.map((trail) {
-        final geometry = trail.getPath(polylineResolution);
+    final LayerHitNotifier hitNotifier = ValueNotifier(null);
 
-        return selectedRelation?.members.contains(trail.id) ?? false ? TaggedPolyline(
-          tag: trail.id.toString(),
-          points: geometry,
-          strokeWidth: 1.0,
-          borderColor: CupertinoColors.activeGreen.withAlpha(80),
-          borderStrokeWidth: 8.0,
-          color: CupertinoColors.activeGreen,
-        ) : TaggedPolyline(
-          tag: trail.id.toString(),
-          points: geometry,
-          strokeWidth: 1.0,
-          color: CupertinoColors.activeOrange,
-        );
-      }).whereNotNull().toList()..sort((a, b) {
-        // sorts the list to have selected polylines at the top
-        return (selectedRelation?.members.contains(int.parse(a.tag ?? "-1")) ?? false ? 1 : 0) -
-            (selectedRelation?.members.contains(int.parse(b.tag ?? "-1")) ?? false ? 1 : 0);
-      }),
-      onTap: (polylines, tapPosition) {
-        // deselect hazards
-        ref.read(selectedHazardProvider.notifier).deselect();
+    return MouseRegion(
+      hitTestBehavior: HitTestBehavior.deferToChild,
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          final LayerHitResult? hitResult = hitNotifier.value;
+          if (hitResult != null && hitResult.hitValues.isNotEmpty) {
+            // We clicked a polyline
 
-        // select polyline
-        final tag = int.parse(polylines.first.tag ?? "-1");
-        if (selectedRelation?.members.contains(tag) ?? false) {
-          if (ref
-              .read(panelPositionProvider)
-              .position == PanelPositionState.open
-          ) {
-            ref.read(panelPositionProvider.notifier).move(
-                PanelPositionState.snapped);
-          } else {
+            // deselect hazards
             ref.read(selectedHazardProvider.notifier).deselect();
-            ref.read(selectedRelationProvider.notifier).deselect();
-            ref.read(panelPositionProvider.notifier).move(
-                PanelPositionState.closed);
+
+            // select polyline
+            final tag = hitResult.hitValues.first;
+            if (selectedRelation?.members.contains(tag) ?? false) {
+              if (ref
+                  .read(panelPositionProvider)
+                  .position == PanelPositionState.open
+              ) {
+                ref.read(panelPositionProvider.notifier).move(
+                    PanelPositionState.snapped);
+              } else {
+                ref.read(selectedHazardProvider.notifier).deselect();
+                ref.read(selectedRelationProvider.notifier).deselect();
+                ref.read(panelPositionProvider.notifier).move(
+                    PanelPositionState.closed);
+              }
+            } else {
+              ref.read(selectedRelationProvider.notifier)
+                  .select(relations.firstWhere((r) => r.members.contains(tag)).id);
+              if (ref
+                  .read(panelPositionProvider)
+                  .position == PanelPositionState.closed) {
+                ref.read(panelPositionProvider.notifier).move(
+                    PanelPositionState.snapped);
+              }
+            }
           }
-        } else {
-          ref.read(selectedRelationProvider.notifier)
-              .select(relations.firstWhere((r) => r.members.contains(tag)).id);
-          if (ref
-              .read(panelPositionProvider)
-              .position == PanelPositionState.closed) {
-            ref.read(panelPositionProvider.notifier).move(
-                PanelPositionState.snapped);
-          }
-        }
-      },
-      onMiss: (tapPosition) {
-        if (ref
-            .read(panelPositionProvider)
-            .position == PanelPositionState.open) {
-          ref.read(panelPositionProvider.notifier).move(
-              PanelPositionState.snapped);
-        } else {
-          ref.read(selectedHazardProvider.notifier).deselect();
-          ref.read(selectedRelationProvider.notifier).deselect();
-          ref.read(panelPositionProvider.notifier).move(
-              PanelPositionState.closed);
-        }
-      },
+        },
+        child: PolylineLayer(
+          polylines: trails.map((trail) {
+            final geometry = trail.getPath(polylineResolution);
+
+            return selectedRelation?.members.contains(trail.id) ?? false ? Polyline(
+              hitValue: trail.id,
+              points: geometry,
+              strokeWidth: 1.0,
+              borderColor: CupertinoColors.activeGreen.withAlpha(80),
+              borderStrokeWidth: 8.0,
+              color: CupertinoColors.activeGreen,
+            ) : Polyline(
+              hitValue: trail.id,
+              points: geometry,
+              strokeWidth: 1.0,
+              color: CupertinoColors.activeOrange,
+            );
+          }).whereNotNull().toList()..sort((a, b) {
+            // sorts the list to have selected polylines at the top
+            return (selectedRelation?.members.contains(a.hitValue) ?? false ? 1 : 0) -
+                (selectedRelation?.members.contains(b.hitValue) ?? false ? 1 : 0);
+          }),
+          hitNotifier: hitNotifier,
+        ),
+      ),
     );
   }
 }
