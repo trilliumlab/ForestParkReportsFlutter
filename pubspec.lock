@@ -481,10 +481,11 @@ packages:
   flutter_map_tappable_polyline:
     dependency: "direct main"
     description:
-      name: flutter_map_tappable_polyline
-      sha256: "06fcf41a98586abb876ec64b7c8b04955663dbf69a23dc09664713d076f851fe"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "86eba4a8cd65dfa818b763a6cd6c0e961f00f466"
+      resolved-ref: "86eba4a8cd65dfa818b763a6cd6c0e961f00f466"
+      url: "https://github.com/Camerash/flutter_map_tappable_polyline.git"
+    source: git
     version: "6.0.0"
   flutter_map_tile_caching:
     dependency: "direct main"
@@ -1132,7 +1133,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
+      ref: "57c6491aac940be525d4a641bbcda566e8fa1164"
       resolved-ref: "57c6491aac940be525d4a641bbcda566e8fa1164"
       url: "https://github.com/trilliumlab/simplify.git"
     source: git
