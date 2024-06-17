@@ -13,7 +13,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/models/hazard.dart';
 import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/pages/home_screen.dart';
 import 'package:forest_park_reports/providers/hazard_provider.dart';
 import 'package:forest_park_reports/providers/location_provider.dart';
 import 'package:forest_park_reports/providers/map_cursor_provider.dart';
@@ -92,33 +91,33 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       marker = HazardMarker(
         hazard: hazard,
         rotate: true,
-        rotateOrigin: const Offset(15, 15),
-        builder: (_) =>
-          GestureDetector(
-            onTap: () {
-              ref.read(selectedRelationProvider.notifier).deselect();
-              if (hazard == ref.read(selectedHazardProvider).hazard) {
-                ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
-                ref.read(selectedHazardProvider.notifier).deselect();
-                _popupController.hideAllPopups();
-              } else {
-                if (ref.read(panelPositionProvider).position == PanelPositionState.closed) {
-                  ref.read(panelPositionProvider.notifier).move(PanelPositionState.snapped);
-                }
-                ref.read(selectedHazardProvider.notifier).select(hazard);
-                _popupController.showPopupsOnlyFor([marker]);
+        alignment: Alignment.center,
+            //.add(const Offset(15, 15)),
+        child: GestureDetector(
+          onTap: () {
+            ref.read(selectedRelationProvider.notifier).deselect();
+            if (hazard == ref.read(selectedHazardProvider).hazard) {
+              ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+              ref.read(selectedHazardProvider.notifier).deselect();
+              _popupController.hideAllPopups();
+            } else {
+              if (ref.read(panelPositionProvider).position == PanelPositionState.closed) {
+                ref.read(panelPositionProvider.notifier).move(PanelPositionState.snapped);
               }
-            },
-            child: Icon(
-              Icons.warning_rounded,
-              color: isMaterial(context)
-                  ? Theme
-                  .of(context)
-                  .colorScheme.error
-                  : CupertinoDynamicColor.resolve(
-                  CupertinoColors.destructiveRed, context)
-            ),
+              ref.read(selectedHazardProvider.notifier).select(hazard);
+              _popupController.showPopupsOnlyFor([marker]);
+            }
+          },
+          child: Icon(
+            Icons.warning_rounded,
+            color: isMaterial(context)
+                ? Theme
+                .of(context)
+                .colorScheme.error
+                : CupertinoDynamicColor.resolve(
+                CupertinoColors.destructiveRed, context)
           ),
+        ),
       );
       return marker;
     }).toList();
@@ -137,9 +136,9 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
     return FlutterMap(
       mapController: _animatedMapController.mapController,
       options: MapOptions(
-        center: kHomeCameraPosition.center,
-        zoom: kHomeCameraPosition.zoom,
-        rotation: kHomeCameraPosition.rotation,
+        initialCenter: kHomeCameraPosition.center,
+        initialZoom: kHomeCameraPosition.zoom,
+        initialRotation: kHomeCameraPosition.rotation,
         onPositionChanged: (MapPosition position, bool hasGesture) {
           if (position.zoom != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) =>
@@ -160,7 +159,7 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       // ],
       children: [
         TileLayer(
-          tileProvider: FMTC.instance('forestPark').getTileProvider(),
+          tileProvider: const FMTCStore('forestPark').getTileProvider(),
           backgroundColor: const Color(0xff53634b),
           // lightMode
           //     ? const Color(0xfff7f7f2)
@@ -228,7 +227,7 @@ class CursorMarkerLayer extends ConsumerWidget {
         markers: [
           Marker(
             point: cursor,
-            builder: (_) => const Icon(
+            child: const Icon(
               Icons.circle,
               color: Colors.grey,
               size: 14.0,
@@ -272,7 +271,7 @@ class TrailEndsMarkerLayer extends ConsumerWidget {
         // End marker
         Marker(
           point: lastTrail.geometry.last,
-          builder: (_) => RotationTransition(
+          child: RotationTransition(
             turns: AlwaysStoppedAnimation(bearing/(2*pi)),
             child: const Icon(
               Icons.square,
@@ -284,7 +283,7 @@ class TrailEndsMarkerLayer extends ConsumerWidget {
         // Start marker
         Marker(
           point: firstTrail.geometry.first,
-          builder: (_) => const Icon(
+          child: const Icon(
             Icons.circle,
             color: Colors.green,
             size: 12.0,
@@ -410,7 +409,7 @@ class HazardInfoPopup extends StatelessWidget {
             ),
           ),
           material: (_, child, __) => Container(
-            color: theme.colorScheme.background,
+            color: theme.colorScheme.surface,
             child: child,
           ),
           child: IntrinsicWidth(
@@ -492,5 +491,5 @@ class HazardImage extends ConsumerWidget {
 
 class HazardMarker extends Marker {
   final HazardModel hazard;
-  HazardMarker({required this.hazard, required super.builder, super.rotate, super.rotateOrigin}) : super(point: hazard.location);
+  HazardMarker({required this.hazard, required super.child, super.rotate, super.alignment}) : super(point: hazard.location);
 }

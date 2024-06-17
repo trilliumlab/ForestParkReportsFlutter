@@ -11,8 +11,6 @@ PODS:
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
-  - isar_flutter_libs (1.0.0):
-    - Flutter
   - libwebp (1.2.4):
     - libwebp/demux (= 1.2.4)
     - libwebp/mux (= 1.2.4)
@@ -25,6 +23,10 @@ PODS:
   - Mantle (2.2.0):
     - Mantle/extobjc (= 2.2.0)
   - Mantle/extobjc (2.2.0)
+  - ObjectBox (1.9.2)
+  - objectbox_flutter_libs (0.0.1):
+    - Flutter
+    - ObjectBox (= 1.9.2)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -41,13 +43,14 @@ DEPENDENCIES:
   - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
-  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
+  - objectbox_flutter_libs (from `.symlinks/plugins/objectbox_flutter_libs/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
     - libwebp
     - Mantle
+    - ObjectBox
     - SDWebImage
     - SDWebImageWebPCoder
 
@@ -62,24 +65,25 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator_apple/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
-  isar_flutter_libs:
-    :path: ".symlinks/plugins/isar_flutter_libs/ios"
+  objectbox_flutter_libs:
+    :path: ".symlinks/plugins/objectbox_flutter_libs/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_compass: cbbd285cea1584c7ac9c4e0c3e1f17cbea55e855
   flutter_image_compress_common: ec1d45c362c9d30a3f6a0426c297f47c52007e3e
-  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
-  image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
-  isar_flutter_libs: b69f437aeab9c521821c3f376198c4371fa21073
+  geolocator_apple: 6cbaf322953988e009e5ecb481f07efece75c450
+  image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
+  ObjectBox: 46757a559717ab49b1cc0612eaff82b705acf394
+  objectbox_flutter_libs: 103f3a273b594cb664255086a386740bc179f97d
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   SDWebImage: 2aea163b50bfcb569a2726b6a754c54a4506fcf6
   SDWebImageWebPCoder: f0f287cee4cd96a59937fbf3c77a8cfda9ba67b0
 
 PODFILE CHECKSUM: 7be2f5f74864d463a8ad433546ed1de7e0f29aef
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2
