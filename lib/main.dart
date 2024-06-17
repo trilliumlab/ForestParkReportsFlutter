@@ -12,8 +12,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  await FMTC.initialise();
-  await FMTC.instance('forestPark').manage.createAsync();
+  await FMTCObjectBoxBackend().initialise();
+  await const FMTCStore('forestPark').manage.create();
   runApp(const App());
 }
 
@@ -98,12 +98,12 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             );
             if (isCupertino(context)) {
               light = light.copyWith(colorScheme: light.colorScheme.copyWith(
-                background: Colors.grey.shade100,
-                onBackground: Colors.grey.shade800,
+                surface: Colors.grey.shade100,
+                onSurface: Colors.grey.shade800,
               ));
               dark = dark.copyWith(colorScheme: dark.colorScheme.copyWith(
-                background: Colors.grey.shade900,
-                onBackground: Colors.grey.shade100,
+                surface: Colors.grey.shade900,
+                onSurface: Colors.grey.shade100,
               ));
             }
             return Theme(
