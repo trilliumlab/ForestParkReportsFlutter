@@ -14,7 +14,6 @@ void main() async {
   await dotenv.load();
   await FMTCObjectBoxBackend().initialise();
   await const FMTCStore('forestPark').manage.create();
-  // await FMTCObjectBoxBackend().initialise(rootDirectory: 'forestPark');
   runApp(const App());
 }
 
@@ -99,12 +98,12 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             );
             if (isCupertino(context)) {
               light = light.copyWith(colorScheme: light.colorScheme.copyWith(
-                background: Colors.grey.shade100,
-                onBackground: Colors.grey.shade800,
+                surface: Colors.grey.shade100,
+                onSurface: Colors.grey.shade800,
               ));
               dark = dark.copyWith(colorScheme: dark.colorScheme.copyWith(
-                background: Colors.grey.shade900,
-                onBackground: Colors.grey.shade100,
+                surface: Colors.grey.shade900,
+                onSurface: Colors.grey.shade100,
               ));
             }
             return Theme(
