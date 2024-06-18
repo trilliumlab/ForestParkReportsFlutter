@@ -7,12 +7,11 @@ import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:simplify/simplify.dart';
 
 part 'trail.freezed.dart';
 
 class TrailList extends DelegatingList<TrailModel> {
-  TrailList(List<TrailModel> trails) : super(trails);
+  TrailList(super.trails);
 
   // Constructs a list of trails from a buffer
   factory TrailList.decode(Uint8List buffer) {
@@ -73,14 +72,6 @@ class TrailModel {
   double totalIncline = 0;
   // tracks the elevation negative delta
   double totalDecline = 0;
-
-  final Map<PolylineResolutionModel, List<LatLng>> _pathCache = {};
-  List<LatLng> getPath(PolylineResolutionModel resolution) {
-    if (!_pathCache.containsKey(resolution)) {
-      _pathCache[resolution] = simplify(geometry, tolerance: resolution.tolerance);
-    }
-    return _pathCache[resolution]!;
-  }
 
   // TODO use factory constructor
   // constructs a track from binary encoded track
@@ -229,31 +220,6 @@ class TrailModel {
     }
 
     return builder.takeBytes();
-  }
-}
-
-enum PolylineResolutionModel {
-  full(0),
-  ultra(0.00004),
-  high(0.0002),
-  medium(0.0003),
-  low(0.0004);
-
-  final double tolerance;
-  const PolylineResolutionModel(this.tolerance);
-
-  factory PolylineResolutionModel.resolutionFromZoom(double zoom) {
-    if (zoom < 12) {
-      return PolylineResolutionModel.low;
-    } else if (zoom < 13) {
-      return PolylineResolutionModel.medium;
-    } else if (zoom < 14.5) {
-      return PolylineResolutionModel.high;
-    } else if (zoom < 16) {
-      return PolylineResolutionModel.ultra;
-    } else {
-      return PolylineResolutionModel.full;
-    }
   }
 }
 

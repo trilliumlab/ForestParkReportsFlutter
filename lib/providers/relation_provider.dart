@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:forest_park_reports/models/relation.dart';
 import 'package:forest_park_reports/providers/database_provider.dart';
 import 'package:forest_park_reports/providers/dio_provider.dart';

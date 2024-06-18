@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 
 class OutlineBoxShadow extends BoxShadow {
   const OutlineBoxShadow({
-    Color color = const Color(0xFF000000),
-    Offset offset = Offset.zero,
-    double blurRadius = 0.0,
-  }) : super(color: color, offset: offset, blurRadius: blurRadius);
+    super.color,
+    super.offset,
+    super.blurRadius,
+  });
 
   @override
   Paint toPaint() {

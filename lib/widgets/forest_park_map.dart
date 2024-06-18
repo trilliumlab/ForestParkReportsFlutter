@@ -142,9 +142,6 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
         //     ? const Color(0xfff7f7f2)
         //     : const Color(0xff36475c),
         onPositionChanged: (MapCamera position, bool hasGesture) {
-          WidgetsBinding.instance.addPostFrameCallback((_) =>
-              ref.read(polylineResolutionProvider.notifier)
-                  .updateZoom(position.zoom));
           if (hasGesture) {
             ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.none);
           }
@@ -318,7 +315,6 @@ class TrailPolylineLayer extends ConsumerWidget {
     }
     final selectedRelation = selectedRelationID == null ? null
         : relations.get(selectedRelationID);
-    final polylineResolution = ref.watch(polylineResolutionProvider);
 
     final LayerHitNotifier hitNotifier = ValueNotifier(null);
 
@@ -362,19 +358,18 @@ class TrailPolylineLayer extends ConsumerWidget {
           }
         },
         child: PolylineLayer(
+          hitNotifier: hitNotifier,
           polylines: trails.map((trail) {
-            final geometry = trail.getPath(polylineResolution);
-
             return selectedRelation?.members.contains(trail.id) ?? false ? Polyline(
               hitValue: trail.id,
-              points: geometry,
+              points: trail.geometry,
               strokeWidth: 1.0,
               borderColor: CupertinoColors.activeGreen.withAlpha(80),
               borderStrokeWidth: 8.0,
               color: CupertinoColors.activeGreen,
             ) : Polyline(
               hitValue: trail.id,
-              points: geometry,
+              points: trail.geometry,
               strokeWidth: 1.0,
               color: CupertinoColors.activeOrange,
             );
@@ -383,7 +378,6 @@ class TrailPolylineLayer extends ConsumerWidget {
             return (selectedRelation?.members.contains(a.hitValue) ?? false ? 1 : 0) -
                 (selectedRelation?.members.contains(b.hitValue) ?? false ? 1 : 0);
           }),
-          hitNotifier: hitNotifier,
         ),
       ),
     );
@@ -469,7 +463,7 @@ class HazardInfoPopup extends StatelessWidget {
 
 class HazardImage extends ConsumerWidget {
   final String uuid;
-  const HazardImage(this.uuid, {Key? key}) : super(key: key);
+  const HazardImage(this.uuid, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
