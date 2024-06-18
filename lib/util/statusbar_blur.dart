@@ -13,7 +13,7 @@ class StatusBarBlur extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
-            height: kIosStatusBarHeight,
+            height: MediaQuery.of(context).viewPadding.top,
           ),
         ),
       ),
