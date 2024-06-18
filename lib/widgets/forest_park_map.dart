@@ -40,6 +40,7 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
   late final PopupController _popupController;
   late StreamController<double?> _alignPositionStreamController;
   late final AnimatedMapController _animatedMapController;
+  bool _isFingerDown = false;
 
   @override
   void initState() {
@@ -134,98 +135,104 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       }
     });
 
-    return FlutterMap(
-      mapController: _animatedMapController.mapController,
-      options: MapOptions(
-        initialCenter: kHomeCameraPosition.center,
-        initialZoom: kHomeCameraPosition.zoom,
-        initialRotation: kHomeCameraPosition.rotation,
-        backgroundColor: const Color(0xff53634b),
-        // lightMode
-        //     ? const Color(0xfff7f7f2)
-        //     : const Color(0xff36475c),
-        onPositionChanged: (MapCamera position, bool hasGesture) {
-          if (hasGesture) {
-            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.none);
-          }
-        },
-        maxZoom: 20,
-        onTap: (TapPosition position, LatLng? latlng) {
-          // We clicked somewhere that is not a polyline nor hazard.
-          // Deselect both
-          if (ref
-              .read(panelPositionProvider)
-              .position == PanelPositionState.open) {
-            ref.read(panelPositionProvider.notifier).move(
-                PanelPositionState.snapped);
-          } else {
-            ref.read(selectedHazardProvider.notifier).deselect();
-            ref.read(selectedRelationProvider.notifier).deselect();
-            ref.read(panelPositionProvider.notifier).move(
-                PanelPositionState.closed);
-          }
-        },
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _isFingerDown = true,
+      onPointerUp: (_) => _isFingerDown = false,
+      // onPointerUp: ,
+      child: FlutterMap(
+        mapController: _animatedMapController.mapController,
+        options: MapOptions(
+          initialCenter: kHomeCameraPosition.center,
+          initialZoom: kHomeCameraPosition.zoom,
+          initialRotation: kHomeCameraPosition.rotation,
+          backgroundColor: const Color(0xff53634b),
+          // lightMode
+          //     ? const Color(0xfff7f7f2)
+          //     : const Color(0xff36475c),
+          onPositionChanged: (MapCamera position, bool hasGesture) {
+            if (hasGesture && _isFingerDown) {
+              ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.none);
+            }
+          },
+          maxZoom: 20,
+          onTap: (TapPosition position, LatLng? latlng) {
+            // We clicked somewhere that is not a polyline nor hazard.
+            // Deselect both
+            if (ref
+                .read(panelPositionProvider)
+                .position == PanelPositionState.open) {
+              ref.read(panelPositionProvider.notifier).move(
+                  PanelPositionState.snapped);
+            } else {
+              ref.read(selectedHazardProvider.notifier).deselect();
+              ref.read(selectedRelationProvider.notifier).deselect();
+              ref.read(panelPositionProvider.notifier).move(
+                  PanelPositionState.closed);
+            }
+          },
+        ),
+        //TODO attribution, this one looks off
+        // nonRotatedChildren: const [
+        //   SimpleAttributionWidget(
+        //       source: Text('OpenStreetMap contributors')
+        //   ),
+        // ],
+        children: [
+          TileLayer(
+            tileProvider: const FMTCStore('forestPark').getTileProvider(
+              httpClient: IOClient(HttpClient()..maxConnectionsPerHost = 3)
+            ),
+            urlTemplate: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
+            // urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            // urlTemplate: "https://api.mapbox.com/styles/v1/ethemoose/cl5d12wdh009817p8igv5ippy/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
+            // urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}@2x",
+            // urlTemplate: false
+            //         ? "https://api.mapbox.com/styles/v1/ethemoose/cl55mcv4b004u15sbw36oqa8p/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}"
+            //         : "https://api.mapbox.com/styles/v1/ethemoose/cl548b3a4000s15tkf8bbw2pt/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
+            retinaMode: true,
+            maxNativeZoom: 22,
+            maxZoom: 23,
+            // TODO this should be a setting
+            // retinaMode: true,
+          ),
+          // TODO render on top of everything (currently breaks tappable polyline)
+          // we'll probably need to handle taps ourselves, shouldn't be too bad
+          if (locationStatus.permission.authorized)
+            Consumer(
+                builder: (context, ref, _) {
+                  final positionStreamController = StreamController<LocationMarkerPosition?>();
+                  ref.listen(locationProvider, (_, pos) {
+                    positionStreamController.add(pos.valueOrNull?.locationMarkerPosition());
+                  });
+                  final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
+                  return CurrentLocationLayer(
+                    alignPositionStream: _alignPositionStreamController.stream,
+                    alignPositionOnUpdate: followOnLocationTarget.update,
+                    positionStream: positionStreamController.stream
+                  );
+                }
+            ),
+          const TrailPolylineLayer(),
+          const TrailEndsMarkerLayer(),
+          PopupMarkerLayer(
+            options: PopupMarkerLayerOptions(
+                popupController: _popupController,
+                markers: markers,
+                popupDisplayOptions: PopupDisplayOptions(
+                  builder: (_, marker) {
+                    if (marker is HazardMarker) {
+                      return HazardInfoPopup(hazard: marker.hazard);
+                    }
+                    return Container();
+                  },
+                  animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
+                )
+            ),
+          ),
+          const CursorMarkerLayer(),
+        ],
       ),
-      //TODO attribution, this one looks off
-      // nonRotatedChildren: const [
-      //   SimpleAttributionWidget(
-      //       source: Text('OpenStreetMap contributors')
-      //   ),
-      // ],
-      children: [
-        TileLayer(
-          tileProvider: const FMTCStore('forestPark').getTileProvider(
-            httpClient: IOClient(HttpClient()..maxConnectionsPerHost = 3)
-          ),
-          urlTemplate: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
-          // urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          // urlTemplate: "https://api.mapbox.com/styles/v1/ethemoose/cl5d12wdh009817p8igv5ippy/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
-          // urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}@2x",
-          // urlTemplate: false
-          //         ? "https://api.mapbox.com/styles/v1/ethemoose/cl55mcv4b004u15sbw36oqa8p/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}"
-          //         : "https://api.mapbox.com/styles/v1/ethemoose/cl548b3a4000s15tkf8bbw2pt/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
-          retinaMode: true,
-          maxNativeZoom: 22,
-          maxZoom: 23,
-          // TODO this should be a setting
-          // retinaMode: true,
-        ),
-        // TODO render on top of everything (currently breaks tappable polyline)
-        // we'll probably need to handle taps ourselves, shouldn't be too bad
-        if (locationStatus.permission.authorized)
-          Consumer(
-              builder: (context, ref, _) {
-                final positionStreamController = StreamController<LocationMarkerPosition?>();
-                ref.listen(locationProvider, (_, pos) {
-                  positionStreamController.add(pos.valueOrNull?.locationMarkerPosition());
-                });
-                final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
-                return CurrentLocationLayer(
-                  alignPositionStream: _alignPositionStreamController.stream,
-                  alignPositionOnUpdate: followOnLocationTarget.update,
-                  positionStream: positionStreamController.stream
-                );
-              }
-          ),
-        const TrailPolylineLayer(),
-        const TrailEndsMarkerLayer(),
-        PopupMarkerLayer(
-          options: PopupMarkerLayerOptions(
-              popupController: _popupController,
-              markers: markers,
-              popupDisplayOptions: PopupDisplayOptions(
-                builder: (_, marker) {
-                  if (marker is HazardMarker) {
-                    return HazardInfoPopup(hazard: marker.hazard);
-                  }
-                  return Container();
-                },
-                animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
-              )
-          ),
-        ),
-        const CursorMarkerLayer(),
-      ],
     );
   }
 }
