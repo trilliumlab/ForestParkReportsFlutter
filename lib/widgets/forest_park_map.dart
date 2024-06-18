@@ -195,12 +195,15 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
         if (locationStatus.permission.authorized)
           Consumer(
               builder: (context, ref, _) {
-                final positionStream = ref.watch(locationProvider.stream);
+                final positionStreamController = StreamController<LocationMarkerPosition?>();
+                ref.listen(locationProvider, (_, pos) {
+                  positionStreamController.add(pos.valueOrNull?.locationMarkerPosition());
+                });
                 final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
                 return CurrentLocationLayer(
                   alignPositionStream: _alignPositionStreamController.stream,
                   alignPositionOnUpdate: followOnLocationTarget.update,
-                  positionStream: positionStream.map((p) => p.locationMarkerPosition()),
+                  positionStream: positionStreamController.stream
                 );
               }
           ),
