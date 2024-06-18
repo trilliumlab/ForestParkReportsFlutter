@@ -20,7 +20,6 @@ const kNetworkEndian = Endian.little;
 
 const kDbName = "forest_park_reports";
 
-const double kIosStatusBarHeight = 48;
 const double kFabPadding = 10;
 
 const kHomeCameraPosition = CameraPosition(

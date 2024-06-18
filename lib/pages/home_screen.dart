@@ -221,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Settings FAB
           Positioned(
             right: kFabPadding,
-            top: kIosStatusBarHeight + kFabPadding,
+            top: MediaQuery.of(context).viewPadding.top + kFabPadding,
             child: Consumer(
                 builder: (context, ref, child) {
                   return PlatformFAB(
