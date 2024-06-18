@@ -14,16 +14,6 @@ import 'package:sembast/sembast.dart';
 part 'trail_provider.g.dart';
 
 @riverpod
-class PolylineResolution extends _$PolylineResolution {
-  @override
-  PolylineResolutionModel build() => PolylineResolutionModel.low;
-
-  void updateZoom(double zoom) {
-    state = PolylineResolutionModel.resolutionFromZoom(zoom);
-  }
-}
-
-@riverpod
 class Trails extends _$Trails {
   static final store = StoreRef<int, Blob>("trails");
 
