@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:http/io_client.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +25,8 @@ import 'package:forest_park_reports/util/outline_box_shadow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
-import '../providers/follow_on_location_provider.dart';
+import '../providers/align_position_provider.dart';
+
 
 class ForestParkMap extends ConsumerStatefulWidget {
   const ForestParkMap({super.key});
@@ -35,7 +38,7 @@ class ForestParkMap extends ConsumerStatefulWidget {
 class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindingObserver, TickerProviderStateMixin{
   // TODO add satallite map style
   late final PopupController _popupController;
-  late StreamController<double?> _followCurrentLocationStreamController;
+  late StreamController<double?> _alignPositionStreamController;
   late final AnimatedMapController _animatedMapController;
 
   @override
@@ -43,7 +46,7 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _popupController = PopupController();
-    _followCurrentLocationStreamController = StreamController<double?>();
+    _alignPositionStreamController = StreamController<double?>();
     _animatedMapController = AnimatedMapController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -55,7 +58,7 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _animatedMapController.mapController.dispose();
-    _followCurrentLocationStreamController.close();
+    _alignPositionStreamController.close();
     super.dispose();
   }
 
@@ -78,9 +81,9 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
     // the provider is updated
     // final parkTrails = ref.watch(parkTrailsProvider);
     final locationStatus = ref.watch(locationPermissionStatusProvider);
-    ref.listen(followOnLocationTargetProvider, (prev, next) {
-      if (next==FollowOnLocationTargetState.forestPark){
-        _followCurrentLocationStreamController.add(null);
+    ref.listen(alignPositionTargetProvider, (prev, next) {
+      if (next==AlignPositionTargetState.forestPark){
+        _alignPositionStreamController.add(null);
         _animatedMapController.centerOnPoint(kHomeCameraPosition.center, zoom: kHomeCameraPosition.zoom);
       }
     });
@@ -143,10 +146,10 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
         //     : const Color(0xff36475c),
         onPositionChanged: (MapCamera position, bool hasGesture) {
           if (hasGesture) {
-            ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.none);
+            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.none);
           }
         },
-        maxZoom: 22,
+        maxZoom: 20,
         onTap: (TapPosition position, LatLng? latlng) {
           // We clicked somewhere that is not a polyline nor hazard.
           // Deselect both
@@ -171,16 +174,21 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       // ],
       children: [
         TileLayer(
-          tileProvider: const FMTCStore('forestPark').getTileProvider(),
+          tileProvider: const FMTCStore('forestPark').getTileProvider(
+            httpClient: IOClient(HttpClient()..maxConnectionsPerHost = 3)
+          ),
           urlTemplate: "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga",
-          //urlTemplate: "https://api.mapbox.com/styles/v1/ethemoose/cl5d12wdh009817p8igv5ippy/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
+          // urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          // urlTemplate: "https://api.mapbox.com/styles/v1/ethemoose/cl5d12wdh009817p8igv5ippy/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
           // urlTemplate: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}@2x",
           // urlTemplate: false
           //         ? "https://api.mapbox.com/styles/v1/ethemoose/cl55mcv4b004u15sbw36oqa8p/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}"
           //         : "https://api.mapbox.com/styles/v1/ethemoose/cl548b3a4000s15tkf8bbw2pt/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
-          maxNativeZoom: 22-1,
-          maxZoom: 22-1,
           retinaMode: true,
+          maxNativeZoom: 22,
+          maxZoom: 23,
+          // TODO this should be a setting
+          // retinaMode: true,
         ),
         // TODO render on top of everything (currently breaks tappable polyline)
         // we'll probably need to handle taps ourselves, shouldn't be too bad
@@ -188,14 +196,11 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
           Consumer(
               builder: (context, ref, _) {
                 final positionStream = ref.watch(locationProvider.stream);
-                final followOnLocationTarget = ref.watch(followOnLocationTargetProvider);
+                final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
                 return CurrentLocationLayer(
-                  followCurrentLocationStream: _followCurrentLocationStreamController.stream,
-                  followOnLocationUpdate: followOnLocationTarget.update,
+                  alignPositionStream: _alignPositionStreamController.stream,
+                  alignPositionOnUpdate: followOnLocationTarget.update,
                   positionStream: positionStream.map((p) => p.locationMarkerPosition()),
-                  // Only enable heading on mobile
-                  // headingStream: (Platform.isAndroid || Platform.isIOS) ? null : const Stream.empty(),
-                  headingStream: positionStream.map((p) => p.locationMarkerHeading()),
                 );
               }
           ),
@@ -434,24 +439,6 @@ class HazardInfoPopup extends StatelessWidget {
                     hazard.timeString(),
                   ),
                 ),
-                // Renders hazard image on popup
-                // Consumer(
-                //   builder: (context, ref, ___) {
-                //     final lastImage = ref.watch(hazardUpdatesProvider(hazard.uuid)).lastImage;
-                //     return lastImage != null ? Padding(
-                //       padding: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
-                //       child: ClipRRect(
-                //         borderRadius: radius,
-                //         child: AspectRatio(
-                //             aspectRatio: 3/4,
-                //             child: SizedBox.shrink(
-                //               child: HazardImage(lastImage),
-                //             )
-                //         ),
-                //       ),
-                //     ) : Container();
-                //   },
-                // ),
               ],
             ),
           ),

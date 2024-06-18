@@ -14,7 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/widgets/forest_park_map.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import '../providers/follow_on_location_provider.dart';
+import '../providers/align_position_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,7 +44,6 @@ class ScreenPanelController extends PanelController {
   double get pastSnapPosition => ((panelPosition-snapPoint)/(1-snapPoint)).clamp(0, 1);
   double get panelSnapHeight => ((panelOpenHeight-panelClosedHeight) * snapPoint) + panelClosedHeight;
   double get panelHeight => safePanelPosition * (panelOpenHeight - panelClosedHeight) + panelClosedHeight;
-
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -170,19 +169,19 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight) + 80,
             child: Consumer(
                 builder: (context, ref, child) {
-                  final followOnLocationTarget = ref.watch(followOnLocationTargetProvider);
+                  final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
                   return PlatformFAB(
                     onPressed: () async {
                       final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
                       if (!context.mounted) return;
                       if (status.permission.authorized) {
                         switch (followOnLocationTarget) {
-                          case FollowOnLocationTargetState.none:
-                            ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.currentLocation);
-                          case FollowOnLocationTargetState.currentLocation:
-                            ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.forestPark);
-                          case FollowOnLocationTargetState.forestPark:
-                            ref.read(followOnLocationTargetProvider.notifier).update(FollowOnLocationTargetState.currentLocation);
+                          case AlignPositionTargetState.none:
+                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
+                          case AlignPositionTargetState.currentLocation:
+                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.forestPark);
+                          case AlignPositionTargetState.forestPark:
+                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
                         }
                       } else {
                         showMissingPermissionDialog(
@@ -195,11 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: PlatformWidget(
                       cupertino: (_, __) => Icon(
                         switch (followOnLocationTarget) {
-                          FollowOnLocationTargetState.currentLocation =>
+                          AlignPositionTargetState.currentLocation =>
                             CupertinoIcons.location_fill,
-                          FollowOnLocationTargetState.none =>
+                          AlignPositionTargetState.none =>
                             CupertinoIcons.location,
-                          FollowOnLocationTargetState.forestPark =>
+                          AlignPositionTargetState.forestPark =>
                             Icons.park,
                         },
                         color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
@@ -207,10 +206,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             : CupertinoColors.systemGrey.darkHighContrastColor
                       ),
                       material: (_, __) => Icon(
-                        followOnLocationTarget == FollowOnLocationTargetState.forestPark
+                        followOnLocationTarget == AlignPositionTargetState.forestPark
                             ? Icons.park
                             : Icons.my_location_rounded,
-                        color: followOnLocationTarget == FollowOnLocationTargetState.none
+                        color: followOnLocationTarget == AlignPositionTargetState.none
                             ? theme.colorScheme.onSurface
                             : theme.colorScheme.primary,
                       ),
