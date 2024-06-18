@@ -1,32 +1,23 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/models/hazard_update.dart';
 import 'package:forest_park_reports/pages/home_screen/panel_page.dart';
 import 'package:forest_park_reports/providers/database_provider.dart';
-import 'package:forest_park_reports/providers/hazard_provider.dart';
 import 'package:forest_park_reports/providers/location_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
-import 'package:forest_park_reports/util/outline_box_shadow.dart';
 import 'package:forest_park_reports/util/permissions_dialog.dart';
 import 'package:forest_park_reports/util/statusbar_blur.dart';
 import 'package:forest_park_reports/widgets/add_hazard_modal.dart';
-import 'package:forest_park_reports/widgets/hazard_info.dart';
-import 'package:forest_park_reports/widgets/trail_info.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:forest_park_reports/providers/trail_provider.dart';
 import 'package:forest_park_reports/widgets/forest_park_map.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../providers/follow_on_location_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -69,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // _panelHeight = _initFabHeight;
   }
 
   @override
@@ -168,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         material: (_, __) => Icon(
                           Icons.add,
-                          color: theme.colorScheme.onBackground,
+                          color: theme.colorScheme.onSurface,
                         ),
                       )
                   );
@@ -184,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return PlatformFAB(
                     onPressed: () async {
                       final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       if (status.permission.authorized) {
                         switch (followOnLocationTarget) {
                           case FollowOnLocationTargetState.none:
@@ -221,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? Icons.park
                             : Icons.my_location_rounded,
                         color: followOnLocationTarget == FollowOnLocationTargetState.none
-                            ? theme.colorScheme.onBackground
+                            ? theme.colorScheme.onSurface
                             : theme.colorScheme.primary,
                       ),
                     ),
@@ -250,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       material: (_, __) => Icon(
                         Icons.settings,
-                        color: theme.colorScheme.onBackground,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                   );

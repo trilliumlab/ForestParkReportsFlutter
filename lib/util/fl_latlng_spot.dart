@@ -6,5 +6,5 @@ import '../models/hazard.dart';
 class FlCoordinateSpot extends FlSpot {
   final LatLng position;
   final HazardModel? hazard;
-  FlCoordinateSpot(super.x, super.y, this.position, [this.hazard]);
+  const FlCoordinateSpot(super.x, super.y, this.position, [this.hazard]);
 }

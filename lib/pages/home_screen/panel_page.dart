@@ -9,7 +9,6 @@ import 'package:forest_park_reports/pages/home_screen.dart';
 import 'package:forest_park_reports/providers/hazard_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
 import 'package:forest_park_reports/providers/relation_provider.dart';
-import 'package:forest_park_reports/providers/trail_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 import 'package:forest_park_reports/widgets/forest_park_map.dart';
 import 'package:forest_park_reports/widgets/hazard_info.dart';
@@ -185,9 +184,9 @@ class _PanelPageState extends ConsumerState<PanelPage> {
 class Panel extends StatelessWidget {
   final Widget child;
   const Panel({
-    Key? key,
+    super.key,
     required this.child
-  }) : super(key: key);
+  });
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -220,7 +219,7 @@ class Panel extends StatelessWidget {
                   ),
                 ),
                 material: (_, __) => Container(
-                  color: theme.colorScheme.background,
+                  color: theme.colorScheme.surface,
                   child: child,
                 )
             ),
@@ -236,10 +235,10 @@ class PlatformFAB extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;
   const PlatformFAB({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.child,
-  }) : super(key: key);
+  });
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -276,7 +275,7 @@ class PlatformFAB extends StatelessWidget {
         );
       },
       material: (_, __) => FloatingActionButton(
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: theme.colorScheme.surface,
         onPressed: onPressed,
         child: child,
       ),
@@ -285,7 +284,7 @@ class PlatformFAB extends StatelessWidget {
 }
 
 class PlatformPill extends StatelessWidget {
-  const PlatformPill({Key? key}) : super(key: key);
+  const PlatformPill({super.key});
   @override
   Widget build(BuildContext context) {
     final isIos = isCupertino(context);
@@ -301,7 +300,7 @@ class PlatformPill extends StatelessWidget {
         decoration: BoxDecoration(
             color: isIos
                 ? CupertinoDynamicColor.resolve(CupertinoColors.systemGrey2, context)
-                : theme.colorScheme.onBackground,
+                : theme.colorScheme.onSurface,
             borderRadius: const BorderRadius.all(Radius.circular(12.0))),
       ),
     );

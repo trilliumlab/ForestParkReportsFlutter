@@ -1,7 +1,5 @@
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../consts.dart';
 
 part 'follow_on_location_provider.g.dart';
 
