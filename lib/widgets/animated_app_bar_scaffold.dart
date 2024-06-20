@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class AnimatedAppBarScaffold extends StatefulWidget {
@@ -25,17 +26,24 @@ class _AnimatedAppBarScaffoldState extends State<AnimatedAppBarScaffold> with Ti
     widget.scrollController.addListener(scrollListener);
   }
 
+  Color get _background => isCupertino(context)
+        ? CupertinoDynamicColor.resolve(CupertinoColors.systemGroupedBackground, context)
+        : Theme.of(context).scaffoldBackgroundColor;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final background = CupertinoDynamicColor.resolve(CupertinoColors.systemGroupedBackground, context);
+    final barColor = isCupertino(context)
+        ? CupertinoTheme.of(context).barBackgroundColor.withAlpha(150)
+        : Theme.of(context).colorScheme.surface;
+
     _barColorTween = ColorTween(
-        begin: background,
-        end: CupertinoTheme.of(context).barBackgroundColor.withAlpha(150)
+        begin: _background,
+        end: barColor,
     ).animate(_animationController);
     _separatorColorTween = ColorTween(
-      begin: background,
+      begin: _background,
       end: CupertinoDynamicColor.resolve(CupertinoColors.separator, context).withAlpha(150),
     ).animate(_animationController);
   }
@@ -54,25 +62,27 @@ class _AnimatedAppBarScaffoldState extends State<AnimatedAppBarScaffold> with Ti
 
   @override
   Widget build(BuildContext context) {
-    final background = CupertinoDynamicColor.resolve(CupertinoColors.systemGroupedBackground, context);
+    final titleStyle = isCupertino(context)
+        ? CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(fontSize: 20)
+        : null;
 
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) => PlatformScaffold(
           appBar: PlatformAppBar(
-            title: Text(widget.title, style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(fontSize: 20)),
+            title: Text(widget.title, style: titleStyle),
+            backgroundColor: _barColorTween!.value,
             cupertino: (context, _) => CupertinoNavigationBarData(
-              backgroundColor: _barColorTween!.value,
               previousPageTitle: widget.previousPageTitle,
               border: Border(
                 bottom: BorderSide(
-                  color: _separatorColorTween!.value ?? background,
+                  color: _separatorColorTween!.value ?? _background,
                   width: 0.0, // 0.0 means one physical pixel
                 ),
               ),
             ),
           ),
-          backgroundColor: background,
+          backgroundColor: _background,
           body: child
       ),
       child: widget.body,

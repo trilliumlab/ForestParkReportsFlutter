@@ -61,7 +61,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     // to use widgets that render in the style of the device's platform.
     // Eg. cupertino on ios, and material 3 on android
     return PlatformProvider(
-      initialPlatform: kPlatformOverride,
+      // initialPlatform: kPlatformOverride,
       builder: (context) {
         return _theme(
           builder: (context) => const PlatformApp(

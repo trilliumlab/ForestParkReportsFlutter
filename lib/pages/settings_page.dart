@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/models/settings.dart';
 import 'package:forest_park_reports/providers/database_provider.dart';
@@ -47,32 +48,28 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
 
-    final headerStyle = CupertinoTheme.of(context).textTheme.textStyle.copyWith(
-      fontSize: 14,
-      color: CupertinoDynamicColor.resolve(kHeaderFooterColor, context),
-    );
-
     return SettingsPageScaffold(
       title: "Settings",
       previousPageTitle: "Home",
       children: [
-        CupertinoListSection.insetGrouped(
-          header: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: Text("THEME", style: headerStyle),
-          ),
+        SettingsSection(
+          label: "Theme",
           children: [
-            SelectionSettingWidget(
-              name: "UI Theme",
-              pageTitle: "Settings",
-              options: UITheme.values,
-              selectedOption: settings.uiTheme,
-              onSelection: (option) {
-                ref.read(settingsProvider.notifier).update(settings.copyWith(
-                  uiTheme: option,
-                ));
-              },
-            ),
+            /* FIXME: Currently the theme can't update when a custom platform is set...
+             * Flutter Platform Widgets bug
+             */
+            // SelectionSettingWidget(
+            //   name: "UI Theme",
+            //   pageTitle: "Settings",
+            //   options: UITheme.values,
+            //   selectedOption: settings.uiTheme,
+            //   onSelection: (option) {
+            //     PlatformProvider.of(context)?.changeToCupertinoPlatform();
+            //     ref.read(settingsProvider.notifier).update(settings.copyWith(
+            //       uiTheme: option,
+            //     ));
+            //   },
+            // ),
             SelectionSettingWidget(
               name: "Color Theme",
               pageTitle: "Settings",
@@ -86,11 +83,8 @@ class SettingsPage extends ConsumerWidget {
             ),
           ],
         ),
-        CupertinoListSection.insetGrouped(
-          header: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: Text("MAP", style: headerStyle),
-          ),
+        SettingsSection(
+          label: "Map",
           children: [
             ToggleSettingWidget(
               name: "Retina Mode",
@@ -103,24 +97,80 @@ class SettingsPage extends ConsumerWidget {
             )
           ],
         ),
-        CupertinoListSection.insetGrouped(
-          header: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: Text("ADVANCED", style: headerStyle),
-          ),
+        SettingsSection(
+          label: "Advanced",
           children: [
             ButtonSettingWidget(
               name: "Reset database",
               buttonStyle: ButtonSettingStyle.danger,
               confirmation: SettingConfirmation(
-                title: "Reset database?",
-                content: "All settings and offline reports will be lost."),
+                  title: "Reset database?",
+                  content: "All settings and offline reports will be lost."),
               onTap: () {
                 ref.read(forestParkDatabaseProvider.notifier).delete();
               },
             )
           ],
         ),
+      ],
+    );
+  }
+}
+
+class SettingsSection extends PlatformWidgetBase {
+  final List<Widget> children;
+  final String? label;
+  const SettingsSection({super.key, required this.children, this.label});
+
+  @override
+  Widget createCupertinoWidget(BuildContext context) {
+    return CupertinoListSection.insetGrouped(
+      backgroundColor: CupertinoDynamicColor.resolve(CupertinoColors.systemGroupedBackground, context),
+      header: label != null
+          ? Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: Text(
+          label!.toUpperCase(),
+          style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+            fontSize: 14,
+            color: CupertinoDynamicColor.resolve(kHeaderFooterColor, context),
+          ),
+        ),
+      ) : null,
+      children: children,
+    );
+  }
+
+  @override
+  Widget createMaterialWidget(BuildContext context) {
+    return Column(
+      children: [
+        if (label != null)
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: kAndroidSettingsMargin, top: 10, bottom: 10),
+              child: Text(
+                label!,
+                style: Theme.of(context).textTheme.labelMedium
+              ),
+            ),
+          ),
+        const Divider(
+          height: 0,
+          indent: kAndroidSettingsMargin,
+          endIndent: kAndroidSettingsMargin,
+        ),
+        for (final child in children)
+          ...[
+            child,
+            const Divider(
+              height: 0,
+              indent: kAndroidSettingsMargin,
+              endIndent: kAndroidSettingsMargin,
+            ),
+          ],
+        const Padding(padding: EdgeInsets.only(bottom: 20))
       ],
     );
   }
@@ -140,15 +190,27 @@ class ToggleSettingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformListTile(
+      material: (_, __) => MaterialListTileData(
+        onTap: () {
+          onChanged(!value);
+        }
+      ),
       title: Text(name),
       trailing: PlatformSwitch(
+        material: (_, __) => MaterialSwitchData(
+          thumbIcon: WidgetStateProperty.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? const Icon(Icons.check)
+                : const Icon(Icons.close);
+            },
+          ),
+        ),
         value: value,
         onChanged: onChanged,
       ),
     );
   }
 }
-
 
 class SettingConfirmation {
   final String title;
@@ -292,7 +354,7 @@ class _SelectionSettingWidgetPageState extends State<_SelectionSettingWidgetPage
       title: widget.name,
       previousPageTitle: widget.pageTitle,
       children: [
-        CupertinoListSection.insetGrouped(
+        SettingsSection(
           children: [
             for (final option in widget.options)
               PlatformListTile(
@@ -317,6 +379,7 @@ class _SelectionSettingWidgetPageState extends State<_SelectionSettingWidgetPage
   }
 }
 
+const double kAndroidSettingsMargin = 16;
 const kHeaderFooterColor = CupertinoDynamicColor(
   color: Color.fromRGBO(108, 108, 108, 1.0),
   darkColor: Color.fromRGBO(142, 142, 146, 1.0),
