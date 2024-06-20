@@ -234,10 +234,12 @@ class Panel extends StatelessWidget {
 class PlatformFAB extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;
+  final Object? heroTag;
   const PlatformFAB({
     super.key,
     required this.onPressed,
     required this.child,
+    this.heroTag,
   });
   @override
   Widget build(BuildContext context) {
@@ -275,6 +277,7 @@ class PlatformFAB extends StatelessWidget {
         );
       },
       material: (_, __) => FloatingActionButton(
+        heroTag: heroTag,
         backgroundColor: theme.colorScheme.surface,
         onPressed: onPressed,
         child: child,

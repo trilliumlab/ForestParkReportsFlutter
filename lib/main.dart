@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/providers/settings_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/pages/home_page.dart';
@@ -14,17 +15,19 @@ void main() async {
   await dotenv.load();
   await FMTCObjectBoxBackend().initialise();
   await const FMTCStore('forestPark').manage.create();
-  runApp(const App());
+  runApp(const ProviderScope(
+    child: App(),
+  ));
 }
 
-class App extends StatefulWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  State<App> createState() => _AppState();
+  ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> with WidgetsBindingObserver {
+class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
   // we listen to brightness changes (IE light to dark mode) and
   // rebuild the entire widget tree when it's changed
   Brightness _brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
@@ -54,80 +57,99 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     ));
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-    return _providers(
-      child: _themes(
-        builder: (light, dark) => PlatformApp(
-          material: (_, __) => MaterialAppData(
-            theme: light,
-            darkTheme: dark,
-            themeMode: ThemeMode.system
+    // PlatformProvider is flutter_platform_widgets' provider, allowing us
+    // to use widgets that render in the style of the device's platform.
+    // Eg. cupertino on ios, and material 3 on android
+    return PlatformProvider(
+      initialPlatform: kPlatformOverride,
+      builder: (context) {
+        return _theme(
+          builder: (context) => const PlatformApp(
+            title: 'Forest Park Reports',
+            home: PlatformChanger(
+              child: HomeScreen(),
+            ),
           ),
-          cupertino: (_, __) => CupertinoAppData(
-            theme: CupertinoThemeData(brightness: _brightness)
-          ),
-          title: 'Forest Park Reports',
-          home: const HomeScreen(),
-        ),
-      ),
+        );
+      },
     );
   }
 
   // here we build the apps theme
-  Widget _themes({required Widget Function(ThemeData light, ThemeData dark) builder}) {
+  Widget _theme({required Widget Function(BuildContext context) builder}) {
     // DynamicColorBuilder allows us to get the system theme on android, macos, and windows.
     // On android the colorScheme will be the material you color palette,
     // on macos and windows, this will be derived from the system accent color.
-    return Builder(
-      builder: (context) {
-        return DynamicColorBuilder(
-          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-            // In case we can't get a system theme, we need a fallback theme.
-            // We are only modifying the colorScheme field of ThemeData,
-            // so ONLY USE COLORS FROM THERE!
-            // TODO make a proper app theme and move to theme file.
-            var light = ThemeData(
-              colorScheme: lightDynamic,
-              brightness: Brightness.light,
-              useMaterial3: true,
-            );
-            var dark = ThemeData(
-              colorScheme: darkDynamic,
-              brightness: Brightness.dark,
-              useMaterial3: true,
-            );
-            if (isCupertino(context)) {
-              // light = light.copyWith(colorScheme: light.colorScheme.copyWith(
-              //   surface: Colors.grey.shade100,
-              //   onSurface: Colors.grey.shade800,
-              // ));
-              // dark = dark.copyWith(colorScheme: dark.colorScheme.copyWith(
-              //   surface: Colors.grey.shade900,
-              //   onSurface: Colors.grey.shade100,
-              // ));
-            }
-            return Theme(
-              data: _brightness == Brightness.dark ? dark : light,
-              child: builder(light, dark),
-            );
-          },
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        // In case we can't get a system theme, we need a fallback theme.
+        // Material themes
+        final materialLightTheme = ThemeData.light(useMaterial3: true).copyWith(
+          colorScheme: lightDynamic,
         );
-      }
+        final materialDarkTheme = ThemeData.dark(useMaterial3: true).copyWith(
+          colorScheme: darkDynamic,
+        );
+
+        // Cupertino themes
+        final cupertinoLightTheme = MaterialBasedCupertinoThemeData(materialTheme: materialLightTheme);
+        const darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark);
+        final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
+          materialTheme: materialDarkTheme.copyWith(
+            cupertinoOverrideTheme: CupertinoThemeData(
+              brightness: Brightness.dark,
+              barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
+              textTheme: const CupertinoTextThemeData(),
+            ),
+          ),
+        );
+
+        return PlatformTheme(
+          themeMode: ref.watch(settingsProvider.select((s) => s.colorTheme)).value,
+          materialLightTheme: materialLightTheme,
+          materialDarkTheme: materialDarkTheme,
+          cupertinoLightTheme: cupertinoLightTheme,
+          cupertinoDarkTheme: cupertinoDarkTheme,
+          builder: builder,
+        );
+      },
     );
   }
+}
 
-  // here we define all of apps provider widgets
-  Widget _providers({required Widget child}) {
-    // ProviderScope is Riverpod's provider, used for state management
-    return ProviderScope(
-      // PlatformProvider is flutter_platform_widgets' provider, allowing us
-      // to use widgets that render in the style of the device's platform.
-      // Eg. cupertino on ios, and material 3 on android
-      child: PlatformProvider(
-        initialPlatform: kPlatformOverride,
-        builder: (context) {
-          return child;
-        },
-      ),
-    );
+class PlatformChanger extends ConsumerStatefulWidget {
+  final Widget child;
+  const PlatformChanger({super.key, required this.child});
+
+  @override
+  ConsumerState createState() => _ThemeChangerState();
+}
+
+class _ThemeChangerState extends ConsumerState<PlatformChanger> {
+
+
+  @override
+  Widget build(BuildContext context) {
+    // final platform = ref.watch(settingsProvider.select((s) => s.uiTheme)).value;
+    // final pwProvider = PlatformProvider.of(context);
+    //
+    // print("selectedPlatform = $platform, pwProvider = ${pwProvider?.platform}");
+    //
+    // if (pwProvider != null && platform != pwProvider.platform) {
+    //   Future.delayed(const Duration(microseconds: 1), () {
+    //     print("changing platform");
+    //     switch(platform) {
+    //       case null:
+    //         pwProvider.changeToAutoDetectPlatform();
+    //       case TargetPlatform.iOS:
+    //         pwProvider.changeToCupertinoPlatform();
+    //       case TargetPlatform.android:
+    //         pwProvider.changeToMaterialPlatform();
+    //       default:
+    //     }
+    //   });
+    // }
+
+    return widget.child;
   }
 }

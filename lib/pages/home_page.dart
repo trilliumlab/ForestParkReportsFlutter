@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/pages/home_page/panel_page.dart';
 import 'package:forest_park_reports/pages/settings_page.dart';
-import 'package:forest_park_reports/providers/database_provider.dart';
 import 'package:forest_park_reports/providers/location_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
@@ -13,7 +12,6 @@ import 'package:forest_park_reports/widgets/add_hazard_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/widgets/forest_park_map.dart';
-import 'package:sembast/sembast_io.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 import '../providers/align_position_provider.dart';
 
@@ -133,90 +131,92 @@ class _HomeScreenState extends State<HomeScreen> {
             right: kFabPadding,
             bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight - 8) + 20,
             child: Consumer(
-                builder: (context, ref, child) {
-                  return PlatformFAB(
-                      onPressed: () async {
-                        showCupertinoModalPopup(
-                          context: context,
-                          builder: (context) {
-                            return Dismissible(
-                                direction: DismissDirection.down,
-                                key: const Key('key'),
-                                onDismissed: (_) => Navigator.of(context).pop(),
-                                child: const AddHazardModal()
-                            );
-                          },
+              builder: (context, ref, child) {
+                return PlatformFAB(
+                  heroTag: "add_hazard_fab",
+                  onPressed: () async {
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Dismissible(
+                            direction: DismissDirection.down,
+                            key: const Key('key'),
+                            onDismissed: (_) => Navigator.of(context).pop(),
+                            child: const AddHazardModal()
                         );
                       },
-                      child: PlatformWidget(
-                        cupertino: (_, __) => Icon(
-                          // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
-                            CupertinoIcons.add,
-                            color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                                ? CupertinoColors.systemGrey.highContrastColor
-                                : CupertinoColors.systemGrey.darkHighContrastColor
-                        ),
-                        material: (_, __) => Icon(
-                          Icons.add,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      )
-                  );
-                }
+                    );
+                  },
+                  child: PlatformWidget(
+                    cupertino: (_, __) => Icon(
+                      // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
+                        CupertinoIcons.add,
+                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                            ? CupertinoColors.systemGrey.highContrastColor
+                            : CupertinoColors.systemGrey.darkHighContrastColor
+                    ),
+                    material: (_, __) => Icon(
+                      Icons.add,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  )
+                );
+              }
             ),
           ),
           Positioned(
             right: kFabPadding,
             bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight) + 80,
             child: Consumer(
-                builder: (context, ref, child) {
-                  final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
-                  return PlatformFAB(
-                    onPressed: () async {
-                      final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
-                      if (!context.mounted) return;
-                      if (status.permission.authorized) {
-                        switch (followOnLocationTarget) {
-                          case AlignPositionTargetState.none:
-                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
-                          case AlignPositionTargetState.currentLocation:
-                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.forestPark);
-                          case AlignPositionTargetState.forestPark:
-                            ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
-                        }
-                      } else {
-                        showMissingPermissionDialog(
-                          context,
-                          'Location Required',
-                          'Location permission is required to jump to the current location',
-                        );
+              builder: (context, ref, child) {
+                final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
+                return PlatformFAB(
+                  heroTag: "location_fab",
+                  onPressed: () async {
+                    final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
+                    if (!context.mounted) return;
+                    if (status.permission.authorized) {
+                      switch (followOnLocationTarget) {
+                        case AlignPositionTargetState.none:
+                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
+                        case AlignPositionTargetState.currentLocation:
+                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.forestPark);
+                        case AlignPositionTargetState.forestPark:
+                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
                       }
-                    },
-                    child: PlatformWidget(
-                      cupertino: (_, __) => Icon(
-                        switch (followOnLocationTarget) {
-                          AlignPositionTargetState.currentLocation =>
-                            CupertinoIcons.location_fill,
-                          AlignPositionTargetState.none =>
-                            CupertinoIcons.location,
-                          AlignPositionTargetState.forestPark =>
-                            Icons.park,
-                        },
-                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                            ? CupertinoColors.systemGrey.highContrastColor
-                            : CupertinoColors.systemGrey.darkHighContrastColor
-                      ),
-                      material: (_, __) => Icon(
-                        followOnLocationTarget == AlignPositionTargetState.forestPark
-                            ? Icons.park
-                            : Icons.my_location_rounded,
-                        color: followOnLocationTarget == AlignPositionTargetState.none
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.primary,
-                      ),
+                    } else {
+                      showMissingPermissionDialog(
+                        context,
+                        'Location Required',
+                        'Location permission is required to jump to the current location',
+                      );
+                    }
+                  },
+                  child: PlatformWidget(
+                    cupertino: (_, __) => Icon(
+                      switch (followOnLocationTarget) {
+                        AlignPositionTargetState.currentLocation =>
+                          CupertinoIcons.location_fill,
+                        AlignPositionTargetState.none =>
+                          CupertinoIcons.location,
+                        AlignPositionTargetState.forestPark =>
+                          Icons.park,
+                      },
+                      color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                          ? CupertinoColors.systemGrey.highContrastColor
+                          : CupertinoColors.systemGrey.darkHighContrastColor
                     ),
-                  );
-                }
+                    material: (_, __) => Icon(
+                      followOnLocationTarget == AlignPositionTargetState.forestPark
+                          ? Icons.park
+                          : Icons.my_location_rounded,
+                      color: followOnLocationTarget == AlignPositionTargetState.none
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.primary,
+                    ),
+                  ),
+                );
+              }
             ),
           ),
           // Settings FAB
@@ -224,31 +224,32 @@ class _HomeScreenState extends State<HomeScreen> {
             right: kFabPadding,
             top: MediaQuery.of(context).viewPadding.top + kFabPadding,
             child: Consumer(
-                builder: (context, ref, child) {
-                  return PlatformFAB(
-                    onPressed: () async {
-                      Navigator.of(context).push(
-                        platformPageRoute(
-                          context: context,
-                          builder: (_) => const SettingsPage(),
-                        ),
-                      );
-                    },
-                    child: PlatformWidget(
-                      cupertino: (_, __) => Icon(
-                        // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
-                          CupertinoIcons.gear,
-                          color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                              ? CupertinoColors.systemGrey.highContrastColor
-                              : CupertinoColors.systemGrey.darkHighContrastColor
+              builder: (context, ref, child) {
+                return PlatformFAB(
+                  heroTag: "settings_fab",
+                  onPressed: () async {
+                    Navigator.of(context).push(
+                      platformPageRoute(
+                        context: context,
+                        builder: (_) => const SettingsPage(),
                       ),
-                      material: (_, __) => Icon(
-                        Icons.settings,
-                        color: theme.colorScheme.onSurface,
-                      ),
+                    );
+                  },
+                  child: PlatformWidget(
+                    cupertino: (_, __) => Icon(
+                      // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
+                        CupertinoIcons.gear,
+                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                            ? CupertinoColors.systemGrey.highContrastColor
+                            : CupertinoColors.systemGrey.darkHighContrastColor
                     ),
-                  );
-                }
+                    material: (_, __) => Icon(
+                      Icons.settings,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                );
+              }
             ),
           ),
           // status bar blur
