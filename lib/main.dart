@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/pages/home_screen.dart';
+import 'package:forest_park_reports/pages/home_page.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -96,14 +96,14 @@ class _AppState extends State<App> with WidgetsBindingObserver {
               useMaterial3: true,
             );
             if (isCupertino(context)) {
-              light = light.copyWith(colorScheme: light.colorScheme.copyWith(
-                surface: Colors.grey.shade100,
-                onSurface: Colors.grey.shade800,
-              ));
-              dark = dark.copyWith(colorScheme: dark.colorScheme.copyWith(
-                surface: Colors.grey.shade900,
-                onSurface: Colors.grey.shade100,
-              ));
+              // light = light.copyWith(colorScheme: light.colorScheme.copyWith(
+              //   surface: Colors.grey.shade100,
+              //   onSurface: Colors.grey.shade800,
+              // ));
+              // dark = dark.copyWith(colorScheme: dark.colorScheme.copyWith(
+              //   surface: Colors.grey.shade900,
+              //   onSurface: Colors.grey.shade100,
+              // ));
             }
             return Theme(
               data: _brightness == Brightness.dark ? dark : light,

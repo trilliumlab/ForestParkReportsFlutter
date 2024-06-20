@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/models/hazard_update.dart';
 import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/pages/home_screen.dart';
+import 'package:forest_park_reports/pages/home_page.dart';
 import 'package:forest_park_reports/providers/hazard_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
 import 'package:forest_park_reports/providers/relation_provider.dart';

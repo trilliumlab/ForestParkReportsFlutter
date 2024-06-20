@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/pages/home_screen/panel_page.dart';
+import 'package:forest_park_reports/pages/home_page/panel_page.dart';
+import 'package:forest_park_reports/pages/settings_page.dart';
 import 'package:forest_park_reports/providers/database_provider.dart';
 import 'package:forest_park_reports/providers/location_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
@@ -226,8 +227,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context, ref, child) {
                   return PlatformFAB(
                     onPressed: () async {
-                      final db = await ref.read(forestParkDatabaseProvider.future);
-                      await databaseFactoryIo.deleteDatabase(db.path);
+                      Navigator.of(context).push(
+                        platformPageRoute(
+                          context: context,
+                          builder: (_) => const SettingsPage(),
+                        ),
+                      );
                     },
                     child: PlatformWidget(
                       cupertino: (_, __) => Icon(

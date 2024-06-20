@@ -49,7 +49,7 @@ class ActiveHazard extends _$ActiveHazard {
 
     final db = await ref.read(forestParkDatabaseProvider.future);
     for (final hazard in hazards) {
-      store.record(hazard.uuid).add(db, hazard.toJson());
+      store.record(hazard.uuid).put(db, hazard.toJson());
     }
 
     return hazards;
@@ -70,7 +70,7 @@ class ActiveHazard extends _$ActiveHazard {
     ]);
 
     final db = await ref.read(forestParkDatabaseProvider.future);
-    store.record(hazard.uuid).add(db, hazard.toJson());
+    store.record(hazard.uuid).put(db, hazard.toJson());
   }
 
   Future<String?> uploadImage(XFile file, {void Function(int, int)? onSendProgress}) async {
