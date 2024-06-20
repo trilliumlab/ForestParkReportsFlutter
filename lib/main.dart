@@ -61,14 +61,12 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     // to use widgets that render in the style of the device's platform.
     // Eg. cupertino on ios, and material 3 on android
     return PlatformProvider(
-      // initialPlatform: kPlatformOverride,
+      initialPlatform: kPlatformOverride,
       builder: (context) {
         return _theme(
           builder: (context) => const PlatformApp(
             title: 'Forest Park Reports',
-            home: PlatformChanger(
-              child: HomeScreen(),
-            ),
+            home: HomeScreen(),
           ),
         );
       },
@@ -114,42 +112,5 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
         );
       },
     );
-  }
-}
-
-class PlatformChanger extends ConsumerStatefulWidget {
-  final Widget child;
-  const PlatformChanger({super.key, required this.child});
-
-  @override
-  ConsumerState createState() => _ThemeChangerState();
-}
-
-class _ThemeChangerState extends ConsumerState<PlatformChanger> {
-
-
-  @override
-  Widget build(BuildContext context) {
-    // final platform = ref.watch(settingsProvider.select((s) => s.uiTheme)).value;
-    // final pwProvider = PlatformProvider.of(context);
-    //
-    // print("selectedPlatform = $platform, pwProvider = ${pwProvider?.platform}");
-    //
-    // if (pwProvider != null && platform != pwProvider.platform) {
-    //   Future.delayed(const Duration(microseconds: 1), () {
-    //     print("changing platform");
-    //     switch(platform) {
-    //       case null:
-    //         pwProvider.changeToAutoDetectPlatform();
-    //       case TargetPlatform.iOS:
-    //         pwProvider.changeToCupertinoPlatform();
-    //       case TargetPlatform.android:
-    //         pwProvider.changeToMaterialPlatform();
-    //       default:
-    //     }
-    //   });
-    // }
-
-    return widget.child;
   }
 }
