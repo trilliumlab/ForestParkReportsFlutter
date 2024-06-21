@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:forest_park_reports/providers/settings_provider.dart';
 import 'package:http/io_client.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
@@ -135,6 +136,8 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
       }
     });
 
+    final retinaMode = ref.watch(settingsProvider.select((s) => s.retinaMode));
+
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (_) => _isFingerDown = true,
@@ -190,11 +193,9 @@ class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindi
             // urlTemplate: false
             //         ? "https://api.mapbox.com/styles/v1/ethemoose/cl55mcv4b004u15sbw36oqa8p/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}"
             //         : "https://api.mapbox.com/styles/v1/ethemoose/cl548b3a4000s15tkf8bbw2pt/tiles/512/{z}/{x}/{y}@2x?access_token=${dotenv.env["MAPBOX_KEY"]}",
-            retinaMode: true,
-            maxNativeZoom: 22,
-            maxZoom: 23,
-            // TODO this should be a setting
-            // retinaMode: true,
+            retinaMode: retinaMode,
+            maxNativeZoom: 22 - (retinaMode ? 1 : 0),
+            maxZoom: 23 - (retinaMode ? 1 : 0),
           ),
           // TODO render on top of everything (currently breaks tappable polyline)
           // we'll probably need to handle taps ourselves, shouldn't be too bad

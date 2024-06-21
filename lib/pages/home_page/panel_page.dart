@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/models/hazard_update.dart';
 import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/pages/home_screen.dart';
+import 'package:forest_park_reports/pages/home_page.dart';
 import 'package:forest_park_reports/providers/hazard_provider.dart';
 import 'package:forest_park_reports/providers/panel_position_provider.dart';
 import 'package:forest_park_reports/providers/relation_provider.dart';
@@ -234,10 +234,12 @@ class Panel extends StatelessWidget {
 class PlatformFAB extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;
+  final Object? heroTag;
   const PlatformFAB({
     super.key,
     required this.onPressed,
     required this.child,
+    this.heroTag,
   });
   @override
   Widget build(BuildContext context) {
@@ -275,6 +277,7 @@ class PlatformFAB extends StatelessWidget {
         );
       },
       material: (_, __) => FloatingActionButton(
+        heroTag: heroTag,
         backgroundColor: theme.colorScheme.surface,
         onPressed: onPressed,
         child: child,

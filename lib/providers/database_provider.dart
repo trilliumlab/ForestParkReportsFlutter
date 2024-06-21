@@ -23,11 +23,15 @@ class ForestParkDatabase extends _$ForestParkDatabase {
   }
 
   Future<void> delete() async {
+    final db = await future;
+    state = const AsyncLoading();
+    await db.close();
     if (kIsWeb) {
-      databaseFactoryWeb.deleteDatabase(kDbName);
+      await databaseFactoryWeb.deleteDatabase(kDbName);
     } else {
       await File(await ref.read(dbPathProvider.future)).delete();
     }
+    state = await AsyncValue.guard(build);
   }
 }
 
