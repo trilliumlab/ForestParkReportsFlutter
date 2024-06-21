@@ -90,7 +90,16 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
         );
 
         // Cupertino themes
-        final cupertinoLightTheme = MaterialBasedCupertinoThemeData(materialTheme: materialLightTheme);
+        const lightDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.light);
+        final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
+          materialTheme: materialLightTheme.copyWith(
+            cupertinoOverrideTheme:  CupertinoThemeData(
+              brightness: Brightness.light,
+              barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
+              textTheme: const CupertinoTextThemeData(),
+            ),
+          ),
+        );
         const darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark);
         final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
           materialTheme: materialDarkTheme.copyWith(

@@ -22,6 +22,7 @@ class SettingsModel with _$SettingsModel {
       _$SettingsModelFromJson(json);
 }
 
+/// An option for []
 abstract interface class SelectionOption<T> {
   String get displayName;
   T get value;
