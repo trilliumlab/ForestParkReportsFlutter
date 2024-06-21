@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/models/settings.dart';
-import 'package:forest_park_reports/widgets/animated_app_bar_scaffold.dart';
+import 'package:forest_park_reports/model/settings.dart';
+import 'package:forest_park_reports/page/common/animated_app_bar_scaffold.dart';
 
 /// A Scaffold for settings designed to render [SettingsSection].
 class SettingsPageScaffold extends StatefulWidget {
