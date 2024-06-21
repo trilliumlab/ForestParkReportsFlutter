@@ -36,7 +36,7 @@ class Relations extends _$Relations {
 
     final db = await ref.read(forestParkDatabaseProvider.future);
     for (final relation in relations) {
-      store.record(relation.id).add(db, relation.toJson());
+      store.record(relation.id).put(db, relation.toJson());
     }
 
     return relations;

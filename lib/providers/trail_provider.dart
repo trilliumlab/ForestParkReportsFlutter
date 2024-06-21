@@ -45,15 +45,17 @@ class Trails extends _$Trails {
     final trails = TrailList.decode(res.data);
 
     final db = await ref.read(forestParkDatabaseProvider.future);
-    for (final trail in trails) {
-      store.record(trail.id).add(db, Blob(trail.encode()));
-    }
+    db.transaction((txn) async {
+      for (final trail in trails) {
+        store.record(trail.id).put(txn, Blob(trail.encode()));
+      }
+    });
 
     return trails;
   }
 
   Future<void> refresh() async {
-    state = AsyncData(await _fetch());
+    state = await AsyncValue.guard(_fetch);
   }
 
   // TODO we might need higher resolution here than the closest point
