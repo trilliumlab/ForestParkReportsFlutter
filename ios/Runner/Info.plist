@@ -28,12 +28,16 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to take photos of hazards</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to select photos of hazards</string>
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
 	<dict>
 		<key>hazard</key>
 		<string>Precise location is used to accurately report trail hazards</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Used to display location on map</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Used to display location on map</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
