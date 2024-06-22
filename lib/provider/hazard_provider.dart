@@ -5,10 +5,10 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:forest_park_reports/models/hazard.dart';
-import 'package:forest_park_reports/models/hazard_update.dart';
-import 'package:forest_park_reports/providers/database_provider.dart';
-import 'package:forest_park_reports/providers/dio_provider.dart';
+import 'package:forest_park_reports/model/hazard.dart';
+import 'package:forest_park_reports/model/hazard_update.dart';
+import 'package:forest_park_reports/provider/database_provider.dart';
+import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
 

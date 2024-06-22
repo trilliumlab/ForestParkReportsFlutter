@@ -1,5 +1,5 @@
-import 'package:forest_park_reports/models/settings.dart';
-import 'package:forest_park_reports/providers/database_provider.dart';
+import 'package:forest_park_reports/model/settings.dart';
+import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
 

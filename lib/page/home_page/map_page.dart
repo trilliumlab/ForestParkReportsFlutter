@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:forest_park_reports/providers/settings_provider.dart';
 import 'package:http/io_client.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,30 +12,30 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/models/hazard.dart';
-import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/providers/hazard_provider.dart';
-import 'package:forest_park_reports/providers/location_provider.dart';
-import 'package:forest_park_reports/providers/map_cursor_provider.dart';
-import 'package:forest_park_reports/providers/panel_position_provider.dart';
-import 'package:forest_park_reports/providers/relation_provider.dart';
-import 'package:forest_park_reports/providers/trail_provider.dart';
+import 'package:forest_park_reports/model/hazard.dart';
+import 'package:forest_park_reports/model/relation.dart';
+import 'package:forest_park_reports/provider/hazard_provider.dart';
+import 'package:forest_park_reports/provider/location_provider.dart';
+import 'package:forest_park_reports/provider/map_cursor_provider.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
+import 'package:forest_park_reports/provider/relation_provider.dart';
+import 'package:forest_park_reports/provider/trail_provider.dart';
+import 'package:forest_park_reports/provider/settings_provider.dart';
+import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
-import '../providers/align_position_provider.dart';
 
-
-class ForestParkMap extends ConsumerStatefulWidget {
-  const ForestParkMap({super.key});
+class MapPage extends ConsumerStatefulWidget {
+  const MapPage({super.key});
 
   @override
-  ConsumerState<ForestParkMap> createState() => _ForestParkMapState();
+  ConsumerState<MapPage> createState() => _ForestParkMapState();
 }
 
-class _ForestParkMapState extends ConsumerState<ForestParkMap> with WidgetsBindingObserver, TickerProviderStateMixin{
+class _ForestParkMapState extends ConsumerState<MapPage> with WidgetsBindingObserver, TickerProviderStateMixin{
   // TODO add satallite map style
   late final PopupController _popupController;
   late StreamController<double?> _alignPositionStreamController;

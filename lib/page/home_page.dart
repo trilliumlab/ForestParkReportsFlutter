@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/pages/home_page/panel_page.dart';
-import 'package:forest_park_reports/pages/settings_page.dart';
-import 'package:forest_park_reports/providers/location_provider.dart';
-import 'package:forest_park_reports/providers/panel_position_provider.dart';
+import 'package:forest_park_reports/page/home_page/panel_page.dart';
+import 'package:forest_park_reports/page/settings_page.dart';
+import 'package:forest_park_reports/provider/location_provider.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
+import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
-import 'package:forest_park_reports/util/permissions_dialog.dart';
-import 'package:forest_park_reports/util/statusbar_blur.dart';
-import 'package:forest_park_reports/widgets/add_hazard_modal.dart';
+import 'package:forest_park_reports/page/common/permissions_dialog.dart';
+import 'package:forest_park_reports/page/common/statusbar_blur.dart';
+import 'package:forest_park_reports/page/common/add_hazard_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:forest_park_reports/widgets/forest_park_map.dart';
+import 'package:forest_park_reports/page/home_page/map_page.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
-import '../providers/align_position_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 parallaxEnabled: isMaterial(context),
                 parallaxOffset: 0.58,
                 snapPoint: _panelController.snapPoint,
-                body: const ForestParkMap(),
+                body: const MapPage(),
                 controller: _panelController,
                 scrollController: _scrollController,
                 panelBuilder: () => PanelPage(

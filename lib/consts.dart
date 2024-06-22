@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:forest_park_reports/models/camera_position.dart';
+import 'package:forest_park_reports/model/camera_position.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 

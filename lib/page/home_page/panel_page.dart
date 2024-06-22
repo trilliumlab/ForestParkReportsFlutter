@@ -3,16 +3,16 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/models/hazard_update.dart';
-import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/pages/home_page.dart';
-import 'package:forest_park_reports/providers/hazard_provider.dart';
-import 'package:forest_park_reports/providers/panel_position_provider.dart';
-import 'package:forest_park_reports/providers/relation_provider.dart';
+import 'package:forest_park_reports/model/hazard_update.dart';
+import 'package:forest_park_reports/model/relation.dart';
+import 'package:forest_park_reports/page/home_page.dart';
+import 'package:forest_park_reports/provider/hazard_provider.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
+import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
-import 'package:forest_park_reports/widgets/forest_park_map.dart';
-import 'package:forest_park_reports/widgets/hazard_info.dart';
-import 'package:forest_park_reports/widgets/trail_info.dart';
+import 'package:forest_park_reports/page/home_page/map_page.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_info.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PanelPage extends ConsumerStatefulWidget {
