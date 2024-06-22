@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/pages/home_page/panel_page.dart';
@@ -10,6 +11,7 @@ import 'package:forest_park_reports/util/permissions_dialog.dart';
 import 'package:forest_park_reports/util/statusbar_blur.dart';
 import 'package:forest_park_reports/widgets/add_hazard_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/widgets/map_fabs.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/widgets/forest_park_map.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
@@ -125,100 +127,24 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          // Location and add hazard buttons
           // When panel is visible, position 20dp above the panel height (_fabHeight)
           // when panel is hidden, set it to 20db from bottom
           Positioned(
             right: kFabPadding,
-            bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight - 8) + 20,
-            child: Consumer(
-              builder: (context, ref, child) {
-                return PlatformFAB(
-                  heroTag: "add_hazard_fab",
-                  onPressed: () async {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return Dismissible(
-                            direction: DismissDirection.down,
-                            key: const Key('key'),
-                            onDismissed: (_) => Navigator.of(context).pop(),
-                            child: const AddHazardModal()
-                        );
-                      },
-                    );
-                  },
-                  child: PlatformWidget(
-                    cupertino: (_, __) => Icon(
-                      // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
-                        CupertinoIcons.add,
-                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                            ? CupertinoColors.systemGrey.highContrastColor
-                            : CupertinoColors.systemGrey.darkHighContrastColor
-                    ),
-                    material: (_, __) => Icon(
-                      Icons.add,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  )
-                );
-              }
+            bottom: _panelController.panelHeight + kFabPadding, 
+            child: Visibility(
+              visible: !_panelController.isAttached ? true
+                  : 1 < (_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)),
+              child: Opacity(
+                opacity: !_panelController.isAttached ? 1
+                    : 1 - clampDouble((_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)), 0, 1),
+                child: MapFabs(),
+              ),
             ),
           ),
-          Positioned(
-            right: kFabPadding,
-            bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight) + 80,
-            child: Consumer(
-              builder: (context, ref, child) {
-                final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
-                return PlatformFAB(
-                  heroTag: "location_fab",
-                  onPressed: () async {
-                    final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
-                    if (!context.mounted) return;
-                    if (status.permission.authorized) {
-                      switch (followOnLocationTarget) {
-                        case AlignPositionTargetState.none:
-                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
-                        case AlignPositionTargetState.currentLocation:
-                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.forestPark);
-                        case AlignPositionTargetState.forestPark:
-                          ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.currentLocation);
-                      }
-                    } else {
-                      showMissingPermissionDialog(
-                        context,
-                        'Location Required',
-                        'Location permission is required to jump to the current location',
-                      );
-                    }
-                  },
-                  child: PlatformWidget(
-                    cupertino: (_, __) => Icon(
-                      switch (followOnLocationTarget) {
-                        AlignPositionTargetState.currentLocation =>
-                          CupertinoIcons.location_fill,
-                        AlignPositionTargetState.none =>
-                          CupertinoIcons.location,
-                        AlignPositionTargetState.forestPark =>
-                          Icons.park,
-                      },
-                      color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                          ? CupertinoColors.systemGrey.highContrastColor
-                          : CupertinoColors.systemGrey.darkHighContrastColor
-                    ),
-                    material: (_, __) => Icon(
-                      followOnLocationTarget == AlignPositionTargetState.forestPark
-                          ? Icons.park
-                          : Icons.my_location_rounded,
-                      color: followOnLocationTarget == AlignPositionTargetState.none
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                );
-              }
-            ),
-          ),
+          
+
           // Settings FAB
           Positioned(
             right: kFabPadding,
