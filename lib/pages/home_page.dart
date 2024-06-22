@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: _panelController.panelHeight + kFabPadding, 
             child: Visibility(
               visible: !_panelController.isAttached ? true
-                  : 1 < (_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)),
+                  : 1 > (_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)),
               child: Opacity(
                 opacity: !_panelController.isAttached ? 1
                     : 1 - clampDouble((_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)), 0, 1),
