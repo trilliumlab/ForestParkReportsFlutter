@@ -1,6 +1,6 @@
-import 'package:forest_park_reports/models/relation.dart';
-import 'package:forest_park_reports/providers/database_provider.dart';
-import 'package:forest_park_reports/providers/dio_provider.dart';
+import 'package:forest_park_reports/model/relation.dart';
+import 'package:forest_park_reports/provider/database_provider.dart';
+import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
 

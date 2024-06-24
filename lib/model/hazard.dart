@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/models/hazard_type.dart';
-import 'package:forest_park_reports/models/snapped_latlng.dart';
+import 'package:forest_park_reports/model/hazard_type.dart';
+import 'package:forest_park_reports/model/snapped_latlng.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'hazard.g.dart';

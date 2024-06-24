@@ -5,19 +5,19 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/pages/home_page/panel_page.dart';
-import 'package:forest_park_reports/providers/map_cursor_provider.dart';
-import 'package:forest_park_reports/providers/relation_provider.dart';
+import 'package:forest_park_reports/model/hazard.dart';
+import 'package:forest_park_reports/page/home_page/panel_page.dart';
+import 'package:forest_park_reports/page/home_page.dart';
+import 'package:forest_park_reports/provider/map_cursor_provider.dart';
+import 'package:forest_park_reports/provider/relation_provider.dart';
+import 'package:forest_park_reports/provider/hazard_provider.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
+import 'package:forest_park_reports/provider/trail_provider.dart';
 import 'package:forest_park_reports/util/fl_latlng_spot.dart';
 import 'package:forest_park_reports/util/math.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:forest_park_reports/models/hazard.dart';
-import 'package:forest_park_reports/pages/home_page.dart';
-import 'package:forest_park_reports/providers/hazard_provider.dart';
-import 'package:forest_park_reports/providers/panel_position_provider.dart';
-import 'package:forest_park_reports/providers/trail_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
-import 'package:forest_park_reports/widgets/forest_park_map.dart';
+import 'package:forest_park_reports/page/home_page/map_page.dart';
 
 class TrailHazardsWidget extends ConsumerWidget {
   final int relationID;

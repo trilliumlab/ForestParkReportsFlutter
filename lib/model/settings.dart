@@ -1,7 +1,5 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:forest_park_reports/pages/settings_page.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'settings.g.dart';
