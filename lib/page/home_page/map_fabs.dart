@@ -11,7 +11,9 @@ import '../../provider/align_position_provider.dart';
 
 
 class MapFabs extends ConsumerWidget {
-  
+
+  const MapFabs({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -20,8 +22,6 @@ class MapFabs extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         SizedBox(
-          // right: kFabPadding,
-          // bottom: (isCupertino(context) ? _panelController.panelHeight - 18 : _panelController.panelHeight - 8) + 20,
           child: Consumer(
             builder: (context, ref, child) {
               return PlatformFAB(
