@@ -7,6 +7,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 import 'package:forest_park_reports/page/home_page.dart';
 import 'package:forest_park_reports/provider/map_cursor_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
@@ -17,7 +18,8 @@ import 'package:forest_park_reports/util/fl_latlng_spot.dart';
 import 'package:forest_park_reports/util/math.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/util/extensions.dart';
-import 'package:forest_park_reports/page/home_page/map_page.dart';
+
+
 
 class TrailHazardsWidget extends ConsumerWidget {
   final int relationID;

@@ -10,10 +10,12 @@ import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
-import 'package:forest_park_reports/page/home_page/map_page.dart';
-import 'package:forest_park_reports/page/home_page/panel_page/hazard_info.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_info_card.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'panel_page/hazard_image.dart';
+
 
 class PanelPage extends ConsumerStatefulWidget {
   final ScrollController scrollController;
@@ -225,62 +227,6 @@ class Panel extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-//TODO move to widgets
-class PlatformFAB extends StatelessWidget {
-  final VoidCallback onPressed;
-  final Widget child;
-  final Object? heroTag;
-  const PlatformFAB({
-    super.key,
-    required this.onPressed,
-    required this.child,
-    this.heroTag,
-  });
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return PlatformWidget(
-      cupertino: (context, _) {
-        const fabRadius = BorderRadius.all(Radius.circular(8));
-        return Container(
-          decoration: const BoxDecoration(
-            borderRadius: fabRadius,
-            boxShadow: [
-              OutlineBoxShadow(
-                color: Colors.black26,
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: fabRadius,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: SizedBox(
-                width: 50,
-                height: 50,
-                child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    color: CupertinoDynamicColor.resolve(CupertinoColors.secondarySystemBackground, context).withAlpha(210),
-                    pressedOpacity: 0.9,
-                    onPressed: onPressed,
-                    child: child
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-      material: (_, __) => FloatingActionButton(
-        heroTag: heroTag,
-        backgroundColor: theme.colorScheme.surface,
-        onPressed: onPressed,
-        child: child,
       ),
     );
   }

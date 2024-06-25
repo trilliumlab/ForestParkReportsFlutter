@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
+import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/page/settings_page.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/page/common/statusbar_blur.dart';

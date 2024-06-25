@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:forest_park_reports/page/home_page/panel_page.dart';
+import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
+import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:forest_park_reports/page/common/permissions_dialog.dart';
 import 'package:forest_park_reports/page/common/add_hazard_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../provider/align_position_provider.dart';
 
 
 class MapFabs extends ConsumerWidget {

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/model/settings.dart';
+import 'package:forest_park_reports/page/settings_page/settings_widgets.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'settings_page/settings_widgets.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
