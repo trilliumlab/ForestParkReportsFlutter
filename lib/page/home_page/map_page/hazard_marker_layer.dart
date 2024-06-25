@@ -5,7 +5,7 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard.dart';
-import 'package:forest_park_reports/page/home_page/panel_page/hazard_info_popup.dart';
+import 'package:forest_park_reports/page/home_page/map_page/hazard_info_popup.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';

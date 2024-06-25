@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 
-import 'hazard_image.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
+
 
 class UpdateInfoWidget extends StatelessWidget {
   final HazardUpdateModel update;

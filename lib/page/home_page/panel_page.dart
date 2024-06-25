@@ -10,7 +10,7 @@ import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
-import 'package:forest_park_reports/page/home_page/panel_page/hazard_info_card.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
