@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:forest_park_reports/provider/hazard_photo_provider.dart';
 import 'package:http/io_client.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';

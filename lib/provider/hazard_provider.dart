@@ -136,41 +136,6 @@ class HazardUpdates extends _$HazardUpdates {
   }
 }
 
-class HazardPhotoProgressState {
-  int transmitted;
-  int total;
-  HazardPhotoProgressState(this.transmitted, this.total);
-  bool get isComplete => transmitted == total;
-  double get progress {
-    final p = transmitted/total;
-    return p.isNaN ? 0.0 : p.clamp(0, 1);
-  }
-}
-
-@riverpod
-class HazardPhotoProgress extends _$HazardPhotoProgress {
-  @override
-  HazardPhotoProgressState build(String uuid) => HazardPhotoProgressState(0, 0);
-
-  void updateProgress(int transmitted, int total) =>
-      state = HazardPhotoProgressState(transmitted, total);
-}
-
-@riverpod
-class HazardPhoto extends _$HazardPhoto {
-  @override
-  Future<Uint8List?> build(String uuid) async {
-    final res = await ref.read(dioProvider).get<Uint8List>(
-      "/hazard/image/$uuid",
-      options: Options(responseType: ResponseType.bytes),
-      onReceiveProgress: (received, total) =>
-          ref.read(hazardPhotoProgressProvider(uuid).notifier)
-              .updateProgress(received, total),
-    );
-    return res.data;
-  }
-}
-
 class SelectedHazardState {
   final bool moveCamera;
   final HazardModel? hazard;
