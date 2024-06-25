@@ -10,13 +10,14 @@ import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/trail_elevation_graph.dart';
+import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'panel_page/hazard_image.dart';
-
-
+/// The sliding-up modal with info on the current selected trail or hazard on the map
 class PanelPage extends ConsumerStatefulWidget {
   final ScrollController scrollController;
   final ScreenPanelController panelController;
@@ -230,29 +231,4 @@ class Panel extends StatelessWidget {
       ),
     );
   }
-}
-
-class PlatformPill extends StatelessWidget {
-  const PlatformPill({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final isIos = isCupertino(context);
-    final theme = Theme.of(context);
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        margin: EdgeInsets.symmetric(
-            vertical: isIos ? 5 : 10
-        ),
-        width: isIos ? 35 : 26,
-        height: 5,
-        decoration: BoxDecoration(
-            color: isIos
-                ? CupertinoDynamicColor.resolve(CupertinoColors.systemGrey2, context)
-                : theme.colorScheme.onSurface,
-            borderRadius: const BorderRadius.all(Radius.circular(12.0))),
-      ),
-    );
-  }
-
 }

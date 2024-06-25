@@ -24,7 +24,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
-
+/// The main app body with all the moving/positioned elements over the main app.
+/// 
+/// Contains all trails, hazard markers, hazard info popups, plus the main map. 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 

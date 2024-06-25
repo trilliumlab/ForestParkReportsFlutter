@@ -16,6 +16,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+/// The additional modal with the ui for reporting a trail hazard
 class AddHazardModal extends ConsumerStatefulWidget {
   const AddHazardModal({super.key});
 

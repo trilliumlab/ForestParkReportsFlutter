@@ -7,7 +7,7 @@ import 'package:forest_park_reports/util/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-/// Marks the start and end points of the 
+/// Marks the start and end points of the trail with a green circle and a red square accordingly.
 class TrailEndsMarkerLayer extends ConsumerWidget {
   const TrailEndsMarkerLayer({super.key});
 

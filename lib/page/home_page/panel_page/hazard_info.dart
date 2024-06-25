@@ -3,7 +3,7 @@ import 'package:forest_park_reports/model/hazard_update.dart';
 
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 
-
+/// A widget for the main panel modal with info on a singular hazard
 class UpdateInfoWidget extends StatelessWidget {
   final HazardUpdateModel update;
   const UpdateInfoWidget({super.key, required this.update});

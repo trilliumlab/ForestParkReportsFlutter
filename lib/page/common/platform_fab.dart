@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 
+
+/// A generic floating action button that automatically customizes to the current platform based on provided themes 
 class PlatformFAB extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;

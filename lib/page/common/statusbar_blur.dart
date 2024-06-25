@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 
+/// Blurs the top status bar (used for iOS devices)
 class StatusBarBlur extends StatelessWidget {
   const StatusBarBlur({super.key});
   @override

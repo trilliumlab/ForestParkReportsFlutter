@@ -5,6 +5,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 
+/// A popup that appears above a hazard when clicked with details
 class HazardInfoPopup extends StatelessWidget {
   final HazardModel hazard;
   const HazardInfoPopup({super.key, required this.hazard});
