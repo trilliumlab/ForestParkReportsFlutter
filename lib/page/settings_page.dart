@@ -1,7 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/model/settings.dart';
-import 'package:forest_park_reports/page/settings_page/settings_widgets.dart';
+import 'package:forest_park_reports/page/settings_page/settings_page_scaffold.dart';
+import 'package:forest_park_reports/page/settings_page/selection_setting_widget.dart';
+import 'package:forest_park_reports/page/settings_page/toggle_setting_widget.dart';
+import 'package:forest_park_reports/page/settings_page/button_setting_widget.dart';
+import 'package:forest_park_reports/page/settings_page/setting_confirmation.dart';
+import 'package:forest_park_reports/page/settings_page/settings_section.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
