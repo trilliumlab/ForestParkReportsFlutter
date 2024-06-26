@@ -1,42 +1,41 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:http/io_client.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/model/hazard.dart';
-import 'package:forest_park_reports/model/relation.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
-import 'package:forest_park_reports/provider/map_cursor_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
-import 'package:forest_park_reports/provider/trail_provider.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
-import 'package:forest_park_reports/util/outline_box_shadow.dart';
+import 'package:forest_park_reports/page/home_page/map_page/trail_cursor_marker_layer.dart';
+import 'package:forest_park_reports/page/home_page/map_page/trail_ends_marker_layer.dart';
+import 'package:forest_park_reports/page/home_page/map_page/trail_polyline_layer.dart';
+import 'package:forest_park_reports/page/home_page/map_page/hazard_marker_layer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
+/// Renders the main map.
+///
+/// Contains all trails, hazard markers, and hazard info popups.
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
   @override
-  ConsumerState<MapPage> createState() => _ForestParkMapState();
+  ConsumerState<MapPage> createState() => _MapPageState();
 }
 
-class _ForestParkMapState extends ConsumerState<MapPage> with WidgetsBindingObserver, TickerProviderStateMixin{
-  // TODO add satallite map style
+class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, TickerProviderStateMixin{
+  // TODO add satellite map style
   late final PopupController _popupController;
   late StreamController<double?> _alignPositionStreamController;
   late final AnimatedMapController _animatedMapController;
@@ -89,51 +88,7 @@ class _ForestParkMapState extends ConsumerState<MapPage> with WidgetsBindingObse
       }
     });
 
-    final markers = (ref.watch(activeHazardProvider).valueOrNull??[]).map((hazard) {
-      late final HazardMarker marker;
-      marker = HazardMarker(
-        hazard: hazard,
-        rotate: true,
-        alignment: Alignment.center,
-        child: GestureDetector(
-          onTap: () {
-            ref.read(selectedRelationProvider.notifier).deselect();
-            if (hazard == ref.read(selectedHazardProvider).hazard) {
-              ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
-              ref.read(selectedHazardProvider.notifier).deselect();
-              _popupController.hideAllPopups();
-            } else {
-              if (ref.read(panelPositionProvider).position == PanelPositionState.closed) {
-                ref.read(panelPositionProvider.notifier).move(PanelPositionState.snapped);
-              }
-              ref.read(selectedHazardProvider.notifier).select(hazard);
-              _popupController.showPopupsOnlyFor([marker]);
-            }
-          },
-          child: Icon(
-            Icons.warning_rounded,
-            color: isMaterial(context)
-                ? Theme
-                .of(context)
-                .colorScheme.error
-                : CupertinoDynamicColor.resolve(
-                CupertinoColors.destructiveRed, context)
-          ),
-        ),
-      );
-      return marker;
-    }).toList();
-
-    ref.listen<SelectedHazardState>(selectedHazardProvider, (prev, next) {
-      if (next.hazard == null) {
-        _popupController.hideAllPopups();
-      } else {
-        _popupController.showPopupsOnlyFor(markers.where((e) => e.hazard == next.hazard).toList());
-        if (next.moveCamera) {
-          _animatedMapController.centerOnPoint(next.hazard!.location);
-        }
-      }
-    });
+    
 
     final retinaMode = ref.watch(settingsProvider.select((s) => s.retinaMode));
 
@@ -215,282 +170,10 @@ class _ForestParkMapState extends ConsumerState<MapPage> with WidgetsBindingObse
             ),
           const TrailPolylineLayer(),
           const TrailEndsMarkerLayer(),
-          PopupMarkerLayer(
-            options: PopupMarkerLayerOptions(
-                popupController: _popupController,
-                markers: markers,
-                popupDisplayOptions: PopupDisplayOptions(
-                  builder: (_, marker) {
-                    if (marker is HazardMarker) {
-                      return HazardInfoPopup(hazard: marker.hazard);
-                    }
-                    return Container();
-                  },
-                  animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
-                )
-            ),
-          ),
-          const CursorMarkerLayer(),
+          HazardMarkerLayer(popupController: _popupController, mapController: _animatedMapController,),
+          const TrailCursorMarkerLayer(),
         ],
       ),
     );
   }
-}
-
-class CursorMarkerLayer extends ConsumerWidget {
-  const CursorMarkerLayer({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cursor = ref.watch(mapCursorProvider);
-    if (cursor == null) {
-      return Container();
-    } else {
-      return MarkerLayer(
-        markers: [
-          Marker(
-            point: cursor,
-            child: const Icon(
-              Icons.circle,
-              color: Colors.grey,
-              size: 14.0,
-            ),
-          ),
-        ],
-      );
-    }
-  }
-}
-
-class TrailEndsMarkerLayer extends ConsumerWidget {
-  const TrailEndsMarkerLayer({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final relationID = ref.watch(selectedRelationProvider);
-    if (relationID == null) {
-      return Container();
-    }
-
-    final relation = ref.watch(relationsProvider).value?.get(relationID);
-    final trails = ref.watch(trailsProvider).value;
-
-    if (relation == null || trails == null) {
-      return Container();
-    }
-
-    final firstTrail = trails.get(relation.members.first);
-    final lastTrail = trails.get(relation.members.last);
-
-    if (firstTrail == null || lastTrail == null) {
-      return Container();
-    }
-
-    final prevPoint = lastTrail.geometry[lastTrail.geometry.length-2];
-    final bearing = lastTrail.geometry.last.bearingTo(prevPoint);
-
-    return MarkerLayer(
-      markers: [
-        // End marker
-        Marker(
-          point: lastTrail.geometry.last,
-          child: RotationTransition(
-            turns: AlwaysStoppedAnimation(bearing/(2*pi)),
-            child: const Icon(
-              Icons.square,
-              color: Colors.red,
-              size: 12.0,
-            ),
-          ),
-        ),
-        // Start marker
-        Marker(
-          point: firstTrail.geometry.first,
-          child: const Icon(
-            Icons.circle,
-            color: Colors.green,
-            size: 12.0,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class TrailPolylineLayer extends ConsumerWidget {
-  const TrailPolylineLayer({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedRelationID = ref.watch(selectedRelationProvider);
-    final relations = ref.watch(relationsProvider.select((value) => value.value));
-    final trails = ref.watch(trailsProvider).value;
-    if (relations == null || trails == null) {
-      return Container();
-    }
-    final selectedRelation = selectedRelationID == null ? null
-        : relations.get(selectedRelationID);
-
-    final LayerHitNotifier hitNotifier = ValueNotifier(null);
-
-    return MouseRegion(
-      hitTestBehavior: HitTestBehavior.deferToChild,
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () {
-          final LayerHitResult? hitResult = hitNotifier.value;
-          if (hitResult != null && hitResult.hitValues.isNotEmpty) {
-            // We clicked a polyline
-
-            // deselect hazards
-            ref.read(selectedHazardProvider.notifier).deselect();
-
-            // select polyline
-            final tag = hitResult.hitValues.first;
-            if (selectedRelation?.members.contains(tag) ?? false) {
-              if (ref
-                  .read(panelPositionProvider)
-                  .position == PanelPositionState.open
-              ) {
-                ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.snapped);
-              } else {
-                ref.read(selectedHazardProvider.notifier).deselect();
-                ref.read(selectedRelationProvider.notifier).deselect();
-                ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.closed);
-              }
-            } else {
-              ref.read(selectedRelationProvider.notifier)
-                  .select(relations.firstWhere((r) => r.members.contains(tag)).id);
-              if (ref
-                  .read(panelPositionProvider)
-                  .position == PanelPositionState.closed) {
-                ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.snapped);
-              }
-            }
-          }
-        },
-        child: PolylineLayer(
-          hitNotifier: hitNotifier,
-          polylines: trails.map((trail) {
-            return selectedRelation?.members.contains(trail.id) ?? false ? Polyline(
-              hitValue: trail.id,
-              points: trail.geometry,
-              strokeWidth: 1.0,
-              borderColor: CupertinoColors.activeGreen.withAlpha(80),
-              borderStrokeWidth: 8.0,
-              color: CupertinoColors.activeGreen,
-            ) : Polyline(
-              hitValue: trail.id,
-              points: trail.geometry,
-              strokeWidth: 1.0,
-              color: CupertinoColors.activeOrange,
-            );
-          }).whereNotNull().toList()..sort((a, b) {
-            // sorts the list to have selected polylines at the top
-            return (selectedRelation?.members.contains(a.hitValue) ?? false ? 1 : 0) -
-                (selectedRelation?.members.contains(b.hitValue) ?? false ? 1 : 0);
-          }),
-        ),
-      ),
-    );
-  }
-}
-
-class HazardInfoPopup extends StatelessWidget {
-  final HazardModel hazard;
-  const HazardInfoPopup({super.key, required this.hazard});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    const radius = BorderRadius.all(Radius.circular(8));
-    return Container(
-      decoration: const BoxDecoration(
-        borderRadius: radius,
-        boxShadow: [
-          OutlineBoxShadow(
-            color: Colors.black26,
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: PlatformWidgetBuilder(
-          cupertino: (context, child, _) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-            child: Container(
-              color: CupertinoDynamicColor.resolve(CupertinoColors.secondarySystemBackground, context).withAlpha(210),
-              child: child,
-            ),
-          ),
-          material: (_, child, __) => Container(
-            color: theme.colorScheme.surface,
-            child: child,
-          ),
-          child: IntrinsicWidth(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
-                  child: Text(
-                    hazard.hazard.displayName,
-                    style: theme.textTheme.titleLarge,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4),
-                  child: Text(
-                    hazard.timeString(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class HazardImage extends ConsumerWidget {
-  final String uuid;
-  const HazardImage(this.uuid, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final image = ref.watch(hazardPhotoProvider(uuid));
-    final progress = ref.watch(hazardPhotoProgressProvider(uuid)).progress;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Center(
-          child: PlatformWidget(
-            cupertino: (_, __) => CupertinoActivityIndicator.partiallyRevealed(
-              progress: progress,
-            ),
-            material: (_, __) => CircularProgressIndicator(
-              value: progress,
-            ),
-          ),
-        ),
-        if (image.hasValue)
-          Image.memory(
-            image.value!,
-            fit: BoxFit.cover,
-          ),
-      ],
-    );
-  }
-}
-
-class HazardMarker extends Marker {
-  final HazardModel hazard;
-  HazardMarker({required this.hazard, required super.child, super.rotate, super.alignment}) : super(point: hazard.location);
 }

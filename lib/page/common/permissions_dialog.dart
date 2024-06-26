@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 
+/// UI to request location
 showMissingPermissionDialog(BuildContext context, String title, String message) {
   showPlatformDialog(
     context: context,
