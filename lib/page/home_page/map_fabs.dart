@@ -9,7 +9,7 @@ import 'package:forest_park_reports/page/common/add_hazard_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// The buttons locked with the panel movement that snap the map to specific locations and add hazards
+/// The floating action buttons used on the map page. Holds the location and add hazard [PlatformFAB].
 class MapFabs extends ConsumerWidget {
 
   const MapFabs({super.key});
