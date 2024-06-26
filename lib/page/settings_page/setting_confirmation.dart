@@ -12,8 +12,8 @@ class SettingConfirmation {
   SettingConfirmation({required this.title, required this.content});
 }
 
-Future<bool> showConfirmationDialog(BuildContext context, SettingConfirmation confirmation) {
-  return showPlatformDialog(
+Future<bool> showConfirmationDialog(BuildContext context, SettingConfirmation confirmation) async {
+  return await showPlatformDialog(
     context: context,
     builder: (context) => PlatformAlertDialog(
       title: Text(confirmation.title),

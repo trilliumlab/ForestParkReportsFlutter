@@ -11,7 +11,7 @@ import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// A layer over the trails with hazard icons and HazardInfoPopup handling
+/// A layer over the trails with hazard icons and [HazardInfoPopup] handling
 class HazardMarkerLayer extends ConsumerWidget {
   const HazardMarkerLayer({
     super.key,

@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:forest_park_reports/page/home_page/panel_page/platform_pill.dart';
+import 'package:forest_park_reports/page/common/platform_pill.dart';
 import 'package:forest_park_reports/page/home_page.dart';
 
 /// The main body of the panel when a trail is selected on the map
