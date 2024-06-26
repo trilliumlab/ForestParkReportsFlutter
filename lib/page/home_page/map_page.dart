@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:forest_park_reports/provider/hazard_photo_provider.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
