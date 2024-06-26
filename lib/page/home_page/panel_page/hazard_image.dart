@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/provider/hazard_provider.dart';
+import 'package:forest_park_reports/provider/hazard_photo_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Displays an image of a hazard; used in hazard_info, trail_info, and panel_page
