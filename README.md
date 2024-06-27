@@ -67,7 +67,8 @@ For more information, see the [online documentation][flutter-docs-url].
 
 ### Running
 
-1. Run code generation: 
+1. Run code generation:
+   
    ```bash
    dart run build_runner build
    ```
