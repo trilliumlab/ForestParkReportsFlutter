@@ -33,5 +33,5 @@ Future<bool> showConfirmationDialog(BuildContext context, SettingConfirmation co
         ),
       ],
     ),
-  ) as Future<bool>;
+  );
 }
