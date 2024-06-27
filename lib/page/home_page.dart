@@ -132,10 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Visibility(
               visible: !_panelController.isAttached ? true
                   : 1 > (_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)),
-              child: Opacity(
+              child: MapFabs(
                 opacity: !_panelController.isAttached ? 1
-                    : 1 - clampDouble((_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)), 0, 1),
-                child: MapFabs(),
+                    : Curves.easeInOut.transform(
+                    1 - clampDouble((_panelController.panelPosition - _panelController.snapPoint)
+                        / (0.2 * (1 - _panelController.snapPoint)), 0, 1)
+                ),
               ),
             ),
           ),
