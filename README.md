@@ -24,7 +24,7 @@ The latest nightly builds can be found here:
 [![Android][apk-shield]][apk-url]
 [![iOS][ipa-shield]][ipa-url]
 
-> **Warning**  
+> [!WARNING]  
 > Nightly builds are **experimental** and **untested**.
 > Builds are distributing for testing purposes only, and may not be stable.
 
@@ -72,10 +72,10 @@ For more information, see the [online documentation][flutter-docs-url].
    dart run build_runner build
    ```
 
-   > **Important**  
-   > Code generation needs to be run whenever files in [lib/model](lib/model) and [lib/provider](lib/provider)
-   > are modified.
-   > To have code generation automatically run on save, run `dart run build_runner watch`
+> [!IMPORTANT]  
+> Code generation needs to be run whenever files in [lib/model](lib/model) and [lib/provider](lib/provider)
+> are modified.
+> To have code generation automatically run on save, run `dart run build_runner watch`
 
 2. Now your can run Trail Eyes:
 
@@ -83,12 +83,12 @@ For more information, see the [online documentation][flutter-docs-url].
    flutter run
    ```
   
-   > **Note**  
-   > iOS development requires some extra setup. To configure a signing certificate,
-   > open [ios/Runner.xcworkspace](ios/Runner.xcworkspace) in Xcode. 
-   > Ensure you're signed into your development Apple ID, and select `Runner` in the sidebar.
-   > Under `Signing & Capabilities`, select `Automatically manage signing`,
-   > and select your team under the `Team` dropdown.
+> [!NOTE]  
+> iOS development requires some extra setup. To configure a signing certificate,
+> open [ios/Runner.xcworkspace](ios/Runner.xcworkspace) in Xcode. 
+> Ensure you're signed into your development Apple ID, and select `Runner` in the sidebar.
+> Under `Signing & Capabilities`, select `Automatically manage signing`,
+> and select your team under the `Team` dropdown.
 
 ### Building
 
@@ -104,16 +104,16 @@ For more information, see the [online documentation][flutter-docs-url].
   flutter build --release ipa
   ```
 
-  > **Note**  
-  > The export options must be configured in Xcode manually after the first run.
-  > Open [build/ios/archive/Runner.xcarchive](build/ios/archive/Runner.xcarchive)
-  > in Xcode and distribute the IPA.
-  > This will produce an `ExportOptions.plist` that can be used to automatically build IPAs with the
-  > same settings in the future. To pass the `ExportOptions.plist` to flutter, append `--export-options-plist=path/to/ExportOptions.plist` to the previous command.
+> [!NOTE]  
+> The export options must be configured in Xcode manually after the first run.
+> Open [build/ios/archive/Runner.xcarchive](build/ios/archive/Runner.xcarchive)
+> in Xcode and distribute the IPA.
+> This will produce an `ExportOptions.plist` that can be used to automatically build IPAs with the
+> same settings in the future. To pass the `ExportOptions.plist` to flutter, append `--export-options-plist=path/to/ExportOptions.plist` to the previous command.
 
 ## Project Structure
 
-```toml
+```ini
 forest-park-reports-app
 ├── android # native Android project
 ├── assets # app assets
