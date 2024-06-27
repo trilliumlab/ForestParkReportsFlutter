@@ -11,8 +11,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The floating action buttons used on the map page. Holds the location and add hazard [PlatformFAB].
 class MapFabs extends ConsumerWidget {
+  final double opacity;
 
-  const MapFabs({super.key});
+  const MapFabs({super.key, this.opacity = 1});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +27,7 @@ class MapFabs extends ConsumerWidget {
             builder: (context, ref, child) {
               return PlatformFAB(
                 heroTag: "add_hazard_fab",
+                opacity: opacity,
                 onPressed: () async {
                   showCupertinoModalPopup(
                     context: context,
@@ -65,6 +67,7 @@ class MapFabs extends ConsumerWidget {
               final followOnLocationTarget = ref.watch(alignPositionTargetProvider);
               return PlatformFAB(
                 heroTag: "location_fab",
+                opacity: opacity,
                 onPressed: () async {
                   final status = await ref.read(locationPermissionStatusProvider.notifier).checkPermission();
                   if (!context.mounted) return;
