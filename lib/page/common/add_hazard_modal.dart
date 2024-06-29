@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +29,6 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
   HazardType? _selectedHazard;
   XFile? _image;
   bool _inProgress = false;
-  double _uploadProgress = 0;
 
   void _close() {
     Navigator.pop(context);
@@ -286,10 +284,9 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                 ),
               ),
               if (_inProgress)
-                Align(
+                const Align(
                   alignment: Alignment.topCenter,
                   child: LinearProgressIndicator(
-                    value: _uploadProgress > 0.95 || _uploadProgress < 0.05 ? null : _uploadProgress,
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -300,5 +297,3 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     );
   }
 }
-
-

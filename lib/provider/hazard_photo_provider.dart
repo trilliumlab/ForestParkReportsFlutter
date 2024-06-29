@@ -55,9 +55,6 @@ class HazardPhoto extends _$HazardPhoto {
     final res = await ref.read(dioProvider).get<Uint8List>(
       "/hazard/image/$uuid",
       options: Options(responseType: ResponseType.bytes),
-      // onReceiveProgress: (received, total) =>
-      //     ref.read(hazardPhotoProgressProvider(uuid).notifier)
-      //         .updateProgress(received, total),
     );
     final data = res.data;
     // If we're not on web we should save the image to the cache.
