@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/page/settings_page/setting_confirmation.dart';
+import 'package:forest_park_reports/page/common/confirmation.dart';
 
 /// Styles for [ButtonSettingWidget].
 enum ButtonSettingStyle {
@@ -23,7 +23,7 @@ class ButtonSettingWidget extends StatelessWidget {
   /// The style; used to denote what type of action is being preformed. See [ButtonSettingStyle].
   final ButtonSettingStyle buttonStyle;
   /// The confirmation info. If null, no confirmation is presented.
-  final SettingConfirmation? confirmation;
+  final ConfirmationInfo? confirmation;
 
   const ButtonSettingWidget({
     super.key,

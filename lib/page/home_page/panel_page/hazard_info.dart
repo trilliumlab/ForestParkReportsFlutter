@@ -20,7 +20,7 @@ class UpdateInfoWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                update.active ? "Confirmed" : "Deleted",
+                update.active ? "Reported Present" : "Reported Cleared",
                 style: theme.textTheme.titleLarge,
               ),
               Text(

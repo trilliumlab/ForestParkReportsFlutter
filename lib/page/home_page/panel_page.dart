@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
+import 'package:forest_park_reports/page/common/confirmation.dart';
 import 'package:forest_park_reports/page/home_page.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
@@ -60,7 +61,15 @@ class _PanelPageState extends ConsumerState<PanelPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 10),
                 child: PlatformTextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!await showConfirmationDialog(context, ConfirmationInfo(
+                      title: "Report hazard cleared?",
+                      content: "Please make sure the hazard is gone.",
+                      affirmative: "Yes"
+                    ))) {
+                      return;
+                    }
+
                     ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
@@ -72,9 +81,9 @@ class _PanelPageState extends ConsumerState<PanelPage> {
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
-                  child: Text(
-                    "Cleared",
-                    style: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)),
+                  child: const Text(
+                    "Report Cleared",
+                    style: TextStyle(color: CupertinoColors.systemGreen),
                   ),
                 ),
               ),
@@ -83,7 +92,15 @@ class _PanelPageState extends ConsumerState<PanelPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 20),
                 child: PlatformTextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!await showConfirmationDialog(context, ConfirmationInfo(
+                        title: "Report hazard present?",
+                        content: "Please make sure the hazard is still present.",
+                        affirmative: "Yes"
+                    ))) {
+                      return;
+                    }
+
                     ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
@@ -95,9 +112,9 @@ class _PanelPageState extends ConsumerState<PanelPage> {
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
-                  child: Text(
-                    "Present",
-                    style: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.systemBlue, context)),
+                  child: const Text(
+                    "Report Present",
+                    style: TextStyle(color: CupertinoColors.destructiveRed),
                   ),
                 ),
               ),

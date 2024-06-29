@@ -96,7 +96,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
             cupertinoOverrideTheme:  CupertinoThemeData(
               brightness: Brightness.light,
               barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
-              textTheme: const CupertinoTextThemeData(),
+              textTheme: CupertinoTextThemeData(
+                navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialLightTheme.colorScheme.primary)
+              ),
             ),
           ),
         );
@@ -106,7 +108,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
             cupertinoOverrideTheme: CupertinoThemeData(
               brightness: Brightness.dark,
               barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
-              textTheme: const CupertinoTextThemeData(),
+              textTheme: CupertinoTextThemeData(
+                  navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialDarkTheme.colorScheme.primary)
+              ),
             ),
           ),
         );
