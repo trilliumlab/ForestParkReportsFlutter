@@ -19,7 +19,7 @@ import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widg
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The sliding-up modal with info on the current selected trail or hazard on the map
-class PanelPage extends ConsumerStatefulWidget {
+class PanelPage extends ConsumerWidget {
   final ScrollController scrollController;
   final ScreenPanelController panelController;
   const PanelPage({
@@ -27,14 +27,9 @@ class PanelPage extends ConsumerStatefulWidget {
     required this.scrollController,
     required this.panelController,
   });
-  @override
-  ConsumerState<PanelPage> createState() => _PanelPageState();
-}
 
-//TODO stateless?
-class _PanelPageState extends ConsumerState<PanelPage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final selectedRelationID = ref.watch(selectedRelationProvider);
     final selectedRelation = selectedRelationID == null ? null : ref.watch(relationsProvider).value?.get(selectedRelationID);
     final selectedHazard = ref.watch(selectedHazardProvider.select((h) => h.hazard));
@@ -50,8 +45,8 @@ class _PanelPageState extends ConsumerState<PanelPage> {
     return Panel(
       // panel for when a hazard is selected
       child: selectedHazard != null ? TrailInfoWidget(
-        scrollController: widget.scrollController,
-        panelController: widget.panelController,
+        scrollController: scrollController,
+        panelController: panelController,
         // TODO fetch trail name
         title: "${selectedHazard.hazard.displayName} on ${hazardRelation!.tags["name"]}",
         bottomWidget: Row(
@@ -126,10 +121,10 @@ class _PanelPageState extends ConsumerState<PanelPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Opacity(
-                opacity: widget.panelController.snapWidgetOpacity,
+                opacity: panelController.snapWidgetOpacity,
                 child: SizedBox(
-                  height: widget.panelController.panelSnapHeight * 0.7
-                      + (widget.panelController.panelOpenHeight-widget.panelController.panelSnapHeight)*widget.panelController.pastSnapPosition * 0.6,
+                  height: panelController.panelSnapHeight * 0.7
+                      + (panelController.panelOpenHeight-panelController.panelSnapHeight)*panelController.pastSnapPosition * 0.6,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     child: HazardImage(lastImage, blurHash: hazardUpdates?.lastBlurHash),
@@ -164,25 +159,25 @@ class _PanelPageState extends ConsumerState<PanelPage> {
 
       // panel for when a trail is selected
       selectedRelation != null ? TrailInfoWidget(
-        scrollController: widget.scrollController,
-        panelController: widget.panelController,
+        scrollController: scrollController,
+        panelController: panelController,
         // TODO show real name
         title: selectedRelation.tags["name"],
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Opacity(
-              opacity: widget.panelController.snapWidgetOpacity,
+              opacity: panelController.snapWidgetOpacity,
               child: TrailElevationGraph(
                 relationID: selectedRelation.id,
-                height: widget.panelController.panelSnapHeight*0.6,
+                height: panelController.panelSnapHeight*0.6,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 14),
             child: Opacity(
-              opacity: widget.panelController.fullWidgetOpacity,
+              opacity: panelController.fullWidgetOpacity,
               child: TrailHazardsWidget(
                   relationID: selectedRelation.id
               ),
@@ -193,8 +188,8 @@ class _PanelPageState extends ConsumerState<PanelPage> {
 
       // panel for when nothing is selected
       TrailInfoWidget(
-          scrollController: widget.scrollController,
-          panelController: widget.panelController,
+          scrollController: scrollController,
+          panelController: panelController,
           children: const []
       ),
     );
