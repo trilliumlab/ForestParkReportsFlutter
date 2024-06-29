@@ -1,19 +1,27 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:blurhash_ffi/blurhash.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:image/image.dart' as img;
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/dio_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
+import 'package:uuid/uuid.dart';
 
 part 'hazard_provider.g.dart';
 
-@riverpod
+const uuidGenerator = Uuid();
+
+@Riverpod(keepAlive: true)
 class ActiveHazard extends _$ActiveHazard {
   static final store = StoreRef<String, Map<String, dynamic>>("hazards");
 
@@ -58,31 +66,92 @@ class ActiveHazard extends _$ActiveHazard {
     state = AsyncData(await _fetch());
   }
 
-  Future<void> create(HazardRequestModel request) async {
-    final res = await ref.read(dioProvider).post("/hazard/new", data: request.toJson());
+  Future<void> create(HazardRequestModel request, {XFile? imageFile}) async {
+    img.Image? image;
+
+    // If we're passed an image, decode it.
+    if (imageFile != null) {
+      final cmd = img.Command()
+        ..decodeNamedImage(imageFile.path, await imageFile.readAsBytes());
+      image = await cmd.getImageThread();
+    }
+
+    // If decoding successful, generate blurHash and add to hazard request.
+    if (image != null) {
+      request = request.copyWith(
+          image: uuidGenerator.v1(),
+          blurHash: await _getBlurHash(image),
+      );
+    }
+
+    // Save new hazard - returns the HazardModel created
+    final res = await ref.read(dioProvider).post(
+      "/hazard/new",
+      data: request.toJson()
+    );
     final hazard = HazardModel.fromJson(res.data);
 
+    // Add new HazardModel to state and db
     state = AsyncData([
       if (state.hasValue)
         ...state.requireValue,
       hazard
     ]);
-
     final db = await ref.read(forestParkDatabaseProvider.future);
     store.record(hazard.uuid).put(db, hazard.toJson());
+
+    // Now we try to upload the image if we have one
+    if (image == null) {
+      return;
+    }
+    final imageData = await _compressImage(image);
+    if (imageData == null) {
+      return;
+    }
+    await _uploadImage(imageData, request.image!);
   }
 
-  Future<String?> uploadImage(XFile file, {void Function(int, int)? onSendProgress}) async {
-    final image = await FlutterImageCompress.compressWithFile(
-        file.path,
-        keepExif: true,
-        quality: 80
-    );
+  Future<Uint8List?> _compressImage(img.Image image) async {
+    final double resizeScale = 1920.0 / max(image.width, image.height);
+
+    // Resize image to maximum dimension 1920 and jpeg encode.
+    final cmd = img.Command()
+      ..image(image)
+      ..copyResize(width: (image.width * resizeScale).round())
+      ..encodeJpg(quality: 80);
+
+    // Run command in isolate.
+    return await cmd.getBytesThread();
+  }
+
+  Future<String?> _getBlurHash(img.Image image) async {
+    final double thumbScale = 240.0 / max(image.width, image.height);
+
+    // Resize image to very small - this speeds up the image hashing algorithm greatly.
+    final cmd = img.Command()
+      ..image(image)
+      ..copyResize(width: (image.width * thumbScale).round())
+      ..encodeBmp();
+
+    // Run command in isolate.
+    final thumb = await cmd.getBytesThread();
+    if (thumb == null) {
+      return null;
+    }
+
+    // Calculate BlurHash
+    final imageProvider = MemoryImage(thumb);
+    final String blurHash = await BlurhashFFI.encode(imageProvider);
+
+    return blurHash;
+  }
+
+  Future<bool> _uploadImage(Uint8List image, String uuid, {void Function(int, int)? onSendProgress}) async {
     FormData formData = FormData.fromMap({
-      "file": MultipartFile.fromBytes(image!),
+      "file": MultipartFile.fromBytes(image),
     });
-    final res = await ref.read(dioProvider).post(
-        "/hazard/image",
+    final res = await ref.read(dioProvider).put(
+        "/hazard/image/$uuid",
         data: formData,
         options: Options(
           headers: {
@@ -91,7 +160,7 @@ class ActiveHazard extends _$ActiveHazard {
         ),
         onSendProgress: onSendProgress
     );
-    return res.data['uuid'];
+    return res.statusCode == 200;
   }
 }
 
@@ -110,9 +179,10 @@ class HazardUpdateList extends ListBase<HazardUpdateModel> {
   void operator []=(int index, HazardUpdateModel value) { l[index] = value; }
 
   String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
+  String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class HazardUpdates extends _$HazardUpdates {
   @override
   HazardUpdateList build(String hazard) {
@@ -141,7 +211,7 @@ class SelectedHazardState {
   SelectedHazardState(this.moveCamera, [this.hazard]);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SelectedHazard extends _$SelectedHazard {
   @override
   SelectedHazardState build() => SelectedHazardState(false);

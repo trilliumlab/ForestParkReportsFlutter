@@ -115,7 +115,7 @@ class _PanelPageState extends ConsumerState<PanelPage> {
                       + (widget.panelController.panelOpenHeight-widget.panelController.panelSnapHeight)*widget.panelController.pastSnapPosition * 0.6,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: HazardImage(lastImage),
+                    child: HazardImage(lastImage, blurHash: hazardUpdates?.lastBlurHash),
                   ),
                 ),
               ),

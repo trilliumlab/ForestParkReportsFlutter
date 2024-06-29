@@ -8,6 +8,7 @@ import 'package:forest_park_reports/page/settings_page/button_setting_widget.dar
 import 'package:forest_park_reports/page/settings_page/setting_confirmation.dart';
 import 'package:forest_park_reports/page/settings_page/settings_section.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
+import 'package:forest_park_reports/provider/hazard_photo_provider.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -77,8 +78,12 @@ class SettingsPage extends ConsumerWidget {
               confirmation: SettingConfirmation(
                   title: "Reset database?",
                   content: "All settings and offline reports will be lost."),
-              onTap: () {
+              onTap: () async {
+                //  Delete database
                 ref.read(forestParkDatabaseProvider.notifier).delete();
+                // Delete cache
+                final imageDir = (await ref.read(imageDirectoryProvider.future))!;
+                await imageDir.delete(recursive: true);
               },
             )
           ],

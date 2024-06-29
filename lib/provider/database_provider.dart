@@ -11,7 +11,7 @@ import 'package:sembast_web/sembast_web.dart';
 
 part 'database_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ForestParkDatabase extends _$ForestParkDatabase {
   @override
   Future<Database> build() async {
@@ -35,7 +35,7 @@ class ForestParkDatabase extends _$ForestParkDatabase {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<String> dbPath(DbPathRef ref) async {
   if (kIsWeb) {
     return "";

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -78,21 +79,15 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
-    String? imageUuid;
-    if (_image != null) {
-      imageUuid = await activeHazardNotifier.uploadImage(
-        _image!,
-        onSendProgress: (sent, total) => setState(() {
-          _uploadProgress = sent/total;
-        }),
-      );
-    }
+    print("printing name");
+    print(_image!.name);
+    print("printing path");
+    print(_image!.path);
 
     await activeHazardNotifier.create(HazardRequestModel(
       hazard: _selectedHazard!,
       location: snappedLoc.location,
-      image: imageUuid
-    ));
+    ), imageFile: _image);
     _close();
   }
 

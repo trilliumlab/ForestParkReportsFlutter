@@ -35,7 +35,7 @@ class UpdateInfoWidget extends StatelessWidget {
               aspectRatio: 4/3,
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: (update.image != null) ? HazardImage(update.image!) : Container(),
+                child: (update.image != null) ? HazardImage(update.image!, blurHash: update.blurHash) : Container(),
               ),
             )
           )

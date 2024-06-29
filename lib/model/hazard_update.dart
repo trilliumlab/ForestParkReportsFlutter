@@ -13,6 +13,7 @@ class HazardUpdateModel with _$HazardUpdateModel {
     required DateTime time,
     required String hazard,
     required bool active,
+    String? blurHash,
     String? image,
   }) = _HazardUpdateModel;
 
