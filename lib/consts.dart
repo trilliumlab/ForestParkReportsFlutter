@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 //const kApiUrl = "https://forestpark.elliotnash.org/api/v1";
-// const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
-const kApiUrl = "http://192.168.0.172:8000";
+const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
+// const kApiUrl = "http://192.168.0.172:8000";
 // const kApiUrl = "http://localhost:8000/";
 
 // This is for development only and needs to be set to null before a release
