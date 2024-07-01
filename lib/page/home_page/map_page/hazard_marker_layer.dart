@@ -48,11 +48,7 @@ class HazardMarkerLayer extends ConsumerWidget {
           },
           child: Icon(
             Icons.warning_rounded,
-            color: isMaterial(context)
-                ? Theme
-                .of(context)
-                .colorScheme.error
-                : CupertinoDynamicColor.resolve(
+            color: CupertinoDynamicColor.resolve(
                 CupertinoColors.destructiveRed, context)
           ),
         )

@@ -15,6 +15,7 @@ class HazardModel with _$HazardModel {
     required DateTime time,
     required HazardType hazard,
     required SnappedLatLng location,
+    required String? blurHash,
     required String? image,
   }) = _HazardModel;
 
@@ -30,7 +31,8 @@ class HazardRequestModel with _$HazardRequestModel {
   const factory HazardRequestModel({
     required HazardType hazard,
     required SnappedLatLng location,
-    required String? image,
+    String? blurHash,
+    String? image,
   }) = _HazardRequestModel;
 
   factory HazardRequestModel.fromJson(Map<String, dynamic> json) =>

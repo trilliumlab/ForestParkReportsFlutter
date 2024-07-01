@@ -65,6 +65,7 @@ class HazardInfoWidget extends ConsumerWidget {
     final theme = Theme.of(context);
     final hazardUpdates = ref.watch(hazardUpdatesProvider(hazard.uuid));
     final lastImage = hazardUpdates.lastImage;
+    final lastBlurHash = hazardUpdates.lastBlurHash;
     return PlatformTextButton(
       padding: const EdgeInsets.only(left: 12, right: 8, top: 8, bottom: 8),
       onPressed: () {
@@ -104,7 +105,7 @@ class HazardInfoWidget extends ConsumerWidget {
                   aspectRatio: 4/3,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: HazardImage(lastImage),
+                    child: HazardImage(lastImage, blurHash: lastBlurHash),
                   ),
                 )
             )

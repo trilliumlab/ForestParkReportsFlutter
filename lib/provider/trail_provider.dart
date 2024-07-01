@@ -13,7 +13,7 @@ import 'package:sembast/sembast.dart';
 
 part 'trail_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Trails extends _$Trails {
   static final store = StoreRef<int, Blob>("trails");
 
