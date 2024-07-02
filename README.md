@@ -137,6 +137,22 @@ forest-park-reports-app
 └── windows # native Windows projecct
 ```
 
+## Assets
+
+The [assets/icon](assets/icon) folder contains the app icon. This was created in Adobe Illustrator
+and the source files are [icon 3d.ai](assets/icon/icon 3d.ai) for the main icon and
+[icon.ai](assets/icon/icon.ai) for a flat version. [icon.png](assets/icon/icon.png) is the full
+rendered icon, and [background.png](assets/icon/background.png) and
+[foreground.png](assets/icon/foreground.png) are separated bg/fg layers
+(used by android adaptive icons).
+
+Custom icon symbols go in the [assets/icons](assets/icons) directory (svgs only). The icons are
+loaded in flutter using a font file. To generate the font file and the dart icon class, run:
+
+```bash
+dart run icon_font_generator:generator
+```
+
 ## Contributing
 
 Contributions are welcomed! If you have any suggestions, feel free to open a pull request.
