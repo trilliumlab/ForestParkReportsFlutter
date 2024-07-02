@@ -5,23 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'hazard_photo_provider.g.dart';
+import 'app_directory_provider.dart';
 
-/// Provides the directory where cached images should be stored.
-/// Creates directory if it does not exist.
-@Riverpod(keepAlive: true)
-Future<Directory?> imageDirectory(ImageDirectoryRef ref) async {
-  if (kIsWeb) {
-    return null;
-  }
-  final appDir = await getApplicationSupportDirectory();
-  final imageDir = Directory(join(appDir.path, kImageDirectory));
-  await imageDir.create(recursive: true);
-  return imageDir;
-}
+part 'hazard_photo_provider.g.dart';
 
 /// Provides the [Uint8List] image data for a photo of given UUID. Caches downloads locally.
 @Riverpod(keepAlive: true)
@@ -34,7 +22,7 @@ class HazardPhoto extends _$HazardPhoto {
       data = await _fetch(uuid);
     } else {
       // Read all cached image filenames and see if any match the uuid we need.
-      final imageDir = (await ref.watch(imageDirectoryProvider.future))!;
+      final imageDir = (await ref.watch(appDirectoryProvider(kImageDirectory).future))!;
       final hasImage = await imageDir.list().any((f) => f.uri.pathSegments.last == uuid);
       // If image doesn't exist in cache (or path exists but is not a File) fetch from server.
       if (!hasImage) {
@@ -67,7 +55,7 @@ class HazardPhoto extends _$HazardPhoto {
 
   Future<void> _saveImage(String uuid, Uint8List data) async {
     // Get image path and ensure exists.
-    final imageDir = (await ref.read(imageDirectoryProvider.future))!;
+    final imageDir = (await ref.read(appDirectoryProvider(kImageDirectory).future))!;
     final imageFile = File(join(imageDir.path, uuid));
     await imageFile.create();
     // Write data.

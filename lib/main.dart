@@ -3,13 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
+import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/page/home_page.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final providerContainer = ProviderContainer();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,28 +24,13 @@ Future<void> main() async {
       await FMTCObjectBoxBackend().initialise();
       await const FMTCStore('forestPark').manage.create();
     }(),
-    FlutterUploader().setBackgroundHandler(backgroundHandler)
+    OfflineUploader().initialize()
   ]);
 
-  runApp(const ProviderScope(
-    child: App(),
+  runApp(UncontrolledProviderScope(
+    container: providerContainer,
+    child: const App(),
   ));
-}
-
-/// Handler for background network requests using flutter_uploader
-void backgroundHandler() {
-  // Needed so that plugin communication works.
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // This uploader instance works within the isolate only.
-  FlutterUploader uploader = FlutterUploader();
-
-  uploader.progress.listen((progress) {
-    // upload progress
-  });
-  uploader.result.listen((result) {
-    // upload results
-  });
 }
 
 class App extends ConsumerStatefulWidget {

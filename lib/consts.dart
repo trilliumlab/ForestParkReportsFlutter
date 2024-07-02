@@ -21,6 +21,7 @@ const kNetworkEndian = Endian.little;
 
 const kDbName = "forest_park_reports";
 const kImageDirectory = "images";
+const kQueueDirectory = "queue";
 
 const double kFabPadding = 10;
 
