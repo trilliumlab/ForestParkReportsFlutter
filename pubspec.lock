@@ -475,6 +475,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_uploader:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: update-to-dart-3
+      resolved-ref: f9bb28a2460a5d9b9c641d5dab4b9522400e8982
+      url: "https://github.com/orestesgaolin/flutter_uploader.git"
+    source: git
+    version: "3.0.0-beta.5"
   flutter_web_plugins:
     dependency: transitive
     description: flutter

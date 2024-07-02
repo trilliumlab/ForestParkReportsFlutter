@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:blurhash_ffi/blurhash.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:image/image.dart' as img;
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
@@ -80,7 +81,7 @@ class ActiveHazard extends _$ActiveHazard {
     if (image != null) {
       request = request.copyWith(
           image: uuidGenerator.v1(),
-          blurHash: await _getBlurHash(image),
+          blurHash: await image.getBlurHash(),
       );
     }
 
@@ -104,46 +105,11 @@ class ActiveHazard extends _$ActiveHazard {
     if (image == null) {
       return;
     }
-    final imageData = await _compressImage(image);
+    final imageData = await image.compress();
     if (imageData == null) {
       return;
     }
     await _uploadImage(imageData, request.image!);
-  }
-
-  Future<Uint8List?> _compressImage(img.Image image) async {
-    final double resizeScale = 1920.0 / max(image.width, image.height);
-
-    // Resize image to maximum dimension 1920 and jpeg encode.
-    final cmd = img.Command()
-      ..image(image)
-      ..copyResize(width: (image.width * resizeScale).round())
-      ..encodeJpg(quality: 80);
-
-    // Run command in isolate.
-    return await cmd.getBytesThread();
-  }
-
-  Future<String?> _getBlurHash(img.Image image) async {
-    final double thumbScale = 240.0 / max(image.width, image.height);
-
-    // Resize image to very small - this speeds up the image hashing algorithm greatly.
-    final cmd = img.Command()
-      ..image(image)
-      ..copyResize(width: (image.width * thumbScale).round())
-      ..encodeBmp();
-
-    // Run command in isolate.
-    final thumb = await cmd.getBytesThread();
-    if (thumb == null) {
-      return null;
-    }
-
-    // Calculate BlurHash
-    final imageProvider = MemoryImage(thumb);
-    final String blurHash = await BlurhashFFI.encode(imageProvider);
-
-    return blurHash;
   }
 
   Future<bool> _uploadImage(Uint8List image, String uuid, {void Function(int, int)? onSendProgress}) async {
