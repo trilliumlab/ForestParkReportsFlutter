@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -8,17 +9,18 @@ import 'package:image/image.dart' as img;
 extension CompressImage on img.Image {
   /// Compresses and JPEG encodes an [img.Image]
   /// such that the largest side is [maxSidePixels] pixels.
-  Future<Uint8List?> compress({double maxSidePixels = 1920.0}) async {
+  Future<void> compressToFile({required String filePath, double maxSidePixels = 1920.0}) async {
     final double resizeScale = maxSidePixels / max(width, height);
 
     // Resize image to maximum dimension 1920 and jpeg encode.
     final cmd = img.Command()
       ..image(this)
       ..copyResize(width: (width * resizeScale).round())
-      ..encodeJpg(quality: 80);
+      ..encodeJpg(quality: 80)
+      ..writeToFile(filePath);
 
     // Run command in isolate.
-    return await cmd.getBytesThread();
+    await cmd.executeThread();
   }
 
   /// Computes the BlurHash of an image.

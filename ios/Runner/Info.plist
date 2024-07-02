@@ -65,6 +65,10 @@
 	</array>
 	<key>FUTimeoutInSeconds</key>
 	<integer>28800</integer>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

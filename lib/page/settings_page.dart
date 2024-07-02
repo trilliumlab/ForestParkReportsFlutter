@@ -8,7 +8,7 @@ import 'package:forest_park_reports/page/settings_page/toggle_setting_widget.dar
 import 'package:forest_park_reports/page/settings_page/button_setting_widget.dart';
 import 'package:forest_park_reports/page/common/confirmation.dart';
 import 'package:forest_park_reports/page/settings_page/settings_section.dart';
-import 'package:forest_park_reports/provider/app_directory_provider.dart';
+import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -83,7 +83,7 @@ class SettingsPage extends ConsumerWidget {
                 //  Delete database
                 ref.read(forestParkDatabaseProvider.notifier).delete();
                 // Delete cache
-                final imageDir = (await ref.read(appDirectoryProvider(kImageDirectory).future))!;
+                final imageDir = (await ref.read(directoryProvider(kImageDirectory).future))!;
                 await imageDir.delete(recursive: true);
               },
             )

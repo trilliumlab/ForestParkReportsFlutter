@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -40,7 +40,6 @@ Future<String> dbPath(DbPathRef ref) async {
   if (kIsWeb) {
     return "";
   }
-  final dir = await getApplicationSupportDirectory();
-  await dir.create(recursive: true);
-  return join(dir.path, "$kDbName.db");
+  final dir = await ref.watch(appDirectoryProvider.future);
+  return join(dir!.path, "$kDbName.db");
 }

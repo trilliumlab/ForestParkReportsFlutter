@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/model/camera_position.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:uuid/uuid.dart';
 
 //const kApiUrl = "https://forestpark.elliotnash.org/api/v1";
 const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
@@ -36,3 +37,5 @@ const kElevationMaxEntries = 200;
 
 // encoding consts
 const kElevationDeltaModifier = 4;
+
+const kUuidGen = Uuid();
