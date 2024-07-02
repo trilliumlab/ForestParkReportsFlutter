@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/model/camera_position.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,8 @@ const kHomeCameraPosition = CameraPosition(
   center: LatLng(45.57416784067063, -122.76892379502566),
   zoom: 11.5,
 );
+
+const kMarkerTopAlignment = Alignment(0, -0.65);
 
 const kElevationMaxEntries = 200;
 
