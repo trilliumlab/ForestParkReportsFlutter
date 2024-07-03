@@ -97,16 +97,17 @@ class OfflineUploader {
     final queuedRequestResponse = QueuedRequestResponseModel.fromJson(queuedRequestResponseJson);
     print("Received queuedRequestResponse in main isolate: $queuedRequestResponse");
 
+    // Now we need to pass data to provider
     switch(queuedRequestResponse.requestType) {
       case QueuedRequestType.newHazard:
         providerContainer.read(activeHazardProvider.notifier)
             .handleCreateResponse(queuedRequestResponse.response);
         break;
       case QueuedRequestType.imageUpload:
-      // TODO: not handled
+        // Not needed right now, image upload has no response.
         break;
       case QueuedRequestType.updateHazard:
-      // TODO: not handled
+        // TODO: not handled
         break;
     }
   }

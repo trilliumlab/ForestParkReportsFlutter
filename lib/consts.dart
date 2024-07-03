@@ -6,8 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
 //const kApiUrl = "https://forestpark.elliotnash.org/api/v1";
-// const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
-const kApiUrl = "http://192.168.0.247:8000";
+const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
+// const kApiUrl = "http://192.168.0.247:8000";
 // const kApiUrl = "http://localhost:8000/";
 
 // This is for development only.
@@ -18,10 +18,10 @@ const kPlatformOverride = null;
 // Example: 11:53 AM July 12 2022
 final DateFormat kDisplayDateFormat = DateFormat('hh:mm a MMMM dd y');
 
-// Provider constants
+// Provider consts
 const kHazardRefreshPeriod = Duration(seconds: 100000);
 
-// Filesystem constants
+// Filesystem consts
 const kDbName = "forest_park_reports";
 const kImageDirectory = "images";
 const kQueueDirectory = "queue";
@@ -40,6 +40,9 @@ const kElevationMaxEntries = 200;
 // Encoding consts
 const kNetworkEndian = Endian.little;
 const kElevationDeltaModifier = 4;
+
+// Isolate consts
+const kBackgroundRequestPortName = "backgroundRequestPort";
 
 // Uuid generator
 const kUuidGen = Uuid();
