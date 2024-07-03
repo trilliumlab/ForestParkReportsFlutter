@@ -24,16 +24,15 @@ const kImageDirectory = "images";
 
 /// An assortment of calculated values regarding the panel  
 class PanelValues {
+  // The fraction of the total window height to which the panel should open
   static const double _openFraction = 0.8;
+
+  // The minimum visible height of the panel (can go below when hidden)
   static const double _collapsedHeight = 100;
 
-  // Fraction of the 
-  static const double _snapFraction = 0.4;
+  // Fraction of the distance between the open and collapsed states to which the panel should snap
+  static const double _snapPoint = 0.4;
   
-
-  // /// The maximum height of the window as a fraction of the TOTAL WINDOW HEIGHT <br />
-  // /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  // static double openFraction(BuildContext context) => _openFraction;
   /// The open height of the panel in pixels <br />
   /// ALWAYS USE THIS IN THE BUILD METHOD. This value may change when the BuildContext changes
   static double openHeight(BuildContext context) => _openFraction * MediaQuery.of(context).size.height;
@@ -50,7 +49,7 @@ class PanelValues {
   static double snapFraction (BuildContext context) => snapHeight(context) / openHeight(context);
   /// The snapped height of the panel in pixels <br />
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  static double snapHeight (BuildContext context) =>  _snapFraction * (openHeight(context) - _collapsedHeight) + _collapsedHeight;
+  static double snapHeight (BuildContext context) =>  _snapPoint * (openHeight(context) - _collapsedHeight) + _collapsedHeight;
 }
 
 const double kFabPadding = 10;
