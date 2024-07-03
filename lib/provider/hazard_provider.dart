@@ -89,7 +89,7 @@ class ActiveHazard extends _$ActiveHazard {
       );
     }
 
-    // Queue new hazard request
+    // Queue new hazard request.
     OfflineUploader().enqueueJson(
       method: UploadMethod.POST,
       requestType: QueuedRequestType.newHazard,
@@ -116,15 +116,8 @@ class ActiveHazard extends _$ActiveHazard {
     );
   }
 
-  Future<void> handleCreateResponse(String? response) async {
-    print("Handling create response: $response");
-    if (response == null) {
-      return;
-    }
-
-    // Parse JSON from string
-    final hazardJson = jsonDecode(response);
-    final hazard = HazardModel.fromJson(hazardJson);
+  Future<void> handleCreateResponse(HazardModel hazard) async {
+    print("Handling hazard create response: $hazard");
 
     // Add new HazardModel to state and db
     state = AsyncData([
@@ -172,9 +165,38 @@ class HazardUpdates extends _$HazardUpdates {
     state = updates;
   }
 
-  Future create(HazardUpdateRequestModel request) async {
-    final res = await ref.read(dioProvider).post("/hazard/update", data: request.toJson());
-    state = HazardUpdateList([...state, HazardUpdateModel.fromJson(res.data)]);
+  Future create(HazardUpdateRequestModel request, {XFile? imageFile}) async {
+    img.Image? image;
+
+    // If we're passed an image, decode it.
+    if (imageFile != null) {
+      final cmd = img.Command()
+        ..decodeNamedImage(imageFile.path, await imageFile.readAsBytes());
+      image = await cmd.getImageThread();
+    }
+
+    // If decoding successful, generate blurHash and add to hazard update request.
+    if (image != null) {
+      request = request.copyWith(
+        image: kUuidGen.v1(),
+        blurHash: await image.getBlurHash(),
+      );
+    }
+
+    // Queue new hazard update request.
+    OfflineUploader().enqueueJson(
+      method: UploadMethod.POST,
+      requestType: QueuedRequestType.updateHazard,
+      url: "$kApiUrl/hazard/update",
+      data: request.toJson(),
+    );
+  }
+
+  Future<void> handleCreateResponse(HazardUpdateModel hazardUpdate) async {
+    print("Handling hazard update create response: $hazardUpdate");
+
+    // Add new hazard update to state
+    state = HazardUpdateList([...state, hazardUpdate]);
   }
 }
 

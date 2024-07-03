@@ -29,6 +29,7 @@ class HazardUpdateRequestModel with _$HazardUpdateRequestModel {
   const factory HazardUpdateRequestModel({
     required String hazard,
     required bool active,
+    String? blurHash,
     String? image,
   }) = _HazardUpdateRequestModel;
 

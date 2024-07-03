@@ -28,7 +28,7 @@ class QueuedRequestResponseModel with _$QueuedRequestResponseModel {
 
   const factory QueuedRequestResponseModel({
     required QueuedRequestType requestType,
-    required String? response,
+    required Map<String, dynamic>? response,
   }) = _QueuedRequestResponseModel;
 
   factory QueuedRequestResponseModel.fromJson(Map<String, dynamic> json) =>

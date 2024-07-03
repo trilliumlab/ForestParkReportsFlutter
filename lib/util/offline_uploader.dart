@@ -6,6 +6,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
+import 'package:forest_park_reports/model/hazard.dart';
+import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
@@ -45,7 +47,8 @@ void backgroundRequestsHandler() {
         // Construct response
         final queuedRequestResponseJson = QueuedRequestResponseModel(
           requestType: queuedRequest.requestType,
-          response: response.response,
+          response: response.response != null
+              ? jsonDecode(response.response!) : null,
         ).toJson();
 
         // Send response to main isolate to handle
@@ -100,14 +103,21 @@ class OfflineUploader {
     // Now we need to pass data to provider
     switch(queuedRequestResponse.requestType) {
       case QueuedRequestType.newHazard:
-        providerContainer.read(activeHazardProvider.notifier)
-            .handleCreateResponse(queuedRequestResponse.response);
+        if (queuedRequestResponse.response != null) {
+          final hazard = HazardModel.fromJson(queuedRequestResponse.response!);
+          providerContainer.read(activeHazardProvider.notifier)
+              .handleCreateResponse(hazard);
+        }
         break;
       case QueuedRequestType.imageUpload:
         // Not needed right now, image upload has no response.
         break;
       case QueuedRequestType.updateHazard:
-        // TODO: not handled
+        if (queuedRequestResponse.response != null) {
+          final hazardUpdate = HazardUpdateModel.fromJson(queuedRequestResponse.response!);
+          providerContainer.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
+              .handleCreateResponse(hazardUpdate);
+        }
         break;
     }
   }
