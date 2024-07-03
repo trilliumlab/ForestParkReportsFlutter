@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:blurhash_ffi/blurhash.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
@@ -39,7 +41,7 @@ class ActiveHazard extends _$ActiveHazard {
 
     Timer.periodic(
       kHazardRefreshPeriod,
-          (_) => refresh(),
+      (_) => refresh(),
     );
 
     if (hazards.isNotEmpty) {
@@ -87,26 +89,13 @@ class ActiveHazard extends _$ActiveHazard {
       );
     }
 
-    // Save new hazard - returns the HazardModel created
+    // Queue new hazard request
     OfflineUploader().enqueueJson(
       method: UploadMethod.POST,
+      requestType: QueuedRequestType.newHazard,
       url: "$kApiUrl/hazard/new",
       data: request.toJson(),
     );
-    // final res = await ref.read(dioProvider).post(
-    //     "/hazard/new",
-    //     data: request.toJson()
-    // );
-    // final hazard = HazardModel.fromJson(res.data);
-    //
-    // // Add new HazardModel to state and db
-    // state = AsyncData([
-    //   if (state.hasValue)
-    //     ...state.requireValue,
-    //   hazard
-    // ]);
-    // final db = await ref.read(forestParkDatabaseProvider.future);
-    // store.record(hazard.uuid).put(db, hazard.toJson());
 
     // Now we try to upload the image if we have one
     if (image == null) {
@@ -117,30 +106,33 @@ class ActiveHazard extends _$ActiveHazard {
     final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
     await image.compressToFile(filePath: imagePath);
 
-    // Queue upload
+    // Queue image upload
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
+      requestType: QueuedRequestType.updateHazard,
       url: "$kApiUrl/hazard/image/${request.image!}",
       multipart: true,
       filePath: imagePath,
     );
   }
 
-  Future<bool> _uploadImage(Uint8List image, String uuid, {void Function(int, int)? onSendProgress}) async {
-    FormData formData = FormData.fromMap({
-      "file": MultipartFile.fromBytes(image),
-    });
-    final res = await ref.read(dioProvider).put(
-        "/hazard/image/$uuid",
-        data: formData,
-        options: Options(
-          headers: {
-            'Accept-Ranged': 'bytes'
-          },
-        ),
-        onSendProgress: onSendProgress
-    );
-    return res.statusCode == 200;
+  Future<void> handleCreateResponse(String? response) async {
+    if (response == null) {
+      return;
+    }
+
+    // Parse JSON from string
+    final hazardJson = jsonDecode(response);
+    final hazard = HazardModel.fromJson(hazardJson);
+
+    // Add new HazardModel to state and db
+    state = AsyncData([
+      if (state.hasValue)
+        ...state.requireValue,
+      hazard
+    ]);
+    final db = await ref.read(forestParkDatabaseProvider.future);
+    store.record(hazard.uuid).put(db, hazard.toJson());
   }
 }
 

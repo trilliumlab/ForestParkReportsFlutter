@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
+import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:flutter_uploader/flutter_uploader.dart';
+import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
 export 'package:flutter_uploader/flutter_uploader.dart' show UploadMethod;
@@ -19,12 +21,41 @@ void backgroundHandler() {
   // This uploader instance works within the isolate only.
   FlutterUploader uploader = FlutterUploader();
 
-  uploader.progress.listen((progress) {
-    // upload progress
+  // Called whenever upload progress changes.
+  uploader.progress.listen((progress) async {
   });
-  uploader.result.listen((result) {
-    // upload results
-    print("upload completed: $result");
+  // Called when upload completes.
+  uploader.result.listen((response) async {
+    print("upload completed: $response");
+    final db = await providerContainer.read(forestParkDatabaseProvider.future);
+    if (response.statusCode != null) {
+      final queuedRequestJson = await OfflineUploader.store.record(response.taskId).get(db);
+      if (queuedRequestJson != null) {
+        final queuedRequest = QueuedRequestModel.fromJson(queuedRequestJson);
+
+        print("found associated queued request: $queuedRequest");
+
+        // Delete request file.
+        final file = File(queuedRequest.filePath);
+        try {
+          await file.delete();
+        } catch(e) {}
+
+        // Handle response
+        switch(queuedRequest.requestType) {
+          case QueuedRequestType.newHazard:
+            providerContainer.read(activeHazardProvider.notifier)
+                .handleCreateResponse(response.response);
+            break;
+          case QueuedRequestType.imageUpload:
+            // TODO: not handled
+            break;
+          case QueuedRequestType.updateHazard:
+            // TODO: not handled
+            break;
+        }
+      }
+    }
     uploader.clearUploads();
   });
 }
@@ -38,7 +69,7 @@ class OfflineUploader {
   /// [OfflineUploader] is a singleton (will always return the same instance)
   factory OfflineUploader() => _instance;
 
-  static final store = StoreRef<String, String>("queue");
+  static final store = StoreRef<String, Map<String, dynamic>>("queue");
 
   Future<void> initialize() async {
     print("flutter uploader initialized");
@@ -52,6 +83,7 @@ class OfflineUploader {
     required UploadMethod method,
     required String url,
     required Map<String, dynamic> data,
+    required QueuedRequestType requestType,
     Map<String, String>? headers,
   }) async {
     // TODO use dio on web.
@@ -66,7 +98,13 @@ class OfflineUploader {
     final headerMap = headers ?? {};
     headerMap["Content-Type"] = "application/json";
 
-    await enqueueFile(method: method, url: url, filePath: file.path, headers: headerMap);
+    await enqueueFile(
+      method: method,
+      url: url,
+      filePath: file.path,
+      requestType: requestType,
+      headers: headerMap,
+    );
   }
 
   /// Uploads the file with path [filePath] to [url] with http method [method].
@@ -76,11 +114,11 @@ class OfflineUploader {
     required UploadMethod method,
     required String url,
     required String filePath,
+    required QueuedRequestType requestType,
     bool multipart = false,
     Map<String, String>? headers,
   }) async {
     print("enqueuing file at path $filePath");
-    print("headers: $headers");
 
     final taskId = await FlutterUploader().enqueue(
       multipart ? MultipartFormDataUpload(
@@ -101,8 +139,11 @@ class OfflineUploader {
     print("Started task with id: $taskId");
 
     final db = await providerContainer.read(forestParkDatabaseProvider.future);
-    // Store the taskId and filePath so when the request completes we can
-    // look up the filePath we want to delete.
-    store.record(taskId).put(db, filePath);
+    // Store the QueuedRequestModel so when the request completes we can
+    // delete the file and handle the returned data.
+    store.record(taskId).put(db, QueuedRequestModel(
+      requestType: requestType,
+      filePath: filePath
+    ).toJson());
   }
 }
