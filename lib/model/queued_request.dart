@@ -21,3 +21,16 @@ enum QueuedRequestType {
   imageUpload,
   updateHazard;
 }
+
+@freezed
+class QueuedRequestResponseModel with _$QueuedRequestResponseModel {
+  const QueuedRequestResponseModel._();
+
+  const factory QueuedRequestResponseModel({
+    required QueuedRequestType requestType,
+    required String? response,
+  }) = _QueuedRequestResponseModel;
+
+  factory QueuedRequestResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$QueuedRequestResponseModelFromJson(json);
+}

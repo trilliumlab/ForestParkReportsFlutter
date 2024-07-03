@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
@@ -14,7 +16,7 @@ import 'package:sembast/sembast.dart';
 export 'package:flutter_uploader/flutter_uploader.dart' show UploadMethod;
 
 /// Handler for background network requests using flutter_uploader
-void backgroundHandler() {
+void backgroundRequestsHandler() {
   // Needed so that plugin communication works.
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,7 +34,6 @@ void backgroundHandler() {
       final queuedRequestJson = await OfflineUploader.store.record(response.taskId).get(db);
       if (queuedRequestJson != null) {
         final queuedRequest = QueuedRequestModel.fromJson(queuedRequestJson);
-
         print("found associated queued request: $queuedRequest");
 
         // Delete request file.
@@ -41,22 +42,26 @@ void backgroundHandler() {
           await file.delete();
         } catch(e) {}
 
-        // Handle response
-        switch(queuedRequest.requestType) {
-          case QueuedRequestType.newHazard:
-            providerContainer.read(activeHazardProvider.notifier)
-                .handleCreateResponse(response.response);
-            break;
-          case QueuedRequestType.imageUpload:
-            // TODO: not handled
-            break;
-          case QueuedRequestType.updateHazard:
-            // TODO: not handled
-            break;
+        // Construct response
+        final queuedRequestResponseJson = QueuedRequestResponseModel(
+          requestType: queuedRequest.requestType,
+          response: response.response,
+        ).toJson();
+
+        // Send response to main isolate to handle
+        final sendPort = IsolateNameServer.lookupPortByName(kBackgroundRequestPortName);
+        if (sendPort != null) {
+          // If the app is open, then we should handle response in main isolate.
+          sendPort.send(queuedRequestResponseJson);
+        } else {
+          // Otherwise, we don't need the ui to update so we can handle it in current isolate.
+          OfflineUploader().handleQueuedRequestResponse(queuedRequestResponseJson);
         }
+
+        // Clear uploads once we've processed them
+        uploader.clearUploads();
       }
     }
-    uploader.clearUploads();
   });
 }
 
@@ -71,9 +76,39 @@ class OfflineUploader {
 
   static final store = StoreRef<String, Map<String, dynamic>>("queue");
 
+  ReceivePort receivePort = ReceivePort(kBackgroundRequestPortName);
+
   Future<void> initialize() async {
+    // Register receive port globally
+    IsolateNameServer.registerPortWithName(receivePort.sendPort, kBackgroundRequestPortName);
+    receivePort.listen(handleQueuedRequestResponse);
+    // Set function that receives background request responses
+    await FlutterUploader().setBackgroundHandler(backgroundRequestsHandler);
+
     print("flutter uploader initialized");
-    await FlutterUploader().setBackgroundHandler(backgroundHandler);
+  }
+
+  /// **Function for internal use only**
+  ///
+  /// Handles background responses sent to [receivePort] from background isolate.
+  /// Should never be called manually except by background isolate if
+  /// there is no main isolate.
+  Future<void> handleQueuedRequestResponse(dynamic queuedRequestResponseJson) async {
+    final queuedRequestResponse = QueuedRequestResponseModel.fromJson(queuedRequestResponseJson);
+    print("Received queuedRequestResponse in main isolate: $queuedRequestResponse");
+
+    switch(queuedRequestResponse.requestType) {
+      case QueuedRequestType.newHazard:
+        providerContainer.read(activeHazardProvider.notifier)
+            .handleCreateResponse(queuedRequestResponse.response);
+        break;
+      case QueuedRequestType.imageUpload:
+      // TODO: not handled
+        break;
+      case QueuedRequestType.updateHazard:
+      // TODO: not handled
+        break;
+    }
   }
 
   /// Uploads the JSON object [data] to [url] with http method [method].

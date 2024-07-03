@@ -117,6 +117,7 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> handleCreateResponse(String? response) async {
+    print("Handling create response: $response");
     if (response == null) {
       return;
     }
