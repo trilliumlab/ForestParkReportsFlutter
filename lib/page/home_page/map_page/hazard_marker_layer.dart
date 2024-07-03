@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
+import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/page/home_page/map_page/hazard_info_popup.dart';
+import 'package:forest_park_reports/page/home_page/map_page/map_icon.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
@@ -31,7 +33,7 @@ class HazardMarkerLayer extends ConsumerWidget {
       marker = HazardMarker(
         hazard: hazard,
         rotate: true,
-        alignment: Alignment.center,
+        alignment: kMarkerTopAlignment,
         child: GestureDetector(
           onTap: () {
             ref.read(selectedRelationProvider.notifier).deselect();
@@ -45,10 +47,10 @@ class HazardMarkerLayer extends ConsumerWidget {
             ref.read(selectedHazardProvider.notifier).select(hazard);
             _popupController.showPopupsOnlyFor([marker]);
           },
-          child: Icon(
-            Icons.warning_rounded,
+          child: MapIcon(
+            Icons.fmd_bad_rounded,
             color: CupertinoDynamicColor.resolve(
-                CupertinoColors.destructiveRed, context)
+                CupertinoColors.destructiveRed, context),
           ),
         )
       );
@@ -68,17 +70,17 @@ class HazardMarkerLayer extends ConsumerWidget {
 
     return PopupMarkerLayer(
       options: PopupMarkerLayerOptions(
-          popupController: _popupController,
-          markers: markers,
-          popupDisplayOptions: PopupDisplayOptions(
-            builder: (_, marker) {
-              if (marker is HazardMarker) {
-                return HazardInfoPopup(hazard: marker.hazard);
-              }
-              return Container();
-            },
-            animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
-          )
+        popupController: _popupController,
+        markers: markers,
+        popupDisplayOptions: PopupDisplayOptions(
+          builder: (_, marker) {
+            if (marker is HazardMarker) {
+              return HazardInfoPopup(hazard: marker.hazard);
+            }
+            return Container();
+          },
+          animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
+        ),
       ),
     );
   }

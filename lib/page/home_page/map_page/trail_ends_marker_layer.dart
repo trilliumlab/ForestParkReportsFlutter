@@ -43,7 +43,7 @@ class TrailEndsMarkerLayer extends ConsumerWidget {
           child: RotationTransition(
             turns: AlwaysStoppedAnimation(bearing/(2*pi)),
             child: const Icon(
-              Icons.square,
+              Icons.square_rounded,
               color: Colors.red,
               size: 12.0,
             ),

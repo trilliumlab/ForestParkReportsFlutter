@@ -60,6 +60,8 @@ const kHomeCameraPosition = CameraPosition(
   zoom: 11.5,
 );
 
+const kMarkerTopAlignment = Alignment(0, -0.65);
+
 const kElevationMaxEntries = 200;
 
 // encoding consts
