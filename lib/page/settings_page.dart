@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/settings.dart';
 import 'package:forest_park_reports/page/settings_page/settings_page_scaffold.dart';
@@ -85,6 +86,9 @@ class SettingsPage extends ConsumerWidget {
                 // Delete cache
                 final imageDir = (await ref.read(directoryProvider(kImageDirectory).future))!;
                 await imageDir.delete(recursive: true);
+                // Clear upload queue
+                await FlutterUploader().cancelAll();
+                await FlutterUploader().clearUploads();
               },
             )
           ],

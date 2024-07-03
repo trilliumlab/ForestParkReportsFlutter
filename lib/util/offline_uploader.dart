@@ -25,6 +25,7 @@ void backgroundHandler() {
   uploader.result.listen((result) {
     // upload results
     print("upload completed: $result");
+    uploader.clearUploads();
   });
 }
 
@@ -40,6 +41,7 @@ class OfflineUploader {
   static final store = StoreRef<String, String>("queue");
 
   Future<void> initialize() async {
+    print("flutter uploader initialized");
     await FlutterUploader().setBackgroundHandler(backgroundHandler);
   }
 
@@ -49,16 +51,22 @@ class OfflineUploader {
   Future<void> enqueueJson({
     required UploadMethod method,
     required String url,
-    required Map<String, dynamic> data
+    required Map<String, dynamic> data,
+    Map<String, String>? headers,
   }) async {
     // TODO use dio on web.
     final queueDir = await providerContainer
         .read(directoryProvider(kQueueDirectory).future);
 
-    final file = File(join(queueDir!.path, kUuidGen.v1()));
+    final file = File(join(queueDir!.path, "${kUuidGen.v1()}.json"));
     // Store json content in file.
     await file.writeAsString(jsonEncode(data));
-    await enqueueFile(method: method, url: url, filePath: file.path);
+
+    // Add content-type header
+    final headerMap = headers ?? {};
+    headerMap["Content-Type"] = "application/json";
+
+    await enqueueFile(method: method, url: url, filePath: file.path, headers: headerMap);
   }
 
   /// Uploads the file with path [filePath] to [url] with http method [method].
@@ -67,14 +75,28 @@ class OfflineUploader {
   Future<void> enqueueFile({
     required UploadMethod method,
     required String url,
-    required String filePath
+    required String filePath,
+    bool multipart = false,
+    Map<String, String>? headers,
   }) async {
+    print("enqueuing file at path $filePath");
+    print("headers: $headers");
+
     final taskId = await FlutterUploader().enqueue(
-      RawUpload(
+      multipart ? MultipartFormDataUpload(
         url: url,
+        headers: headers,
+        files: [
+          FileItem(path: filePath)
+        ],
+      ) : RawUpload(
+        url: url,
+        headers: headers,
         path: filePath,
       ),
     );
+
+    print("Started task with id: $taskId");
 
     final db = await providerContainer.read(forestParkDatabaseProvider.future);
     // Store the taskId and filePath so when the request completes we can

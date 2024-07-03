@@ -91,7 +91,7 @@ class ActiveHazard extends _$ActiveHazard {
     OfflineUploader().enqueueJson(
       method: UploadMethod.POST,
       url: "$kApiUrl/hazard/new",
-      data: request.toJson()
+      data: request.toJson(),
     );
     // final res = await ref.read(dioProvider).post(
     //     "/hazard/new",
@@ -114,14 +114,18 @@ class ActiveHazard extends _$ActiveHazard {
     }
     // Compress and save image to file.
     final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
-    final imagePath = join(queueDir!.path, request.image!);
+    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
     await image.compressToFile(filePath: imagePath);
 
     // Queue upload
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
       url: "$kApiUrl/hazard/image/${request.image!}",
-      filePath: imagePath
+      headers: {
+        'Accept-Ranged': 'bytes'
+      },
+      multipart: true,
+      filePath: imagePath,
     );
   }
 
