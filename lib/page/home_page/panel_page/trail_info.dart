@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/page/common/platform_pill.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 

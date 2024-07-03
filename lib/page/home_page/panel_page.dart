@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
 import 'package:forest_park_reports/page/common/confirmation.dart';

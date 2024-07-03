@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
 import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/page/settings_page.dart';
@@ -54,9 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
               }
               WidgetsBinding.instance.addPostFrameCallback((_) =>
                   ref.read(panelPositionProvider.notifier).update(position));
-                print(PanelValues.openHeight(context));
-                print(PanelValues.collapsedHeight(context));
-                print(PanelValues.snapHeight(context));
               //TODO cupertino scrolling physics
               return SlidingUpPanel(
                 maxHeight: PanelValues.openHeight(context),
