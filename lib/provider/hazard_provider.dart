@@ -109,7 +109,7 @@ class ActiveHazard extends _$ActiveHazard {
     // Queue image upload
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
-      requestType: QueuedRequestType.updateHazard,
+      requestType: QueuedRequestType.imageUpload,
       url: "$kApiUrl/hazard/image/${request.image!}",
       multipart: true,
       filePath: imagePath,
@@ -189,6 +189,24 @@ class HazardUpdates extends _$HazardUpdates {
       requestType: QueuedRequestType.updateHazard,
       url: "$kApiUrl/hazard/update",
       data: request.toJson(),
+    );
+
+    // Now we try to upload the image if we have one
+    if (image == null) {
+      return;
+    }
+    // Compress and save image to file.
+    final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
+    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
+    await image.compressToFile(filePath: imagePath);
+
+    // Queue image upload
+    await OfflineUploader().enqueueFile(
+      method: UploadMethod.PUT,
+      requestType: QueuedRequestType.imageUpload,
+      url: "$kApiUrl/hazard/image/${request.image!}",
+      multipart: true,
+      filePath: imagePath,
     );
   }
 
