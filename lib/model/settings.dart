@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:forest_park_reports/page/settings_page/selection_setting_widget.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'settings.g.dart';
 part 'settings.freezed.dart';
@@ -10,17 +12,33 @@ class SettingsModel with _$SettingsModel {
   const SettingsModel._();
   const factory SettingsModel({
     // Theme
-    @Default(UITheme.system) UITheme uiTheme,
-    @Default(ColorTheme.system) ColorTheme colorTheme,
+    @Default(UITheme.system) required UITheme uiTheme,
+    @Default(ColorTheme.system) required ColorTheme colorTheme,
     // Map
-    @Default(false) bool retinaMode,
+    @Default(false) required bool retinaMode,
   }) = _SettingsModel;
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsModelFromJson(json);
+
+  /// Creates a new [SettingsModel] from the settings persisted to [SharedPreferences]
+  factory SettingsModel.fromSharedPreferences(SharedPreferences sp) {
+    return SettingsModel.fromJson({
+      for (final key in sp.getKeys())
+        if (key.startsWith("setting."))
+          key.replaceFirst("setting.", ""): sp.get(key),
+    });
+  }
+
+  /// Persists the settings to [SharedPreferences]
+  void persistToSharedPreferences(SharedPreferences sp) {
+    sp.setString("setting.uiTheme", uiTheme.name);
+    sp.setString("setting.colorTheme", colorTheme.name);
+    sp.setBool("setting.retinaMode", retinaMode);
+  }
 }
 
-/// An option for []
+/// An option for [SelectionSettingWidget]
 abstract interface class SelectionOption<T> {
   String get displayName;
   T get value;

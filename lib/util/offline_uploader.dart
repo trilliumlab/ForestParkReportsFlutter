@@ -31,9 +31,11 @@ void backgroundRequestsHandler() {
   // Called when upload completes.
   uploader.result.listen((response) async {
     print("upload completed: $response");
+
     final db = await providerContainer.read(forestParkDatabaseProvider.future);
     if (response.statusCode != null) {
       final queuedRequestJson = await OfflineUploader.store.record(response.taskId).get(db);
+      print("found task in db $queuedRequestJson");
       if (queuedRequestJson != null) {
         final queuedRequest = QueuedRequestModel.fromJson(queuedRequestJson);
         print("found associated queued request: $queuedRequest");
@@ -169,8 +171,16 @@ class OfflineUploader {
   }) async {
     print("enqueuing file at path $filePath");
 
+    // Generate tag that can be read when receiving data to know
+    // which file to delete and the type of request to handle.
+    final tag = jsonEncode(QueuedRequestModel(
+        requestType: requestType,
+        filePath: filePath
+    ).toJson());
+
     final taskId = await FlutterUploader().enqueue(
       multipart ? MultipartFormDataUpload(
+        tag: tag,
         method: method,
         url: url,
         headers: headers,
@@ -178,6 +188,7 @@ class OfflineUploader {
           FileItem(path: filePath)
         ],
       ) : RawUpload(
+        tag: tag,
         method: method,
         url: url,
         headers: headers,
