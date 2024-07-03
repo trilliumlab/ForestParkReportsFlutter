@@ -20,32 +20,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class ScreenPanelController extends PanelController {
-  // utility functions
-  bool get isPanelSnapped => (panelPosition-snapPoint).abs()<0.0001 && !isPanelAnimating;
-  double get safePanelPosition => isAttached ? panelPosition : 0;
-
-  double get snapWidgetOpacity => (panelPosition/snapPoint).clamp(0, 1);
-  double get fullWidgetOpacity => ((panelPosition-snapPoint)/(1-snapPoint)).clamp(0, 1);
-
-  // bounding stuff
-  double snapPoint;
-  double panelClosedHeight;
-  ScreenPanelController({
-    required this.snapPoint,
-    required this.panelClosedHeight,
-  });
-
-  double panelOpenHeight = 0;
-
-  double get pastSnapPosition => ((panelPosition-snapPoint)/(1-snapPoint)).clamp(0, 1);
-  double get panelSnapHeight => ((panelOpenHeight-panelClosedHeight) * snapPoint) + panelClosedHeight;
-  double get panelHeight => safePanelPosition * (panelOpenHeight - panelClosedHeight) + panelClosedHeight;
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  // parameters for the sliding modal/panel on the bottom
-  // TODO animate hiding/showing of panel
+class _HomeScreenState extends State<HomeScreen> {  
   late final _panelController = PanelController();
 
   final _scrollController = ScrollController();
