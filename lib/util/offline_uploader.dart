@@ -84,12 +84,14 @@ class OfflineUploader {
 
     final taskId = await FlutterUploader().enqueue(
       multipart ? MultipartFormDataUpload(
+        method: method,
         url: url,
         headers: headers,
         files: [
           FileItem(path: filePath)
         ],
       ) : RawUpload(
+        method: method,
         url: url,
         headers: headers,
         path: filePath,

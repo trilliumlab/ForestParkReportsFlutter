@@ -121,9 +121,9 @@ class ActiveHazard extends _$ActiveHazard {
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
       url: "$kApiUrl/hazard/image/${request.image!}",
-      headers: {
-        'Accept-Ranged': 'bytes'
-      },
+      // headers: {
+      //   'Accept-Ranged': 'bytes'
+      // },
       multipart: true,
       filePath: imagePath,
     );
