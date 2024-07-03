@@ -6,7 +6,8 @@ import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast.dart';
-import 'package:sembast/sembast_io.dart';
+import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sembast_web/sembast_web.dart';
 
 part 'database_provider.g.dart';
@@ -18,7 +19,8 @@ class ForestParkDatabase extends _$ForestParkDatabase {
     if (kIsWeb) {
       return databaseFactoryWeb.openDatabase(kDbName);
     } else {
-      return await databaseFactoryIo.openDatabase(await ref.watch(dbPathProvider.future));
+      return await getDatabaseFactorySqflite(sqflite.databaseFactory)
+          .openDatabase(await ref.watch(dbPathProvider.future));
     }
   }
 
