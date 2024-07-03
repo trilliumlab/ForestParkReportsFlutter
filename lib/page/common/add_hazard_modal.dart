@@ -181,7 +181,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                           showSelectedIcon: false,
                           selected: {
                             if (_selectedHazard != null)
-                              _selectedHazard!,
+                              _selectedHazard!
                           },
                           onSelectionChanged: (selection) {
                             if (selection.length == 1) {

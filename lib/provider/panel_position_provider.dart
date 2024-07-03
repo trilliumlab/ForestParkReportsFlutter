@@ -1,15 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 part 'panel_position_provider.g.dart';
 
-enum PanelPositionState {
-  open,
-  closed,
-  snapped
-}
-
 class PanelPositionUpdate {
-  final PanelPositionState position;
+  final PanelState position;
   final bool move;
   PanelPositionUpdate(this.position, this.move);
 }
@@ -17,12 +12,12 @@ class PanelPositionUpdate {
 @riverpod
 class PanelPosition extends _$PanelPosition {
   @override
-  PanelPositionUpdate build() => PanelPositionUpdate(PanelPositionState.closed, false);
+  PanelPositionUpdate build() => PanelPositionUpdate(PanelState.HIDDEN, false);
 
-  void move(PanelPositionState position) {
+  void move(PanelState position) {
     state = PanelPositionUpdate(position, true);
   }
-  void update(PanelPositionState position) {
+  void update(PanelState position) {
     state = PanelPositionUpdate(position, false);
   }
 }

@@ -46,10 +46,7 @@ class ScreenPanelController extends PanelController {
 class _HomeScreenState extends State<HomeScreen> {
   // parameters for the sliding modal/panel on the bottom
   // TODO animate hiding/showing of panel
-  late final _panelController = ScreenPanelController(
-    snapPoint: 0.40,
-    panelClosedHeight: 100,
-  );
+  late final _panelController = PanelController();
 
   final _scrollController = ScrollController();
 
@@ -61,7 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // make the height of the panel when open 80% of the screen
-    _panelController.panelOpenHeight = MediaQuery.of(context).size.height * 0.80;
     final theme = Theme.of(context);
 
     return PlatformScaffold(
@@ -73,39 +69,25 @@ class _HomeScreenState extends State<HomeScreen> {
               // listen to panel position state to control panel position
               ref.listen<PanelPositionUpdate>(panelPositionProvider, (prev, next) {
                 if (next.move) {
-                  switch (next.position) {
-                    case PanelPositionState.open:
-                      _panelController.open();
-                      break;
-                    case PanelPositionState.closed:
-                      _panelController.close();
-                      break;
-                    case PanelPositionState.snapped:
-                      _panelController.animatePanelToSnapPoint();
-                      break;
-                  }
+                  _panelController.goToState(next.position);
                 }
               });
               // update panel position
               var position = ref.read(panelPositionProvider).position;
               if (_panelController.isAttached) {
-                if (_panelController.isPanelClosed) {
-                  position = PanelPositionState.closed;
-                } else if (_panelController.isPanelOpen) {
-                  position = PanelPositionState.open;
-                } else if (_panelController.isPanelSnapped) {
-                  position = PanelPositionState.snapped;
-                }
+                position = _panelController.panelState;
               }
               WidgetsBinding.instance.addPostFrameCallback((_) =>
                   ref.read(panelPositionProvider.notifier).update(position));
+                print(PanelValues.openHeight(context));
+                print(PanelValues.collapsedHeight(context));
+                print(PanelValues.snapHeight(context));
               //TODO cupertino scrolling physics
               return SlidingUpPanel(
-                maxHeight: _panelController.panelOpenHeight,
-                minHeight: _panelController.panelClosedHeight,
-                parallaxEnabled: isMaterial(context),
-                parallaxOffset: 0.58,
-                snapPoint: _panelController.snapPoint,
+                maxHeight: PanelValues.openHeight(context),
+                minHeight: PanelValues.collapsedHeight(context),
+                snapHeight: PanelValues.snapHeight(context),
+                defaultPanelState: PanelState.HIDDEN,
                 body: const MapPage(),
                 controller: _panelController,
                 scrollController: _scrollController,
@@ -116,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // don't render panel sheet so we can add custom blur
                 renderPanelSheet: false,
                 onPanelSlide: (double pos) => setState(() {
+                  
                   // _snapWidgetOpacity = (pos/_snapPoint).clamp(0, 1);
                   // _fullWidgetOpacity = ((pos-_snapPoint)/(1-_snapPoint)).clamp(0, 1);
                   // _panelHeight = pos * (_panelHeightOpen - _panelHeightClosed) + _panelHeightClosed;
@@ -125,18 +108,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // Location and add hazard buttons
           // When panel is visible, position 20dp above the panel height (_fabHeight)
-          // when panel is hidden, set it to 20db from bottom
           Positioned(
             right: kFabPadding,
-            bottom: _panelController.panelHeight + kFabPadding, 
+            bottom: kFabPadding + (_panelController.isAttached ? _panelController.panelHeight + kFabPadding : 0), 
             child: Visibility(
               visible: !_panelController.isAttached ? true
-                  : 1 > (_panelController.panelPosition - _panelController.snapPoint) / (0.2 * (1 - _panelController.snapPoint)),
+                  : 1 > (_panelController.panelPosition - PanelValues.snapFraction(context)) / (0.2 * (1 - PanelValues.snapFraction(context))),
               child: MapFabs(
                 opacity: !_panelController.isAttached ? 1
                     : Curves.easeInOut.transform(
-                    1 - clampDouble((_panelController.panelPosition - _panelController.snapPoint)
-                        / (0.2 * (1 - _panelController.snapPoint)), 0, 1)
+                    1 - clampDouble((_panelController.panelPosition - PanelValues.snapFraction(context))
+                        / (0.2 * (1 - PanelValues.snapFraction(context))), 0, 1)
                 ),
               ),
             ),
