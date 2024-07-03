@@ -47,8 +47,7 @@ void backgroundRequestsHandler() {
         // Construct response
         final queuedRequestResponseJson = QueuedRequestResponseModel(
           requestType: queuedRequest.requestType,
-          response: response.response != null
-              ? jsonDecode(response.response!) : null,
+          response: response.response,
         ).toJson();
 
         // Send response to main isolate to handle
@@ -97,14 +96,18 @@ class OfflineUploader {
   /// Should never be called manually except by background isolate if
   /// there is no main isolate.
   Future<void> handleQueuedRequestResponse(dynamic queuedRequestResponseJson) async {
+    print("Received queuedRequestResponse in main isolate: $queuedRequestResponseJson");
+
+    // Parse response
     final queuedRequestResponse = QueuedRequestResponseModel.fromJson(queuedRequestResponseJson);
-    print("Received queuedRequestResponse in main isolate: $queuedRequestResponse");
+    final data = queuedRequestResponse.response != null
+        ? jsonDecode(queuedRequestResponse.response!) : null;
 
     // Now we need to pass data to provider
     switch(queuedRequestResponse.requestType) {
       case QueuedRequestType.newHazard:
-        if (queuedRequestResponse.response != null) {
-          final hazard = HazardModel.fromJson(queuedRequestResponse.response!);
+        if (data != null) {
+          final hazard = HazardModel.fromJson(data);
           providerContainer.read(activeHazardProvider.notifier)
               .handleCreateResponse(hazard);
         }
@@ -113,8 +116,8 @@ class OfflineUploader {
         // Not needed right now, image upload has no response.
         break;
       case QueuedRequestType.updateHazard:
-        if (queuedRequestResponse.response != null) {
-          final hazardUpdate = HazardUpdateModel.fromJson(queuedRequestResponse.response!);
+        if (data != null) {
+          final hazardUpdate = HazardUpdateModel.fromJson(data);
           providerContainer.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
               .handleCreateResponse(hazardUpdate);
         }
