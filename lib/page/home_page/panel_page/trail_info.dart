@@ -1,13 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/page/common/platform_pill.dart';
-import 'package:forest_park_reports/page/home_page.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// The main body of the panel when a trail is selected on the map
 class TrailInfoWidget extends StatefulWidget {
   final ScrollController scrollController;
-  final ScreenPanelController panelController;
+  final PanelController panelController;
   final List<Widget> children;
   final String? title;
   final Widget? bottomWidget;
@@ -30,7 +31,8 @@ class _TrailInfoWidgetState extends State<TrailInfoWidget> {
     return Align(
       alignment: Alignment.topCenter,
       child: SizedBox(
-        height: max(widget.panelController.panelSnapHeight, widget.panelController.panelHeight)-MediaQueryData.fromView(View.of(context)).padding.bottom,
+        height: max(PanelValues.snapHeight(context), widget.panelController.panelHeight)
+            - MediaQueryData.fromView(View.of(context)).padding.bottom,
         child: Column(
           children: [
             Stack(

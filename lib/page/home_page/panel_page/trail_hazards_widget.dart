@@ -7,6 +7,7 @@ import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// A list of hazards on a given trail when that trail is clicked on
 class TrailHazardsWidget extends ConsumerWidget {
@@ -71,7 +72,7 @@ class HazardInfoWidget extends ConsumerWidget {
       onPressed: () {
         ref.read(selectedRelationProvider.notifier).deselect();
         ref.read(selectedHazardProvider.notifier).selectAndMove(hazard);
-        ref.read(panelPositionProvider.notifier).move(PanelPositionState.snapped);
+        ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
       },
       material: (_, __) => MaterialTextButtonData(
         style: ButtonStyle(
