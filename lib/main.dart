@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -74,7 +75,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     // to use widgets that render in the style of the device's platform.
     // Eg. cupertino on ios, and material 3 on android
     return PlatformProvider(
-      initialPlatform: kPlatformOverride,
+      initialPlatform: kDebugMode ? kPlatformOverride : null,
       builder: (context) {
         return _theme(
           builder: (context) => const PlatformApp(

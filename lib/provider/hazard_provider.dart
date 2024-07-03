@@ -38,7 +38,7 @@ class ActiveHazard extends _$ActiveHazard {
     ];
 
     Timer.periodic(
-      const Duration(seconds: 10),
+      kHazardRefreshPeriod,
           (_) => refresh(),
     );
 
@@ -121,9 +121,6 @@ class ActiveHazard extends _$ActiveHazard {
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
       url: "$kApiUrl/hazard/image/${request.image!}",
-      // headers: {
-      //   'Accept-Ranged': 'bytes'
-      // },
       multipart: true,
       filePath: imagePath,
     );
