@@ -49,8 +49,8 @@ class HazardUpdatesTable extends Table {
 @UseRowClass(RelationModel)
 class RelationsTable extends Table {
   IntColumn get id => integer()();
-  TextColumn get tags => text().map(const JsonObjectConverter<Map<String, String>>())();
-  TextColumn get members => text().map(const JsonObjectConverter<List<int>>())();
+  TextColumn get tags => text().map(const JsonMapConverter<String>())();
+  TextColumn get members => text().map(const JsonListConverter<int>())();
 
   @override
   Set<Column> get primaryKey => {id};

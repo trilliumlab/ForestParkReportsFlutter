@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'database_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-class ForestParkDatabase extends _$ForestParkDatabase {
+class Database extends _$Database {
   @override
   AppDatabase build() => AppDatabase();
 
@@ -20,7 +20,7 @@ class ForestParkDatabase extends _$ForestParkDatabase {
 }
 
 @Riverpod(keepAlive: true)
-Future<File?> dbFile(DbPathRef ref) async {
+Future<File?> dbFile(DbFileRef ref) async {
   if (kIsWeb) {
     return null;
   }

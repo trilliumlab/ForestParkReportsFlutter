@@ -14,7 +14,6 @@ import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:path/path.dart';
-import 'package:sembast/sembast.dart';
 export 'package:flutter_uploader/flutter_uploader.dart' show UploadMethod;
 
 /// Handler for background network requests using flutter_uploader
@@ -32,14 +31,15 @@ void backgroundRequestsHandler() {
   uploader.result.listen((response) async {
     print("upload completed: $response");
 
-    final db = await providerContainer.read(forestParkDatabaseProvider.future);
     if (response.statusCode != null) {
-      final queuedRequestJson = await OfflineUploader.store.record(response.taskId).get(db);
-      print("found task in db $queuedRequestJson");
-      if (queuedRequestJson != null) {
-        final queuedRequest = QueuedRequestModel.fromJson(queuedRequestJson);
-        print("found associated queued request: $queuedRequest");
+      // Then we have real response, fetch from db.
+      final db = providerContainer.read(databaseProvider);
+      final queuedRequest = await (db.select(db.queueTable)
+        ..where((row) => row.taskId.equals(response.taskId)))
+        .getSingleOrNull();
 
+      print("found task in db $queuedRequest");
+      if (queuedRequest != null) {
         // Delete request file.
         final file = File(queuedRequest.filePath);
         try {
@@ -77,8 +77,6 @@ class OfflineUploader {
   ///
   /// [OfflineUploader] is a singleton (will always return the same instance)
   factory OfflineUploader() => _instance;
-
-  static final store = StoreRef<String, Map<String, dynamic>>("queue");
 
   ReceivePort receivePort = ReceivePort(kBackgroundRequestPortName);
 
@@ -171,16 +169,8 @@ class OfflineUploader {
   }) async {
     print("enqueuing file at path $filePath");
 
-    // Generate tag that can be read when receiving data to know
-    // which file to delete and the type of request to handle.
-    final tag = jsonEncode(QueuedRequestModel(
-        requestType: requestType,
-        filePath: filePath
-    ).toJson());
-
     final taskId = await FlutterUploader().enqueue(
       multipart ? MultipartFormDataUpload(
-        tag: tag,
         method: method,
         url: url,
         headers: headers,
@@ -188,7 +178,6 @@ class OfflineUploader {
           FileItem(path: filePath)
         ],
       ) : RawUpload(
-        tag: tag,
         method: method,
         url: url,
         headers: headers,
@@ -198,12 +187,15 @@ class OfflineUploader {
 
     print("Started task with id: $taskId");
 
-    final db = await providerContainer.read(forestParkDatabaseProvider.future);
+    final db = providerContainer.read(databaseProvider);
     // Store the QueuedRequestModel so when the request completes we can
     // delete the file and handle the returned data.
-    store.record(taskId).put(db, QueuedRequestModel(
-      requestType: requestType,
-      filePath: filePath
-    ).toJson());
+    db.into(db.queueTable).insertOnConflictUpdate(
+      QueuedRequestModel(
+        taskId: taskId,
+        requestType: requestType,
+        filePath: filePath
+      ),
+    );
   }
 }

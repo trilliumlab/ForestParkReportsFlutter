@@ -1,11 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:blurhash_ffi/blurhash.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:drift/drift.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
@@ -13,7 +9,6 @@ import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:image/image.dart' as img;
 import 'package:collection/collection.dart';
-import 'package:dio/dio.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
@@ -21,23 +16,16 @@ import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sembast/sembast.dart';
-import 'package:uuid/uuid.dart';
 
 part 'hazard_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class ActiveHazard extends _$ActiveHazard {
-  static final store = StoreRef<String, Map<String, dynamic>>("hazards");
-
   @override
   Future<List<HazardModel>> build() async {
-    final db = await ref.watch(forestParkDatabaseProvider.future);
-
-    final hazards = [
-      for (final hazard in await store.find(db))
-        HazardModel.fromJson(hazard.value)
-    ];
+    final db = ref.watch(databaseProvider);
+    
+    final hazards = await db.select(db.hazardsTable).get();
 
     Timer.periodic(
       kHazardRefreshPeriod,
@@ -59,10 +47,10 @@ class ActiveHazard extends _$ActiveHazard {
         HazardModel.fromJson(hazard)
     ];
 
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    for (final hazard in hazards) {
-      store.record(hazard.uuid).put(db, hazard.toJson());
-    }
+    final db = ref.read(databaseProvider);
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.hazardsTable, hazards);
+    });
 
     return hazards;
   }
@@ -125,8 +113,8 @@ class ActiveHazard extends _$ActiveHazard {
         ...state.requireValue,
       hazard
     ]);
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    store.record(hazard.uuid).put(db, hazard.toJson());
+    final db = ref.read(databaseProvider);
+    await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
   }
 }
 
