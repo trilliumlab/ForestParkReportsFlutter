@@ -3,7 +3,9 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
+import 'package:drift/drift.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/database/database.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:latlong2/latlong.dart';
@@ -57,8 +59,8 @@ class BoundsModel with _$BoundsModel {
 }
 
 const haversine = DistanceHaversine(roundResult: false);
-/// Represents a OSM way in an easy to use way
-class TrailModel {
+/// Represents an OSM way in an easy to use way.
+class TrailModel implements Insertable<TrailModel> {
   String system = "";
   int id = -1;
   Map<String, String> tags = {};
@@ -73,8 +75,23 @@ class TrailModel {
   // tracks the elevation negative delta
   double totalDecline = 0;
 
-  // TODO use factory constructor
-  // constructs a track from binary encoded track
+  /// Maps a database [TrailsTable] row to a [TrailModel].
+  TrailModel.fromDb({required int id, required Uint8List data})
+      : this.decode(data);
+
+  /// Maps a [TrailModel] to a database [TrailsTable] row.
+  @override
+  Map<String, Expression<Object>> toColumns(bool nullToAbsent) =>
+      TrailsTableCompanion(
+        id: Value(id),
+        data: Value(encode())
+      ).toColumns(nullToAbsent);
+
+  /// Decodes a [TrailModel] from the binary encoding used to send over network.
+  ///
+  /// For more information on this encoding, see
+  /// [trails-service.ts](https://github.com/trilliumlab/forest-park-reports-server/blob/main/src/services/trails-service.ts)
+  /// in the server repository.
   TrailModel.decode(Uint8List buffer) {
     final data = buffer.buffer.asByteData(buffer.offsetInBytes, buffer.lengthInBytes);
     // keep track of read position
@@ -168,6 +185,11 @@ class TrailModel {
     }
   }
 
+  /// Encodes the [TrailModel] to the binary encoding used to send over network.
+  ///
+  /// For more information on this encoding, see
+  /// [trails-service.ts](https://github.com/trilliumlab/forest-park-reports-server/blob/main/src/services/trails-service.ts)
+  /// in the server repository.
   Uint8List encode() {
     final builder = BytesBuilder();
 
