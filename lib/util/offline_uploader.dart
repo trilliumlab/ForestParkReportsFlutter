@@ -82,6 +82,7 @@ class OfflineUploader {
 
   Future<void> initialize() async {
     // Register receive port globally
+    IsolateNameServer.removePortNameMapping(kBackgroundRequestPortName);
     IsolateNameServer.registerPortWithName(receivePort.sendPort, kBackgroundRequestPortName);
     receivePort.listen(handleQueuedRequestResponse);
     // Set function that receives background request responses
