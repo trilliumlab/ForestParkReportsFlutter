@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:forest_park_reports/database/connection/connection.dart';
+import 'package:forest_park_reports/database/connection.dart';
 import 'package:forest_park_reports/database/json_object_converter.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';

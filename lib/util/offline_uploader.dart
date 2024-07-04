@@ -119,8 +119,8 @@ class OfflineUploader {
       case QueuedRequestType.updateHazard:
         if (data != null) {
           final hazardUpdate = HazardUpdateModel.fromJson(data);
-          providerContainer.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
-              .handleCreateResponse(hazardUpdate);
+          providerContainer.read(activeHazardProvider.notifier)
+              .handleUpdateResponse(hazardUpdate);
         }
         break;
     }

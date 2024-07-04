@@ -65,7 +65,7 @@ class PanelPage extends ConsumerWidget {
                       return;
                     }
 
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: false,
@@ -96,7 +96,7 @@ class PanelPage extends ConsumerWidget {
                       return;
                     }
 
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: true,

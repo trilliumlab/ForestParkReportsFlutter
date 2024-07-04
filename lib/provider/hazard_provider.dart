@@ -59,7 +59,7 @@ class ActiveHazard extends _$ActiveHazard {
     state = AsyncData(await _fetch());
   }
 
-  Future<void> create(HazardRequestModel request, {XFile? imageFile}) async {
+  Future<void> createHazard(HazardRequestModel request, {XFile? imageFile}) async {
     img.Image? image;
 
     // If we're passed an image, decode it.
@@ -116,44 +116,8 @@ class ActiveHazard extends _$ActiveHazard {
     final db = ref.read(databaseProvider);
     await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
   }
-}
 
-class HazardUpdateList extends ListBase<HazardUpdateModel> {
-  final List<HazardUpdateModel> l;
-
-  HazardUpdateList(this.l);
-
-  @override
-  set length(int newLength) { l.length = newLength; }
-  @override
-  int get length => l.length;
-  @override
-  HazardUpdateModel operator [](int index) => l[index];
-  @override
-  void operator []=(int index, HazardUpdateModel value) { l[index] = value; }
-
-  String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
-  String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
-}
-
-@Riverpod(keepAlive: true)
-class HazardUpdates extends _$HazardUpdates {
-  @override
-  HazardUpdateList build(String hazard) {
-    refresh();
-    return HazardUpdateList([]);
-  }
-  Future refresh() async {
-    final res = await ref.read(dioProvider).get("/hazard/$hazard");
-    final updates = HazardUpdateList([
-      for (final val in res.data)
-        HazardUpdateModel.fromJson(val)
-    ]);
-    updates.sort((a, b) => a.time.millisecondsSinceEpoch - b.time.millisecondsSinceEpoch);
-    state = updates;
-  }
-
-  Future create(HazardUpdateRequestModel request, {XFile? imageFile}) async {
+  Future updateHazard(HazardUpdateRequestModel request, {XFile? imageFile}) async {
     img.Image? image;
 
     // If we're passed an image, decode it.
@@ -198,10 +162,50 @@ class HazardUpdates extends _$HazardUpdates {
     );
   }
 
-  Future<void> handleCreateResponse(HazardUpdateModel hazardUpdate) async {
+  Future<void> handleUpdateResponse(HazardUpdateModel hazardUpdate) async {
     print("Handling hazard update create response: $hazardUpdate");
 
-    // Add new hazard update to state
+    // Add new hazard to hazard updates
+    await ref.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
+        .addHazardUpdate(hazardUpdate);
+  }
+}
+
+class HazardUpdateList extends ListBase<HazardUpdateModel> {
+  final List<HazardUpdateModel> l;
+
+  HazardUpdateList(this.l);
+
+  @override
+  set length(int newLength) { l.length = newLength; }
+  @override
+  int get length => l.length;
+  @override
+  HazardUpdateModel operator [](int index) => l[index];
+  @override
+  void operator []=(int index, HazardUpdateModel value) { l[index] = value; }
+
+  String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
+  String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
+}
+
+@Riverpod(keepAlive: true)
+class HazardUpdates extends _$HazardUpdates {
+  @override
+  HazardUpdateList build(String hazard) {
+    refresh();
+    return HazardUpdateList([]);
+  }
+  Future<void> refresh() async {
+    final res = await ref.read(dioProvider).get("/hazard/$hazard");
+    final updates = HazardUpdateList([
+      for (final val in res.data)
+        HazardUpdateModel.fromJson(val)
+    ]);
+    updates.sort((a, b) => a.time.millisecondsSinceEpoch - b.time.millisecondsSinceEpoch);
+    state = updates;
+  }
+  Future<void> addHazardUpdate(HazardUpdateModel hazardUpdate) async {
     state = HazardUpdateList([...state, hazardUpdate]);
   }
 }

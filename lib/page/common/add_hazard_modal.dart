@@ -77,7 +77,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
-    await activeHazardNotifier.create(HazardRequestModel(
+    await activeHazardNotifier.createHazard(HazardRequestModel(
       hazard: _selectedHazard!,
       location: snappedLoc.location,
     ), imageFile: _image);
