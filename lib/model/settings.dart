@@ -12,10 +12,10 @@ class SettingsModel with _$SettingsModel {
   const SettingsModel._();
   const factory SettingsModel({
     // Theme
-    @Default(UITheme.system) required UITheme uiTheme,
-    @Default(ColorTheme.system) required ColorTheme colorTheme,
+    @Default(UITheme.system) UITheme uiTheme,
+    @Default(ColorTheme.system) ColorTheme colorTheme,
     // Map
-    @Default(false) required bool retinaMode,
+    @Default(false) bool retinaMode,
   }) = _SettingsModel;
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) =>
