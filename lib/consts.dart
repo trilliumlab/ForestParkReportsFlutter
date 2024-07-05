@@ -19,7 +19,7 @@ const kPlatformOverride = null;
 final DateFormat kDisplayDateFormat = DateFormat('hh:mm a MMMM dd y');
 
 // Provider consts
-const kHazardRefreshPeriod = Duration(seconds: 100000);
+const kHazardRefreshPeriod = Duration(seconds: 10);
 
 // Filesystem consts
 const kDbName = "forest_park_reports";
