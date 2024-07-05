@@ -1178,11 +1178,12 @@ packages:
   sliding_up_panel2:
     dependency: "direct main"
     description:
-      name: sliding_up_panel2
-      sha256: "7c2aac81c03e74fcd070799c5e2011f1c5de7026bd22a76164e81e23a49f2bdb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0+1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "324317f99fa6c72fb319d76d0075859967c415de"
+      url: "https://github.com/trilliumlab/sliding_up_panel.git"
+    source: git
+    version: "4.0.0+1"
   source_gen:
     dependency: transitive
     description:

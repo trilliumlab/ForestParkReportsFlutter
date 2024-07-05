@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
 import 'package:forest_park_reports/page/common/confirmation.dart';
-import 'package:forest_park_reports/page/home_page.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
@@ -17,11 +17,12 @@ import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_elevation_graph.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// The sliding-up modal with info on the current selected trail or hazard on the map
 class PanelPage extends ConsumerWidget {
   final ScrollController scrollController;
-  final ScreenPanelController panelController;
+  final PanelController panelController;
   const PanelPage({
     super.key,
     required this.scrollController,
@@ -71,7 +72,7 @@ class PanelPage extends ConsumerWidget {
                         active: false,
                       ),
                     );
-                    ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
@@ -102,7 +103,7 @@ class PanelPage extends ConsumerWidget {
                         active: true,
                       ),
                     );
-                    ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
@@ -121,10 +122,10 @@ class PanelPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Opacity(
-                opacity: panelController.snapWidgetOpacity,
+                opacity: (panelController.panelPosition / PanelValues.snapFraction(context)).clamp(0, 1),
                 child: SizedBox(
-                  height: panelController.panelSnapHeight * 0.7
-                      + (panelController.panelOpenHeight-panelController.panelSnapHeight)*panelController.pastSnapPosition * 0.6,
+                  height: PanelValues.snapHeight(context) * 0.7
+                      + (panelController.panelHeight - PanelValues.snapHeight(context)) * 0.6,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     child: HazardImage(lastImage, blurHash: hazardUpdates?.lastBlurHash),
@@ -167,17 +168,18 @@ class PanelPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Opacity(
-              opacity: panelController.snapWidgetOpacity,
+              opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
               child: TrailElevationGraph(
                 relationID: selectedRelation.id,
-                height: panelController.panelSnapHeight*0.6,
+                height: PanelValues.snapHeight(context) * 0.6,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 14),
             child: Opacity(
-              opacity: panelController.fullWidgetOpacity,
+              opacity: ((panelController.panelPosition - PanelValues.snapFraction(context))
+                / (1 - PanelValues.snapFraction(context))).clamp(0, 1),
               child: TrailHazardsWidget(
                   relationID: selectedRelation.id
               ),
