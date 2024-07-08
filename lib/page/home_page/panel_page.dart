@@ -39,8 +39,8 @@ class PanelPage extends ConsumerWidget {
     HazardUpdateList? hazardUpdates;
     String? lastImage;
     if (selectedHazard != null) {
-      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid));
-      lastImage = hazardUpdates!.lastImage;
+      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid)).valueOrNull;
+      lastImage = hazardUpdates?.lastImage;
     }
 
     return Panel(
@@ -139,9 +139,9 @@ class PanelPage extends ConsumerWidget {
             shadowColor: Colors.transparent,
             margin: EdgeInsets.zero,
             child: Column(
-              children: hazardUpdates!.map((update) => UpdateInfoWidget(
+              children: hazardUpdates?.map((update) => UpdateInfoWidget(
                 update: update,
-              )).toList(),
+              )).toList() ?? [],
             ),
           ),
           // Container(

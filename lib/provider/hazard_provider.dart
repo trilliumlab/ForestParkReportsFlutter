@@ -48,6 +48,7 @@ class ActiveHazard extends _$ActiveHazard {
     ];
 
     final db = ref.read(databaseProvider);
+    await db.delete(db.hazardsTable).go();
     await db.batch((batch) {
       batch.insertAllOnConflictUpdate(db.hazardsTable, hazards);
     });
@@ -171,42 +172,49 @@ class ActiveHazard extends _$ActiveHazard {
   }
 }
 
-class HazardUpdateList extends ListBase<HazardUpdateModel> {
-  final List<HazardUpdateModel> l;
-
-  HazardUpdateList(this.l);
-
-  @override
-  set length(int newLength) { l.length = newLength; }
-  @override
-  int get length => l.length;
-  @override
-  HazardUpdateModel operator [](int index) => l[index];
-  @override
-  void operator []=(int index, HazardUpdateModel value) { l[index] = value; }
-
-  String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
-  String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
-}
-
 @Riverpod(keepAlive: true)
 class HazardUpdates extends _$HazardUpdates {
   @override
-  HazardUpdateList build(String hazard) {
-    refresh();
-    return HazardUpdateList([]);
+  Future<HazardUpdateList> build(String hazard) async {
+    final db = ref.watch(databaseProvider);
+    final hazardUpdates = HazardUpdateList(await db.select(db.hazardUpdatesTable).get());
+    if (hazardUpdates.isNotEmpty) {
+      refresh();
+      return hazardUpdates;
+    }
+    return await _fetch();
   }
-  Future<void> refresh() async {
+
+  Future<HazardUpdateList> _fetch() async {
     final res = await ref.read(dioProvider).get("/hazard/$hazard");
     final updates = HazardUpdateList([
       for (final val in res.data)
         HazardUpdateModel.fromJson(val)
     ]);
     updates.sort((a, b) => a.time.millisecondsSinceEpoch - b.time.millisecondsSinceEpoch);
-    state = updates;
+
+    final db = ref.read(databaseProvider);
+    await db.delete(db.hazardUpdatesTable).go();
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.hazardUpdatesTable, updates);
+    });
+
+    return updates;
   }
+
+  Future<void> refresh() async {
+    state = AsyncData(await _fetch());
+  }
+
   Future<void> addHazardUpdate(HazardUpdateModel hazardUpdate) async {
-    state = HazardUpdateList([...state, hazardUpdate]);
+    // Add HazardUpdateModel to state and db
+    state = AsyncData(HazardUpdateList([
+      if (state.hasValue)
+        ...state.requireValue,
+      hazardUpdate
+    ]));
+    final db = ref.read(databaseProvider);
+    await db.into(db.hazardUpdatesTable).insertOnConflictUpdate(hazardUpdate);
   }
 }
 

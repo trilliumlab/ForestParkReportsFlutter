@@ -36,6 +36,7 @@ class Trails extends _$Trails {
     final trails = TrailList.decode(res.data);
 
     final db = ref.read(databaseProvider);
+    await db.delete(db.trailsTable).go();
     await db.batch((batch) {
       batch.insertAllOnConflictUpdate(db.trailsTable, trails);
     });
