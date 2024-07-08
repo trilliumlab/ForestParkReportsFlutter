@@ -1,42 +1,32 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:blurhash_ffi/blurhash.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/model/queued_request.dart';
+import 'package:forest_park_reports/provider/directory_provider.dart';
+import 'package:forest_park_reports/util/image_extensions.dart';
+import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:image/image.dart' as img;
-import 'package:collection/collection.dart';
-import 'package:dio/dio.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sembast/sembast.dart';
-import 'package:uuid/uuid.dart';
 
 part 'hazard_provider.g.dart';
 
-const uuidGenerator = Uuid();
-
 @Riverpod(keepAlive: true)
 class ActiveHazard extends _$ActiveHazard {
-  static final store = StoreRef<String, Map<String, dynamic>>("hazards");
-
   @override
   Future<List<HazardModel>> build() async {
-    final db = await ref.watch(forestParkDatabaseProvider.future);
-
-    final hazards = [
-      for (final hazard in await store.find(db))
-        HazardModel.fromJson(hazard.value)
-    ];
+    final db = ref.watch(databaseProvider);
+    
+    final hazards = await db.select(db.hazardsTable).get();
 
     Timer.periodic(
-      const Duration(seconds: 10),
-          (_) => refresh(),
+      kHazardRefreshPeriod,
+      (_) => refresh(),
     );
 
     if (hazards.isNotEmpty) {
@@ -54,10 +44,11 @@ class ActiveHazard extends _$ActiveHazard {
         HazardModel.fromJson(hazard)
     ];
 
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    for (final hazard in hazards) {
-      store.record(hazard.uuid).put(db, hazard.toJson());
-    }
+    final db = ref.read(databaseProvider);
+    await db.delete(db.hazardsTable).go();
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.hazardsTable, hazards);
+    });
 
     return hazards;
   }
@@ -66,7 +57,7 @@ class ActiveHazard extends _$ActiveHazard {
     state = AsyncData(await _fetch());
   }
 
-  Future<void> create(HazardRequestModel request, {XFile? imageFile}) async {
+  Future<void> createHazard(HazardRequestModel request, {XFile? imageFile}) async {
     img.Image? image;
 
     // If we're passed an image, decode it.
@@ -79,17 +70,40 @@ class ActiveHazard extends _$ActiveHazard {
     // If decoding successful, generate blurHash and add to hazard request.
     if (image != null) {
       request = request.copyWith(
-          image: uuidGenerator.v1(),
-          blurHash: await _getBlurHash(image),
+          image: kUuidGen.v1(),
+          blurHash: await image.getBlurHash(),
       );
     }
 
-    // Save new hazard - returns the HazardModel created
-    final res = await ref.read(dioProvider).post(
-      "/hazard/new",
-      data: request.toJson()
+    // Queue new hazard request.
+    OfflineUploader().enqueueJson(
+      method: UploadMethod.POST,
+      requestType: QueuedRequestType.newHazard,
+      url: "$kApiUrl/hazard/new",
+      data: request.toJson(),
     );
-    final hazard = HazardModel.fromJson(res.data);
+
+    // Now we try to upload the image if we have one
+    if (image == null) {
+      return;
+    }
+    // Compress and save image to file.
+    final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
+    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
+    await image.compressToFile(filePath: imagePath);
+
+    // Queue image upload
+    await OfflineUploader().enqueueFile(
+      method: UploadMethod.PUT,
+      requestType: QueuedRequestType.imageUpload,
+      url: "$kApiUrl/hazard/image/${request.image!}",
+      multipart: true,
+      filePath: imagePath,
+    );
+  }
+
+  Future<void> handleCreateResponse(HazardModel hazard) async {
+    print("Handling hazard create response: $hazard");
 
     // Add new HazardModel to state and db
     state = AsyncData([
@@ -97,111 +111,107 @@ class ActiveHazard extends _$ActiveHazard {
         ...state.requireValue,
       hazard
     ]);
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    store.record(hazard.uuid).put(db, hazard.toJson());
+    final db = ref.read(databaseProvider);
+    await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
+  }
+
+  Future updateHazard(HazardUpdateRequestModel request, {XFile? imageFile}) async {
+    img.Image? image;
+
+    // If we're passed an image, decode it.
+    if (imageFile != null) {
+      final cmd = img.Command()
+        ..decodeNamedImage(imageFile.path, await imageFile.readAsBytes());
+      image = await cmd.getImageThread();
+    }
+
+    // If decoding successful, generate blurHash and add to hazard update request.
+    if (image != null) {
+      request = request.copyWith(
+        image: kUuidGen.v1(),
+        blurHash: await image.getBlurHash(),
+      );
+    }
+
+    // Queue new hazard update request.
+    OfflineUploader().enqueueJson(
+      method: UploadMethod.POST,
+      requestType: QueuedRequestType.updateHazard,
+      url: "$kApiUrl/hazard/update",
+      data: request.toJson(),
+    );
 
     // Now we try to upload the image if we have one
     if (image == null) {
       return;
     }
-    final imageData = await _compressImage(image);
-    if (imageData == null) {
-      return;
-    }
-    await _uploadImage(imageData, request.image!);
-  }
+    // Compress and save image to file.
+    final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
+    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
+    await image.compressToFile(filePath: imagePath);
 
-  Future<Uint8List?> _compressImage(img.Image image) async {
-    final double resizeScale = 1920.0 / max(image.width, image.height);
-
-    // Resize image to maximum dimension 1920 and jpeg encode.
-    final cmd = img.Command()
-      ..image(image)
-      ..copyResize(width: (image.width * resizeScale).round())
-      ..encodeJpg(quality: 80);
-
-    // Run command in isolate.
-    return await cmd.getBytesThread();
-  }
-
-  Future<String?> _getBlurHash(img.Image image) async {
-    final double thumbScale = 240.0 / max(image.width, image.height);
-
-    // Resize image to very small - this speeds up the image hashing algorithm greatly.
-    final cmd = img.Command()
-      ..image(image)
-      ..copyResize(width: (image.width * thumbScale).round())
-      ..encodeBmp();
-
-    // Run command in isolate.
-    final thumb = await cmd.getBytesThread();
-    if (thumb == null) {
-      return null;
-    }
-
-    // Calculate BlurHash
-    final imageProvider = MemoryImage(thumb);
-    final String blurHash = await BlurhashFFI.encode(imageProvider);
-
-    return blurHash;
-  }
-
-  Future<bool> _uploadImage(Uint8List image, String uuid, {void Function(int, int)? onSendProgress}) async {
-    FormData formData = FormData.fromMap({
-      "file": MultipartFile.fromBytes(image),
-    });
-    final res = await ref.read(dioProvider).put(
-        "/hazard/image/$uuid",
-        data: formData,
-        options: Options(
-          headers: {
-            'Accept-Ranged': 'bytes'
-          },
-        ),
-        onSendProgress: onSendProgress
+    // Queue image upload
+    await OfflineUploader().enqueueFile(
+      method: UploadMethod.PUT,
+      requestType: QueuedRequestType.imageUpload,
+      url: "$kApiUrl/hazard/image/${request.image!}",
+      multipart: true,
+      filePath: imagePath,
     );
-    return res.statusCode == 200;
   }
-}
 
-class HazardUpdateList extends ListBase<HazardUpdateModel> {
-  final List<HazardUpdateModel> l;
+  Future<void> handleUpdateResponse(HazardUpdateModel hazardUpdate) async {
+    print("Handling hazard update create response: $hazardUpdate");
 
-  HazardUpdateList(this.l);
-
-  @override
-  set length(int newLength) { l.length = newLength; }
-  @override
-  int get length => l.length;
-  @override
-  HazardUpdateModel operator [](int index) => l[index];
-  @override
-  void operator []=(int index, HazardUpdateModel value) { l[index] = value; }
-
-  String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
-  String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
+    // Add new hazard to hazard updates
+    await ref.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
+        .addHazardUpdate(hazardUpdate);
+  }
 }
 
 @Riverpod(keepAlive: true)
 class HazardUpdates extends _$HazardUpdates {
   @override
-  HazardUpdateList build(String hazard) {
-    refresh();
-    return HazardUpdateList([]);
+  Future<HazardUpdateList> build(String hazard) async {
+    final db = ref.watch(databaseProvider);
+    final hazardUpdates = HazardUpdateList(await db.select(db.hazardUpdatesTable).get());
+    if (hazardUpdates.isNotEmpty) {
+      refresh();
+      return hazardUpdates;
+    }
+    return await _fetch();
   }
-  Future refresh() async {
+
+  Future<HazardUpdateList> _fetch() async {
     final res = await ref.read(dioProvider).get("/hazard/$hazard");
     final updates = HazardUpdateList([
       for (final val in res.data)
         HazardUpdateModel.fromJson(val)
     ]);
     updates.sort((a, b) => a.time.millisecondsSinceEpoch - b.time.millisecondsSinceEpoch);
-    state = updates;
+
+    final db = ref.read(databaseProvider);
+    await db.delete(db.hazardUpdatesTable).go();
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.hazardUpdatesTable, updates);
+    });
+
+    return updates;
   }
 
-  Future create(HazardUpdateRequestModel request) async {
-    final res = await ref.read(dioProvider).post("/hazard/update", data: request.toJson());
-    state = HazardUpdateList([...state, HazardUpdateModel.fromJson(res.data)]);
+  Future<void> refresh() async {
+    state = AsyncData(await _fetch());
+  }
+
+  Future<void> addHazardUpdate(HazardUpdateModel hazardUpdate) async {
+    // Add HazardUpdateModel to state and db
+    state = AsyncData(HazardUpdateList([
+      if (state.hasValue)
+        ...state.requireValue,
+      hazardUpdate
+    ]));
+    final db = ref.read(databaseProvider);
+    await db.into(db.hazardUpdatesTable).insertOnConflictUpdate(hazardUpdate);
   }
 }
 
