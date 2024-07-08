@@ -72,7 +72,6 @@ class HazardInfoWidget extends ConsumerWidget {
       onPressed: () {
         ref.read(selectedRelationProvider.notifier).deselect();
         ref.read(selectedHazardProvider.notifier).selectAndMove(hazard);
-        ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
       },
       material: (_, __) => MaterialTextButtonData(
         style: ButtonStyle(
