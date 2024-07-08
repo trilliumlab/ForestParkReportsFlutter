@@ -122,7 +122,7 @@ class PanelPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Opacity(
-                opacity: (panelController.panelPosition / PanelValues.snapFraction(context)).clamp(0, 1),
+                opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
                 child: SizedBox(
                   height: PanelValues.snapHeight(context) * 0.7
                       + (panelController.panelHeight - PanelValues.snapHeight(context)) * 0.6,
