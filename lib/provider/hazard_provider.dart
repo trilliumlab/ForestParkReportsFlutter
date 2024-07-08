@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:collection';
 
-import 'package:drift/drift.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:image/image.dart' as img;
-import 'package:collection/collection.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
