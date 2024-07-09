@@ -2,22 +2,16 @@ import 'package:forest_park_reports/model/relation.dart';
 import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sembast/sembast.dart';
 
 part 'relation_provider.g.dart';
 
 @riverpod
 class Relations extends _$Relations {
-  static final store = StoreRef<int, Map<String, dynamic>>("relations");
-
   @override
   Future<List<RelationModel>> build() async {
-    final db = await ref.watch(forestParkDatabaseProvider.future);
+    final db = ref.watch(databaseProvider);
 
-    final relations = [
-      for (final relation in await store.find(db))
-        RelationModel.fromJson(relation.value)
-    ];
+    final relations = await db.select(db.relationsTable).get();
 
     if (relations.isNotEmpty) {
       refresh();
@@ -34,10 +28,10 @@ class Relations extends _$Relations {
         RelationModel.fromJson(relation)
     ];
 
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    for (final relation in relations) {
-      store.record(relation.id).put(db, relation.toJson());
-    }
+    final db = ref.read(databaseProvider);
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.relationsTable, relations);
+    });
 
     return relations;
   }

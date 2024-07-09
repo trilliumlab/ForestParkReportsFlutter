@@ -64,15 +64,14 @@ class HazardInfoWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final hazardUpdates = ref.watch(hazardUpdatesProvider(hazard.uuid));
-    final lastImage = hazardUpdates.lastImage;
-    final lastBlurHash = hazardUpdates.lastBlurHash;
+    final hazardUpdates = ref.watch(hazardUpdatesProvider(hazard.uuid)).valueOrNull;
+    final lastImage = hazardUpdates?.lastImage;
+    final lastBlurHash = hazardUpdates?.lastBlurHash;
     return PlatformTextButton(
       padding: const EdgeInsets.only(left: 12, right: 8, top: 8, bottom: 8),
       onPressed: () {
         ref.read(selectedRelationProvider.notifier).deselect();
         ref.read(selectedHazardProvider.notifier).selectAndMove(hazard);
-        ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
       },
       material: (_, __) => MaterialTextButtonData(
         style: ButtonStyle(

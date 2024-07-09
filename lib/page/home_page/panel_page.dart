@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -39,8 +40,8 @@ class PanelPage extends ConsumerWidget {
     HazardUpdateList? hazardUpdates;
     String? lastImage;
     if (selectedHazard != null) {
-      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid));
-      lastImage = hazardUpdates!.lastImage;
+      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid)).valueOrNull;
+      lastImage = hazardUpdates?.lastImage;
     }
 
     return Panel(
@@ -66,7 +67,7 @@ class PanelPage extends ConsumerWidget {
                       return;
                     }
 
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: false,
@@ -97,7 +98,7 @@ class PanelPage extends ConsumerWidget {
                       return;
                     }
 
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: true,
@@ -122,10 +123,10 @@ class PanelPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Opacity(
-                opacity: (panelController.panelPosition / PanelValues.snapFraction(context)).clamp(0, 1),
+                opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
                 child: SizedBox(
-                  height: PanelValues.snapHeight(context) * 0.7
-                      + (panelController.panelHeight - PanelValues.snapHeight(context)) * 0.6,
+                  height: PanelValues.snapHeight(context) * 0.6
+                      + max(panelController.panelPosition - PanelValues.snapFraction(context), 0) * 1.2 * PanelValues.snapHeight(context),
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     child: HazardImage(lastImage, blurHash: hazardUpdates?.lastBlurHash),
@@ -139,9 +140,9 @@ class PanelPage extends ConsumerWidget {
             shadowColor: Colors.transparent,
             margin: EdgeInsets.zero,
             child: Column(
-              children: hazardUpdates!.map((update) => UpdateInfoWidget(
+              children: hazardUpdates?.map((update) => UpdateInfoWidget(
                 update: update,
-              )).toList(),
+              )).toList() ?? [],
             ),
           ),
           // Container(

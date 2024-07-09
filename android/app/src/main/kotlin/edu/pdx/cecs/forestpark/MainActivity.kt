@@ -1,4 +1,4 @@
-package com.example.forest_park_reports
+package edu.pdx.cecs.forestpark
 
 import io.flutter.embedding.android.FlutterActivity
 
