@@ -61,6 +61,8 @@ dependencies:
   sembast: ^3.7.1+2
   sembast_web: ^2.4.0+2
   http: ^1.2.1
+  flutter_map_compass: ^1.0.3
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +90,7 @@ flutter:
       fonts:
         - asset: assets/fonts/trail_eyes_icons.otf
   assets:
+    - assets/image/
     - .env
 
 icons_launcher:
