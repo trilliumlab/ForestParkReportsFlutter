@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // When panel is visible, position 20dp above the panel height (_fabHeight)
           Positioned(
             right: kFabPadding,
-            bottom: kFabPadding + (_panelController.isAttached ? _panelController.panelHeight + kFabPadding : 0), 
+            bottom: kFabPadding + max(_panelController.isAttached ? _panelController.panelHeight : 0, MediaQuery.of(context).viewPadding.bottom), 
             child: Visibility(
               visible: !_panelController.isAttached ? true
                   : 1 > (_panelController.panelPosition - PanelValues.snapFraction(context)) / (0.2 * (1 - PanelValues.snapFraction(context))),
