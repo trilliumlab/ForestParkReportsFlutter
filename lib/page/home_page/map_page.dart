@@ -115,7 +115,7 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
             if (hasGesture && _isFingerDown) {
               ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.none);
             }
-            ref.read(mapCameraPositionProvider.notifier).update(position);
+            ref.read(mapPositionProvider.notifier).update(position);
           },
           maxZoom: 20,
           onTap: (TapPosition position, LatLng? latlng) {

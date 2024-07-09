@@ -63,7 +63,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final camera = ref.watch(mapCameraPositionProvider);
+    final camera = ref.watch(mapPositionProvider);
 
     final ThemeData theme = Theme.of(context);
 
@@ -128,7 +128,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
   void _handleAnimation() {
     final controller = widget.mapController;
     controller.rotate(_rotationTween.evaluate(_rotateAnimation));
-    ref.read(mapCameraPositionProvider.notifier).update(controller.camera);
+    ref.read(mapPositionProvider.notifier).update(controller.camera);
   }
 
   @override
