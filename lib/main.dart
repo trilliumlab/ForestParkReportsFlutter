@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

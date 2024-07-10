@@ -21,6 +21,7 @@ class MapCompass extends ConsumerStatefulWidget {
     this.hideIfRotatedNorth = true,
     this.alignment = Alignment.topRight,
     this.padding = const EdgeInsets.only(),
+    this.showCardDir = false,
   });
 
 
@@ -50,6 +51,9 @@ class MapCompass extends ConsumerStatefulWidget {
 
   /// The map controller that was passed to the FlutterMap
   final MapController mapController;
+
+  /// When true, shows a letter indicating the cardinal direction the map is facing
+  final bool showCardDir;
   
   @override
   ConsumerState<MapCompass> createState() => _MapCompassState();
@@ -67,7 +71,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
 
     final ThemeData theme = Theme.of(context);
 
-    if (widget.hideIfRotatedNorth && (camera?.rotation ?? 0) % 360 == 0) {
+    if (camera == null || widget.hideIfRotatedNorth && (camera.rotation) % 360 == 0) {
       return const SizedBox.shrink();
     }
 
@@ -76,14 +80,19 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
       child: Padding(
         padding: widget.padding,
         child: Transform.rotate(
-          angle: degToRadian(camera?.rotation ?? 0 + widget.rotationOffset),
+          angle: degToRadian(camera.rotation + widget.rotationOffset),
           child: IconButton(
             alignment: Alignment.center,
             padding: EdgeInsets.zero,
             icon: widget.icon ?? PlatformWidget(
-              cupertino: (_, __) => SizedBox(height: 50, child: Image(image: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                ? const AssetImage("assets/image/cupertino_compass.png")
-                : const AssetImage("assets/image/cupertino_compass_dark.png"))),
+              cupertino: (_, __) => Stack(
+                alignment: Alignment.center,
+                children: [SizedBox(height: 50, child: Image(image: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                  ? const AssetImage("assets/image/cupertino_compass.png")
+                  : const AssetImage("assets/image/cupertino_compass_dark.png"))),
+                  cardDirText(camera, context)
+                ]
+              ),
               material: (_, __) => Transform.rotate(
                 angle: degToRadian(-45.0),
                 child: Stack(
@@ -104,13 +113,33 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
     );
   }
 
-  void _resetRotation(MapCamera? camera) {
+  Widget cardDirText(MapCamera camera, BuildContext context) {
+    // Shift camera rotation, clamp from 0 to 360, 
+    // then perform integer division based on 90 degree chunks
+    int dir = ((camera.rotation + 45) % 360) ~/ 90;
+    
+    String letter = 
+        dir == 0 ? 'N' :
+        dir == 1 ? 'W' :
+        dir == 2 ? 'S' :
+        'E'; 
+    Brightness mode = View.of(context).platformDispatcher.platformBrightness;
+    Color color = isCupertino(context) ?
+      mode == Brightness.light
+        ? CupertinoColors.systemGrey.highContrastColor 
+        : CupertinoColors.systemGrey.darkHighContrastColor
+      : Theme.of(context).colorScheme.onSurface; 
+
+    return Text(letter, style: TextStyle(color: color));
+  }
+
+  void _resetRotation(MapCamera camera) {
     // current rotation of the map
-    final rotation = camera?.rotation ?? 0;
+    final rotation = camera.rotation;
     // nearest north (0°, 360°, -360°, ...)
     final endRotation = (rotation / 360).round() * 360.0;
     // don't start animation if rotation doesn't need to change
-    if (rotation == endRotation && camera != null) return;
+    if (rotation == endRotation) return;
 
     _animationController = AnimationController(
       duration: widget.rotationDuration,

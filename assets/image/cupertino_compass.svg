@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
 	<circle r="200" cx="200" cy="200" style="fill:white" />
     <g>
-		<polyline points="200,20 224,60 200,56 176,60 200, 20" style="fill:#f00;stroke:#f00;stroke-linejoin: round;stroke-linecap: round;stroke-width: 8" />
+		<polyline points="200,20 224,60 200,56 176,60 200,20" style="fill:#f00;stroke:#f00;stroke-linejoin: round;stroke-linecap: round;stroke-width: 8" />
 		<polyline points="200,20 204,60 196,60 200,20" style="fill:#d8d8dc;stroke:#d8d8dc;stroke-linejoin: round;stroke-linecap: round;stroke-width: 8" transform="rotate(022.5,200,200)" />
 		<polyline points="200,20 204,60 196,60 200,20" style="fill:#d8d8dc;stroke:#d8d8dc;stroke-linejoin: round;stroke-linecap: round;stroke-width: 8" transform="rotate(045.0,200,200)" />
 		<polyline points="200,20 204,60 196,60 200,20" style="fill:#d8d8dc;stroke:#d8d8dc;stroke-linejoin: round;stroke-linecap: round;stroke-width: 8" transform="rotate(067.5,200,200)" />

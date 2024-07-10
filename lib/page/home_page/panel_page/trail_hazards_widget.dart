@@ -4,10 +4,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
-import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// A list of hazards on a given trail when that trail is clicked on
 class TrailHazardsWidget extends ConsumerWidget {
