@@ -1,22 +1,36 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/provider/settings_provider.dart';
+import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/page/home_page.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
+final providerContainer = ProviderContainer();
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
-  await FMTCObjectBoxBackend().initialise();
-  await const FMTCStore('forestPark').manage.create();
-  runApp(const ProviderScope(
-    child: App(),
+
+  // Initialize in parallel
+  await Future.wait([
+    dotenv.load(),
+    // Run consecutively.
+    () async {
+      await FMTCObjectBoxBackend().initialise();
+      await const FMTCStore('forestPark').manage.create();
+    }(),
+    OfflineUploader().initialize()
+  ]);
+
+  runApp(UncontrolledProviderScope(
+    container: providerContainer,
+    child: const App(),
   ));
 }
 
@@ -61,7 +75,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     // to use widgets that render in the style of the device's platform.
     // Eg. cupertino on ios, and material 3 on android
     return PlatformProvider(
-      initialPlatform: kPlatformOverride,
+      initialPlatform: kDebugMode ? kPlatformOverride : null,
       builder: (context) {
         return _theme(
           builder: (context) => const PlatformApp(
@@ -96,7 +110,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
             cupertinoOverrideTheme:  CupertinoThemeData(
               brightness: Brightness.light,
               barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
-              textTheme: const CupertinoTextThemeData(),
+              textTheme: CupertinoTextThemeData(
+                navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialLightTheme.colorScheme.primary)
+              ),
             ),
           ),
         );
@@ -106,7 +122,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
             cupertinoOverrideTheme: CupertinoThemeData(
               brightness: Brightness.dark,
               barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
-              textTheme: const CupertinoTextThemeData(),
+              textTheme: CupertinoTextThemeData(
+                  navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialDarkTheme.colorScheme.primary)
+              ),
             ),
           ),
         );

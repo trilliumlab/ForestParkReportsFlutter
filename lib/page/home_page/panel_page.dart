@@ -1,11 +1,13 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
-import 'package:forest_park_reports/page/home_page.dart';
+import 'package:forest_park_reports/page/common/confirmation.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
@@ -16,24 +18,20 @@ import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_elevation_graph.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// The sliding-up modal with info on the current selected trail or hazard on the map
-class PanelPage extends ConsumerStatefulWidget {
+class PanelPage extends ConsumerWidget {
   final ScrollController scrollController;
-  final ScreenPanelController panelController;
+  final PanelController panelController;
   const PanelPage({
     super.key,
     required this.scrollController,
     required this.panelController,
   });
-  @override
-  ConsumerState<PanelPage> createState() => _PanelPageState();
-}
 
-//TODO stateless?
-class _PanelPageState extends ConsumerState<PanelPage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final selectedRelationID = ref.watch(selectedRelationProvider);
     final selectedRelation = selectedRelationID == null ? null : ref.watch(relationsProvider).value?.get(selectedRelationID);
     final selectedHazard = ref.watch(selectedHazardProvider.select((h) => h.hazard));
@@ -42,15 +40,15 @@ class _PanelPageState extends ConsumerState<PanelPage> {
     HazardUpdateList? hazardUpdates;
     String? lastImage;
     if (selectedHazard != null) {
-      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid));
-      lastImage = hazardUpdates!.lastImage;
+      hazardUpdates = ref.watch(hazardUpdatesProvider(selectedHazard.uuid)).valueOrNull;
+      lastImage = hazardUpdates?.lastImage;
     }
 
     return Panel(
       // panel for when a hazard is selected
       child: selectedHazard != null ? TrailInfoWidget(
-        scrollController: widget.scrollController,
-        panelController: widget.panelController,
+        scrollController: scrollController,
+        panelController: panelController,
         // TODO fetch trail name
         title: "${selectedHazard.hazard.displayName} on ${hazardRelation!.tags["name"]}",
         bottomWidget: Row(
@@ -60,21 +58,29 @@ class _PanelPageState extends ConsumerState<PanelPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 10),
                 child: PlatformTextButton(
-                  onPressed: () {
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                  onPressed: () async {
+                    if (!await showConfirmationDialog(context, ConfirmationInfo(
+                      title: "Report hazard cleared?",
+                      content: "Please make sure the hazard is gone.",
+                      affirmative: "Yes"
+                    ))) {
+                      return;
+                    }
+
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: false,
                       ),
                     );
-                    ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
-                  child: Text(
-                    "Cleared",
-                    style: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)),
+                  child: const Text(
+                    "Report Cleared",
+                    style: TextStyle(color: CupertinoColors.systemGreen),
                   ),
                 ),
               ),
@@ -83,21 +89,29 @@ class _PanelPageState extends ConsumerState<PanelPage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 20),
                 child: PlatformTextButton(
-                  onPressed: () {
-                    ref.read(hazardUpdatesProvider(selectedHazard.uuid).notifier).create(
+                  onPressed: () async {
+                    if (!await showConfirmationDialog(context, ConfirmationInfo(
+                        title: "Report hazard present?",
+                        content: "Please make sure the hazard is still present.",
+                        affirmative: "Yes"
+                    ))) {
+                      return;
+                    }
+
+                    ref.read(activeHazardProvider.notifier).updateHazard(
                       HazardUpdateRequestModel(
                         hazard: selectedHazard.uuid,
                         active: true,
                       ),
                     );
-                    ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
-                  child: Text(
-                    "Present",
-                    style: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.systemBlue, context)),
+                  child: const Text(
+                    "Report Present",
+                    style: TextStyle(color: CupertinoColors.destructiveRed),
                   ),
                 ),
               ),
@@ -109,13 +123,13 @@ class _PanelPageState extends ConsumerState<PanelPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Opacity(
-                opacity: widget.panelController.snapWidgetOpacity,
+                opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
                 child: SizedBox(
-                  height: widget.panelController.panelSnapHeight * 0.7
-                      + (widget.panelController.panelOpenHeight-widget.panelController.panelSnapHeight)*widget.panelController.pastSnapPosition * 0.6,
+                  height: PanelValues.snapHeight(context) * 0.6
+                      + max(panelController.panelPosition - PanelValues.snapFraction(context), 0) * 1.2 * PanelValues.snapHeight(context),
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: HazardImage(lastImage),
+                    child: HazardImage(lastImage, blurHash: hazardUpdates?.lastBlurHash),
                   ),
                 ),
               ),
@@ -126,9 +140,9 @@ class _PanelPageState extends ConsumerState<PanelPage> {
             shadowColor: Colors.transparent,
             margin: EdgeInsets.zero,
             child: Column(
-              children: hazardUpdates!.map((update) => UpdateInfoWidget(
+              children: hazardUpdates?.map((update) => UpdateInfoWidget(
                 update: update,
-              )).toList(),
+              )).toList() ?? [],
             ),
           ),
           // Container(
@@ -147,25 +161,26 @@ class _PanelPageState extends ConsumerState<PanelPage> {
 
       // panel for when a trail is selected
       selectedRelation != null ? TrailInfoWidget(
-        scrollController: widget.scrollController,
-        panelController: widget.panelController,
+        scrollController: scrollController,
+        panelController: panelController,
         // TODO show real name
         title: selectedRelation.tags["name"],
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Opacity(
-              opacity: widget.panelController.snapWidgetOpacity,
+              opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
               child: TrailElevationGraph(
                 relationID: selectedRelation.id,
-                height: widget.panelController.panelSnapHeight*0.6,
+                height: PanelValues.snapHeight(context) * 0.6,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 14),
             child: Opacity(
-              opacity: widget.panelController.fullWidgetOpacity,
+              opacity: ((panelController.panelPosition - PanelValues.snapFraction(context))
+                / (1 - PanelValues.snapFraction(context))).clamp(0, 1),
               child: TrailHazardsWidget(
                   relationID: selectedRelation.id
               ),
@@ -176,8 +191,8 @@ class _PanelPageState extends ConsumerState<PanelPage> {
 
       // panel for when nothing is selected
       TrailInfoWidget(
-          scrollController: widget.scrollController,
-          panelController: widget.panelController,
+          scrollController: scrollController,
+          panelController: panelController,
           children: const []
       ),
     );

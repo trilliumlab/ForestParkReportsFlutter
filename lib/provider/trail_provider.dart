@@ -8,24 +8,15 @@ import 'package:forest_park_reports/provider/database_provider.dart';
 import 'package:forest_park_reports/provider/dio_provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sembast/blob.dart';
-import 'package:sembast/sembast.dart';
 
 part 'trail_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Trails extends _$Trails {
-  static final store = StoreRef<int, Blob>("trails");
-
   @override
   Future<TrailList> build() async {
-    final trails = TrailList([]);
-
-    final db = await ref.watch(forestParkDatabaseProvider.future);
-
-    for (final trail in await store.find(db)) {
-       trails.add(TrailModel.decode(trail.value.bytes));
-    }
+    final db = ref.watch(databaseProvider);
+    final trails = TrailList(await db.select(db.trailsTable).get());
 
     if (trails.isNotEmpty) {
       refresh();
@@ -44,11 +35,10 @@ class Trails extends _$Trails {
 
     final trails = TrailList.decode(res.data);
 
-    final db = await ref.read(forestParkDatabaseProvider.future);
-    db.transaction((txn) async {
-      for (final trail in trails) {
-        store.record(trail.id).put(txn, Blob(trail.encode()));
-      }
+    final db = ref.read(databaseProvider);
+    await db.delete(db.trailsTable).go();
+    await db.batch((batch) {
+      batch.insertAllOnConflictUpdate(db.trailsTable, trails);
     });
 
     return trails;

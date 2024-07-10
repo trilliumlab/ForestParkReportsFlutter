@@ -23,6 +23,7 @@ import 'package:forest_park_reports/page/home_page/map_page/hazard_marker_layer.
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// Renders the main map.
 ///
@@ -118,14 +119,14 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
             // Deselect both
             if (ref
                 .read(panelPositionProvider)
-                .position == PanelPositionState.open) {
+                .position == PanelState.OPEN) {
               ref.read(panelPositionProvider.notifier).move(
-                  PanelPositionState.snapped);
+                  PanelState.SNAPPED);
             } else {
               ref.read(selectedHazardProvider.notifier).deselect();
               ref.read(selectedRelationProvider.notifier).deselect();
               ref.read(panelPositionProvider.notifier).move(
-                  PanelPositionState.closed);
+                  PanelState.HIDDEN);
             }
           },
         ),
@@ -170,7 +171,7 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
             ),
           const TrailPolylineLayer(),
           const TrailEndsMarkerLayer(),
-          HazardMarkerLayer(popupController: _popupController, mapController: _animatedMapController,),
+          HazardMarkerLayer(popupController: _popupController, mapController: _animatedMapController),
           const TrailCursorMarkerLayer(),
         ],
       ),

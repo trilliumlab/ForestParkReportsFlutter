@@ -7,6 +7,7 @@ import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/provider/trail_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 class TrailPolylineLayer extends ConsumerWidget {
   const TrailPolylineLayer({super.key});
@@ -41,24 +42,24 @@ class TrailPolylineLayer extends ConsumerWidget {
             if (selectedRelation?.members.contains(tag) ?? false) {
               if (ref
                   .read(panelPositionProvider)
-                  .position == PanelPositionState.open
+                  .position == PanelState.OPEN
               ) {
                 ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.snapped);
+                    PanelState.SNAPPED);
               } else {
                 ref.read(selectedHazardProvider.notifier).deselect();
                 ref.read(selectedRelationProvider.notifier).deselect();
                 ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.closed);
+                    PanelState.HIDDEN);
               }
             } else {
               ref.read(selectedRelationProvider.notifier)
                   .select(relations.firstWhere((r) => r.members.contains(tag)).id);
               if (ref
                   .read(panelPositionProvider)
-                  .position == PanelPositionState.closed) {
+                  .position.index <= PanelState.COLLAPSED.index ) {
                 ref.read(panelPositionProvider.notifier).move(
-                    PanelPositionState.snapped);
+                    PanelState.SNAPPED);
               }
             }
           }

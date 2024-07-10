@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/page/home_page/map_page/hazard_info_popup.dart';
+import 'package:forest_park_reports/page/home_page/map_page/map_icon.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// A layer over the trails with hazard icons and [HazardInfoPopup] handling
 class HazardMarkerLayer extends ConsumerWidget {
@@ -31,29 +33,24 @@ class HazardMarkerLayer extends ConsumerWidget {
       marker = HazardMarker(
         hazard: hazard,
         rotate: true,
-        alignment: Alignment.center,
+        alignment: kMarkerTopAlignment,
         child: GestureDetector(
           onTap: () {
             ref.read(selectedRelationProvider.notifier).deselect();
             if (hazard == ref.read(selectedHazardProvider).hazard) {
-              ref.read(panelPositionProvider.notifier).move(PanelPositionState.closed);
+              ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
               ref.read(selectedHazardProvider.notifier).deselect();
               _popupController.hideAllPopups();
-            }
-            else if (ref.read(panelPositionProvider).position == PanelPositionState.closed) {
-              ref.read(panelPositionProvider.notifier).move(PanelPositionState.snapped);
+            } else if (ref.read(panelPositionProvider).position .index <= PanelState.COLLAPSED.index) {
+              ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
             }
             ref.read(selectedHazardProvider.notifier).select(hazard);
             _popupController.showPopupsOnlyFor([marker]);
           },
-          child: Icon(
-            Icons.warning_rounded,
-            color: isMaterial(context)
-                ? Theme
-                .of(context)
-                .colorScheme.error
-                : CupertinoDynamicColor.resolve(
-                CupertinoColors.destructiveRed, context)
+          child: MapIcon(
+            Icons.fmd_bad_rounded,
+            color: CupertinoDynamicColor.resolve(
+                CupertinoColors.destructiveRed, context),
           ),
         )
       );
@@ -73,17 +70,17 @@ class HazardMarkerLayer extends ConsumerWidget {
 
     return PopupMarkerLayer(
       options: PopupMarkerLayerOptions(
-          popupController: _popupController,
-          markers: markers,
-          popupDisplayOptions: PopupDisplayOptions(
-            builder: (_, marker) {
-              if (marker is HazardMarker) {
-                return HazardInfoPopup(hazard: marker.hazard);
-              }
-              return Container();
-            },
-            animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
-          )
+        popupController: _popupController,
+        markers: markers,
+        popupDisplayOptions: PopupDisplayOptions(
+          builder: (_, marker) {
+            if (marker is HazardMarker) {
+              return HazardInfoPopup(hazard: marker.hazard);
+            }
+            return Container();
+          },
+          animation: const PopupAnimation.fade(duration: Duration(milliseconds: 100)),
+        ),
       ),
     );
   }

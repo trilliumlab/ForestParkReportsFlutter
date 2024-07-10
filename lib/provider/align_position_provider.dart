@@ -16,7 +16,7 @@ enum AlignPositionTargetState {
 @riverpod
 class AlignPositionTarget extends _$AlignPositionTarget {
   @override
-  AlignPositionTargetState build() => AlignPositionTargetState.none;
+  AlignPositionTargetState build() => AlignPositionTargetState.forestPark;
   void update(AlignPositionTargetState alignPositionTargetState) {
     state = alignPositionTargetState;
   }

@@ -29,7 +29,6 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
   HazardType? _selectedHazard;
   XFile? _image;
   bool _inProgress = false;
-  double _uploadProgress = 0;
 
   void _close() {
     Navigator.pop(context);
@@ -78,21 +77,10 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
-    String? imageUuid;
-    if (_image != null) {
-      imageUuid = await activeHazardNotifier.uploadImage(
-        _image!,
-        onSendProgress: (sent, total) => setState(() {
-          _uploadProgress = sent/total;
-        }),
-      );
-    }
-
-    await activeHazardNotifier.create(HazardRequestModel(
+    await activeHazardNotifier.createHazard(HazardRequestModel(
       hazard: _selectedHazard!,
       location: snappedLoc.location,
-      image: imageUuid
-    ));
+    ), imageFile: _image);
     _close();
   }
 
@@ -188,7 +176,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                           showSelectedIcon: false,
                           selected: {
                             if (_selectedHazard != null)
-                              _selectedHazard!,
+                              _selectedHazard!
                           },
                           onSelectionChanged: (selection) {
                             if (selection.length == 1) {
@@ -291,10 +279,9 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                 ),
               ),
               if (_inProgress)
-                Align(
+                const Align(
                   alignment: Alignment.topCenter,
                   child: LinearProgressIndicator(
-                    value: _uploadProgress > 0.95 || _uploadProgress < 0.05 ? null : _uploadProgress,
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -305,5 +292,3 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     );
   }
 }
-
-
