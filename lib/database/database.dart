@@ -36,7 +36,7 @@ class HazardsTable extends Table {
 @UseRowClass(HazardUpdateModel)
 class HazardUpdatesTable extends Table {
   TextColumn get uuid => text()();
-  TextColumn get hazard => text().unique().references(HazardsTable, #uuid)();
+  TextColumn get hazard => text().references(HazardsTable, #uuid)();
   DateTimeColumn get time => dateTime()();
   BoolColumn get active => boolean()();
   TextColumn get blurHash => text().nullable()();
