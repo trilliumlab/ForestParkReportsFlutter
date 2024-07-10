@@ -6,7 +6,10 @@
 
   <img src="assets/icon/icon.png" alt="Logo" width="80" height="80">
 
-  A hazard-tracking app for Forest Park, Portland
+  A hazard-tracking app for Forest Park, Portland.
+
+  Development sponsored by Portland State University and NSF award CIF-2046175.
+
 
   [![Release][release-shield]][release-url]
   [![Build Status][actions-shield]][actions-url]
