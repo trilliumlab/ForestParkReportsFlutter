@@ -90,7 +90,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
               Transform.rotate(
                 angle: degToRadian(camera.rotation + widget.rotationOffset),
                 child: widget.icon ?? PlatformWidget(
-                  cupertino: (_, __) => SizedBox(height: 50, child: Image(image: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                  cupertino: (_, __) => SizedBox(height: 50, child: Image(image: Theme.of(context).brightness == Brightness.light
                   ? const AssetImage("assets/image/cupertino_compass.png")
                   : const AssetImage("assets/image/cupertino_compass_dark.png"))),
                   material: (_, __) => Transform.rotate(

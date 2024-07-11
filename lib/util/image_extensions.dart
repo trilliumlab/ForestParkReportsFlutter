@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:blurhash_ffi/blurhash.dart';
 import 'package:flutter/cupertino.dart';
