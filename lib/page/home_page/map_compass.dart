@@ -79,35 +79,37 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
       alignment: widget.alignment,
       child: Padding(
         padding: widget.padding,
-        child: Transform.rotate(
-          angle: degToRadian(camera.rotation + widget.rotationOffset),
-          child: IconButton(
+        child: IconButton(
+          alignment: Alignment.center,
+          padding: EdgeInsets.zero,
+          icon: Stack(
             alignment: Alignment.center,
-            padding: EdgeInsets.zero,
-            icon: widget.icon ?? PlatformWidget(
-              cupertino: (_, __) => Stack(
-                alignment: Alignment.center,
-                children: [SizedBox(height: 50, child: Image(image: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+            children: [
+              Transform.rotate(
+                angle: degToRadian(camera.rotation + widget.rotationOffset),
+                child: widget.icon ?? PlatformWidget(
+                  cupertino: (_, __) => SizedBox(height: 50, child: Image(image: View.of(context).platformDispatcher.platformBrightness == Brightness.light
                   ? const AssetImage("assets/image/cupertino_compass.png")
                   : const AssetImage("assets/image/cupertino_compass_dark.png"))),
-                  cardDirText(camera, context)
-                ]
-              ),
-              material: (_, __) => Transform.rotate(
-                angle: degToRadian(-45.0),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Icon(CupertinoIcons.compass, color: Colors.red, size: 50),
-                    Icon(CupertinoIcons.compass_fill, color: theme.colorScheme.surface, size: 50),
-                    Icon(CupertinoIcons.circle, color: theme.colorScheme.surface, size: 52),
-                  ],
+                  material: (_, __) => Transform.rotate(
+                    angle: degToRadian(-45.0),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(CupertinoIcons.compass, color: Colors.red, size: 50),
+                        Icon(CupertinoIcons.compass_fill, color: theme.colorScheme.surface, size: 50),
+                        Icon(CupertinoIcons.circle, color: theme.colorScheme.surface, size: 52),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-            onPressed:
-                widget.onPressed ?? () => _resetRotation(camera),
+              // Show cardinal dir letter if default iOS compass or if custom compass and showCardDir enabled
+              if (widget.icon == null && isCupertino(context) || widget.icon != null && widget.showCardDir) cardDirText(camera, context)
+            ]
           ),
+          onPressed:
+              widget.onPressed ?? () => _resetRotation(camera),
         ),
       ),
     );
@@ -130,7 +132,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
         : CupertinoColors.systemGrey.darkHighContrastColor
       : Theme.of(context).colorScheme.onSurface; 
 
-    return Text(letter, style: TextStyle(color: color));
+    return Text(letter, style: TextStyle(color: color, fontSize: 20), textAlign: TextAlign.center);
   }
 
   void _resetRotation(MapCamera camera) {
