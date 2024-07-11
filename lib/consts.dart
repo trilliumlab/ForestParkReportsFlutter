@@ -14,6 +14,7 @@ const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
 // TODO Maybe move this over to the settings page or only set on debug
 const kPlatformOverride = null;
 // const kPlatformOverride = TargetPlatform.android;
+// const kPlatformOverride = TargetPlatform.iOS;
 
 // Example: 11:53 AM July 12 2022
 final DateFormat kDisplayDateFormat = DateFormat('hh:mm a MMMM dd y');

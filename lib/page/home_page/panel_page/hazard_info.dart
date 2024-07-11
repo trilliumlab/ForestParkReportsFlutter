@@ -23,7 +23,7 @@ class UpdateInfoWidget extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(2.5)),
+                  borderRadius: const BorderRadius.all(Radius.circular(2.5)),
                   color: update.active
                       ? CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)
                       : CupertinoDynamicColor.resolve(CupertinoColors.systemGreen, context),

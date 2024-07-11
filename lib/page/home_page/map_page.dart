@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:forest_park_reports/provider/map_position_provider.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,8 @@ import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 ///
 /// Contains all trails, hazard markers, and hazard info popups.
 class MapPage extends ConsumerStatefulWidget {
-  const MapPage({super.key});
+  final MapController mapController;
+  const MapPage({super.key, required this.mapController});
 
   @override
   ConsumerState<MapPage> createState() => _MapPageState();
@@ -52,6 +54,7 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
       vsync: this,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
+      mapController: widget.mapController
     );
   }
 
@@ -112,6 +115,7 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
             if (hasGesture && _isFingerDown) {
               ref.read(alignPositionTargetProvider.notifier).update(AlignPositionTargetState.none);
             }
+            ref.read(mapPositionProvider.notifier).update(position);
           },
           maxZoom: 20,
           onTap: (TapPosition position, LatLng? latlng) {
@@ -173,6 +177,7 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
           const TrailEndsMarkerLayer(),
           HazardMarkerLayer(popupController: _popupController, mapController: _animatedMapController),
           const TrailCursorMarkerLayer(),
+          // const MapCompass.cupertino(alignment: Alignment.topLeft, hideIfRotatedNorth: false,)
         ],
       ),
     );

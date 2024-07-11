@@ -64,6 +64,8 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.0
   sqlite3: ^2.4.4
   http: ^1.2.1
+  flutter_map_compass: ^1.0.3
+  flutter_svg: ^2.0.10+1
   flutter_uploader:
     git:
       url: https://github.com/orestesgaolin/flutter_uploader.git
@@ -96,6 +98,7 @@ flutter:
       fonts:
         - asset: assets/fonts/trail_eyes_icons.otf
   assets:
+    - assets/image/
     - .env
 
 icons_launcher:

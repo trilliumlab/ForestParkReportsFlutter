@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:forest_park_reports/page/home_page/map_compass.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
@@ -27,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final _panelController = PanelController();
 
   final _scrollController = ScrollController();
+  
+  final _mapController = MapController();
+  
 
   @override
   void initState() {
@@ -63,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 minHeight: PanelValues.collapsedHeight(context),
                 snapHeight: PanelValues.snapHeight(context),
                 defaultPanelState: PanelState.HIDDEN,
-                body: const MapPage(),
+                body: MapPage(mapController: _mapController,),
                 controller: _panelController,
                 scrollController: _scrollController,
                 panelBuilder: () => PanelPage(
@@ -85,11 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
           // When panel is visible, position 20dp above the panel height (_fabHeight)
           Positioned(
             right: kFabPadding,
-            // Don't let the fab go under the bottom safe area.
-            bottom: max(
-                kFabPadding + (_panelController.isAttached ? _panelController.panelHeight + kFabPadding : 0),
-                MediaQuery.of(context).padding.bottom,
-            ),
+            bottom: kFabPadding + max(
+              _panelController.isAttached ? _panelController.panelHeight : 0,
+              MediaQuery.of(context).viewPadding.bottom
+            ), 
             child: Visibility(
               visible: !_panelController.isAttached ? true
                   : 1 > (_panelController.panelPosition - PanelValues.snapFraction(context)) / (0.2 * (1 - PanelValues.snapFraction(context))),
@@ -98,43 +102,63 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Curves.easeInOut.transform(
                     1 - clampDouble((_panelController.panelPosition - PanelValues.snapFraction(context))
                         / (0.2 * (1 - PanelValues.snapFraction(context))), 0, 1)
-                ),
+                  ),
               ),
             ),
           ),
           
 
-          // Settings FAB
+          // Settings FAB and compass
           Positioned(
             right: kFabPadding,
             top: MediaQuery.of(context).viewPadding.top + kFabPadding,
-            child: Consumer(
-              builder: (context, ref, child) {
-                return PlatformFAB(
-                  heroTag: "settings_fab",
-                  onPressed: () async {
-                    Navigator.of(context).push(
-                      platformPageRoute(
-                        context: context,
-                        builder: (_) => const SettingsPage(),
+            child: Column(
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    return PlatformFAB(
+                      heroTag: "settings_fab",
+                      onPressed: () async {
+                        Navigator.of(context).push(
+                          platformPageRoute(
+                            context: context,
+                            builder: (_) => const SettingsPage(),
+                          ),
+                        );
+                      },
+                      child: PlatformWidget(
+                        cupertino: (_, __) => Icon(
+                          // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
+                            CupertinoIcons.gear,
+                            color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
+                                ? CupertinoColors.systemGrey.highContrastColor
+                                : CupertinoColors.systemGrey.darkHighContrastColor
+                        ),
+                        material: (_, __) => Icon(
+                          Icons.settings,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                     );
-                  },
-                  child: PlatformWidget(
-                    cupertino: (_, __) => Icon(
-                      // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
-                        CupertinoIcons.gear,
-                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                            ? CupertinoColors.systemGrey.highContrastColor
-                            : CupertinoColors.systemGrey.darkHighContrastColor
-                    ),
-                    material: (_, __) => Icon(
-                      Icons.settings,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  }
+                ),
+                const SizedBox(
+                  height: kFabPadding,
+                ),
+                Visibility(
+                  maintainState: true,
+                  visible: !_panelController.isAttached ? true
+                    : 1 > (_panelController.panelPosition - PanelValues.snapFraction(context)) / (0.2 * (1 - PanelValues.snapFraction(context))),
+                  child: Opacity(
+                    opacity: !_panelController.isAttached ? 1
+                      : Curves.easeInOut.transform(
+                      1 - clampDouble((_panelController.panelPosition - PanelValues.snapFraction(context))
+                          / (0.2 * (1 - PanelValues.snapFraction(context))), 0, 1)
                   ),
-                );
-              }
+                    child: MapCompass(mapController: _mapController, hideIfRotatedNorth: true, alignment: Alignment.center,)
+                  )
+                )
+              ],
             ),
           ),
           // status bar blur

@@ -3,13 +3,13 @@ import 'package:flutter/cupertino.dart';
 /// An assortment of calculated values regarding the panel  
 class PanelValues {
   /// The fraction of the total window height to which the panel should open
-  static const double _kOpenFraction = 0.8;
+  static const double _kOpenFraction = 0.85;
 
   /// The minimum visible height of the panel (can go below when hidden)
   static const double _kCollapsedHeight = 100;
 
   /// Fraction of the distance between the open and collapsed states to which the panel should snap
-  static const double _kSnapPoint = 0.4;
+  static const double _kSnapPoint = 0.5;
   
   /// The open height of the panel in pixels
   /// 
