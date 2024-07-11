@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Curves.easeInOut.transform(
                     1 - clampDouble((_panelController.panelPosition - PanelValues.snapFraction(context))
                         / (0.2 * (1 - PanelValues.snapFraction(context))), 0, 1)
-                ),
+                  ),
               ),
             ),
           ),
@@ -145,7 +145,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: kFabPadding,
                 ),
-                MapCompass(mapController: _mapController, hideIfRotatedNorth: true, alignment: Alignment.center,)
+                Visibility(
+                  maintainState: true,
+                  visible: !_panelController.isAttached ? true
+                    : 1 > (_panelController.panelPosition - PanelValues.snapFraction(context)) / (0.2 * (1 - PanelValues.snapFraction(context))),
+                  child: Opacity(
+                    opacity: !_panelController.isAttached ? 1
+                      : Curves.easeInOut.transform(
+                      1 - clampDouble((_panelController.panelPosition - PanelValues.snapFraction(context))
+                          / (0.2 * (1 - PanelValues.snapFraction(context))), 0, 1)
+                  ),
+                    child: MapCompass(mapController: _mapController, hideIfRotatedNorth: true, alignment: Alignment.center,)
+                  )
+                )
               ],
             ),
           ),
