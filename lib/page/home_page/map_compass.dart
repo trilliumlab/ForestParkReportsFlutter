@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 /// A compass for flutter_map that shows the map rotation and allows to reset
 /// the rotation back to 0.
+/// Adapted from https://github.com/josxha/flutter_map_plugins/blob/main/flutter_map_compass/lib/src/map_compass.dart
 class MapCompass extends ConsumerStatefulWidget {
   /// If [icon] is left blank, defaults to a platform-customized icon with light and dark versions.
   const MapCompass({
