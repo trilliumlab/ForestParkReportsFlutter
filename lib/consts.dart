@@ -40,7 +40,7 @@ const kElevationMaxEntries = 200;
 
 // Encoding consts
 const kNetworkEndian = Endian.little;
-const kElevationDeltaModifier = 4;
+const kElevationDeltaMultiplier = 8;
 
 // Isolate consts
 const kBackgroundRequestPortName = "backgroundRequestPort";
