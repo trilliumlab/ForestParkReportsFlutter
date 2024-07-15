@@ -159,7 +159,7 @@ class TrailModel implements drift.Insertable<TrailModel> {
         elevation = data.getFloat32(cursor, kNetworkEndian);
         cursor += 4;
       } else {
-        elevation = geometry.last.elevation + (data.getInt8(cursor++).toDouble()/kElevationDeltaModifier);
+        elevation = geometry.last.elevation + (data.getInt8(cursor++).toDouble()/kElevationDeltaMultiplier);
       }
       // calculate max and min elevation + delta
       final delta = elevation - (geometry.lastOrNull?.elevation ?? elevation);
@@ -236,7 +236,7 @@ class TrailModel implements drift.Insertable<TrailModel> {
             (
                 (geometry[i].elevation - geometry[0].elevation)
                     - (geometry[i-1].elevation - geometry[0].elevation)
-            ) * kElevationDeltaModifier
+            ) * kElevationDeltaMultiplier
         ).round());
       }
     }
