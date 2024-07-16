@@ -26,6 +26,16 @@ class HazardUpdateList extends ListBase<HazardUpdateModel> {
 
   String? get lastImage => lastWhereOrNull((e) => e.image != null)?.image;
   String? get lastBlurHash => lastWhereOrNull((e) => e.blurHash != null)?.blurHash;
+
+  factory HazardUpdateList.fromJson(dynamic json) => HazardUpdateList([
+    for (final update in json)
+      HazardUpdateModel.fromJson(update),
+  ]);
+
+  List<Map<String, dynamic>> toJson() => [
+    for (final update in this)
+      update.toJson(),
+  ];
 }
 
 @freezed
@@ -36,9 +46,25 @@ class HazardUpdateModel with _$HazardUpdateModel implements drift.Insertable<Haz
     required String hazard,
     required DateTime time,
     required bool active,
+    @Default(false) bool offline,
     String? blurHash,
     String? image,
   }) = _HazardUpdateModel;
+
+  factory HazardUpdateModel.create({
+    required String hazard,
+    required bool active,
+    String? blurHash,
+    String? image,
+  }) => HazardUpdateModel(
+    uuid: kUuidGen.v1(),
+    hazard: hazard,
+    time: DateTime.now(),
+    active: active,
+    offline: true,
+    blurHash: blurHash,
+    image: image,
+  );
 
   /// Maps a [HazardUpdateModel] to a database [HazardUpdatesTable] row.
   @override
@@ -48,6 +74,7 @@ class HazardUpdateModel with _$HazardUpdateModel implements drift.Insertable<Haz
         hazard: drift.Value(hazard),
         time: drift.Value(time),
         active: drift.Value(active),
+        offline: drift.Value(offline),
         blurHash: drift.Value(blurHash),
         image: drift.Value(image),
       ).toColumns(nullToAbsent);
@@ -56,18 +83,4 @@ class HazardUpdateModel with _$HazardUpdateModel implements drift.Insertable<Haz
       _$HazardUpdateModelFromJson(json);
 
   String timeString() => kDisplayDateFormat.format(time.toLocal());
-}
-
-@freezed
-class HazardUpdateRequestModel with _$HazardUpdateRequestModel {
-  const HazardUpdateRequestModel._();
-  const factory HazardUpdateRequestModel({
-    required String hazard,
-    required bool active,
-    String? blurHash,
-    String? image,
-  }) = _HazardUpdateRequestModel;
-
-  factory HazardUpdateRequestModel.fromJson(Map<String, dynamic> json) =>
-      _$HazardUpdateRequestModelFromJson(json);
 }

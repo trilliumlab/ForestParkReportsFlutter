@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard.dart';
+import 'package:forest_park_reports/model/hazard_new_response.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
@@ -108,7 +109,7 @@ class OfflineUploader {
     switch(queuedRequestResponse.requestType) {
       case QueuedRequestType.newHazard:
         if (data != null) {
-          final hazard = HazardModel.fromJson(data);
+          final hazard = HazardNewResponseModel.fromJson(data);
           providerContainer.read(activeHazardProvider.notifier)
               .handleCreateResponse(hazard);
         }
@@ -134,6 +135,7 @@ class OfflineUploader {
     required String url,
     required Map<String, dynamic> data,
     required QueuedRequestType requestType,
+    required String associatedUuid,
     Map<String, String>? headers,
   }) async {
     // TODO use dio on web.
@@ -153,6 +155,7 @@ class OfflineUploader {
       url: url,
       filePath: file.path,
       requestType: requestType,
+      associatedUuid: associatedUuid,
       headers: headerMap,
     );
   }
@@ -165,6 +168,7 @@ class OfflineUploader {
     required String url,
     required String filePath,
     required QueuedRequestType requestType,
+    required String associatedUuid,
     bool multipart = false,
     Map<String, String>? headers,
   }) async {
@@ -195,7 +199,8 @@ class OfflineUploader {
       QueuedRequestModel(
         taskId: taskId,
         requestType: requestType,
-        filePath: filePath
+        filePath: filePath,
+        associatedUuid: associatedUuid,
       ),
     );
   }

@@ -70,10 +70,8 @@ class PanelPage extends ConsumerWidget {
                     }
 
                     ref.read(activeHazardProvider.notifier).updateHazard(
-                      HazardUpdateRequestModel(
-                        hazard: selectedHazard.uuid,
-                        active: false,
-                      ),
+                      hazard: selectedHazard.uuid,
+                      active: false,
                     );
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
@@ -106,10 +104,8 @@ class PanelPage extends ConsumerWidget {
                     }
 
                     ref.read(activeHazardProvider.notifier).updateHazard(
-                      HazardUpdateRequestModel(
-                        hazard: selectedHazard.uuid,
-                        active: true,
-                      ),
+                      hazard: selectedHazard.uuid,
+                      active: true,
                     );
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();

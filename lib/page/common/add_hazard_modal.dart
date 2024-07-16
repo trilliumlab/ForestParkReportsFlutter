@@ -79,10 +79,11 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
-    await activeHazardNotifier.createHazard(HazardRequestModel(
+    await activeHazardNotifier.createHazard(
       hazard: _selectedHazard!,
       location: snappedLoc.location,
-    ), imageFile: _image);
+      imageFile: _image
+    );
 
     showAlertBanner(
       child: const Text("Your report has been queued"),

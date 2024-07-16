@@ -18,10 +18,25 @@ class HazardModel with _$HazardModel implements drift.Insertable<HazardModel> {
     required DateTime time,
     required HazardType hazard,
     required SnappedLatLng location,
-    // TODO these probably can be removed.
+    required bool offline,
     String? blurHash,
     String? image,
   }) = _HazardModel;
+
+  factory HazardModel.create({
+    required HazardType hazard,
+    required SnappedLatLng location,
+    String? blurHash,
+    String? image,
+  }) => HazardModel(
+    uuid: kUuidGen.v1(),
+    time: DateTime.now(),
+    hazard: hazard,
+    location: location,
+    offline: true,
+    blurHash: blurHash,
+    image: image,
+  );
 
   /// Maps a database [HazardsTable] row to a [HazardModel].
   factory HazardModel.fromDb({
@@ -32,11 +47,17 @@ class HazardModel with _$HazardModel implements drift.Insertable<HazardModel> {
     required int node,
     required double lat,
     required double long,
+    required bool offline,
+    String? blurHash,
+    String? image,
   }) => HazardModel(
     uuid: uuid,
     time: time,
     hazard: hazard,
     location: SnappedLatLng(trail, node, LatLng(lat, long)),
+    offline: offline,
+    blurHash: blurHash,
+    image: image,
   );
 
   /// Maps a [HazardModel] to a database [HazardsTable] row.
@@ -50,24 +71,13 @@ class HazardModel with _$HazardModel implements drift.Insertable<HazardModel> {
         node: drift.Value(location.node),
         lat: drift.Value(location.latitude),
         long: drift.Value(location.longitude),
+        offline: drift.Value(offline),
+        blurHash: drift.Value(blurHash),
+        image: drift.Value(image),
       ).toColumns(nullToAbsent);
 
   factory HazardModel.fromJson(Map<String, dynamic> json) =>
       _$HazardModelFromJson(json);
 
   String timeString() => kDisplayDateFormat.format(time.toLocal());
-}
-
-@freezed
-class HazardRequestModel with _$HazardRequestModel {
-  const HazardRequestModel._();
-  const factory HazardRequestModel({
-    required HazardType hazard,
-    required SnappedLatLng location,
-    String? blurHash,
-    String? image,
-  }) = _HazardRequestModel;
-
-  factory HazardRequestModel.fromJson(Map<String, dynamic> json) =>
-      _$HazardRequestModelFromJson(json);
 }
