@@ -35,13 +35,13 @@ class HazardMarkerLayer extends ConsumerWidget {
         rotate: true,
         alignment: kMarkerTopAlignment,
         child: GestureDetector(
-          onTap: () {
+          onTap: hazard.offline ? null : () {
             ref.read(selectedRelationProvider.notifier).deselect();
             if (hazard == ref.read(selectedHazardProvider).hazard) {
               ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
               ref.read(selectedHazardProvider.notifier).deselect();
               _popupController.hideAllPopups();
-            } else if (ref.read(panelPositionProvider).position .index <= PanelState.COLLAPSED.index) {
+            } else if (ref.read(panelPositionProvider).position.index <= PanelState.COLLAPSED.index) {
               ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
             }
             ref.read(selectedHazardProvider.notifier).select(hazard);
@@ -49,8 +49,9 @@ class HazardMarkerLayer extends ConsumerWidget {
           },
           child: MapIcon(
             Icons.fmd_bad_rounded,
-            color: CupertinoDynamicColor.resolve(
-                CupertinoColors.destructiveRed, context),
+            color: hazard.offline
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.destructiveRed,
           ),
         )
       );
