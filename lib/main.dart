@@ -13,6 +13,7 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final providerContainer = ProviderContainer();
+final GlobalKey homeKey = GlobalKey();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,9 +84,9 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
       initialPlatform: kDebugMode ? kPlatformOverride : null,
       builder: (context) {
         return _theme(
-          builder: (context) => const PlatformApp(
+          builder: (context) => PlatformApp(
             title: 'Forest Park Reports',
-            home: HomeScreen(),
+            home: HomeScreen(key: homeKey),
           ),
         );
       },

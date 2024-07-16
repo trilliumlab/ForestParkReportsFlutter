@@ -4,7 +4,7 @@ import 'package:forest_park_reports/model/hazard_update.dart';
 
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 
-const double _kImageHeight = 80;
+const double kImageHeight = 80;
 
 /// A widget for the main panel modal with info on a singular hazard
 class UpdateInfoWidget extends StatelessWidget {
@@ -28,7 +28,7 @@ class UpdateInfoWidget extends StatelessWidget {
                       ? CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)
                       : CupertinoDynamicColor.resolve(CupertinoColors.systemGreen, context),
                 ),
-                height: _kImageHeight,
+                height: kImageHeight,
                 width: 5,
               ),
               const SizedBox(width: 8),
@@ -48,7 +48,7 @@ class UpdateInfoWidget extends StatelessWidget {
             ],
           ),
           SizedBox(
-            height: _kImageHeight,
+            height: kImageHeight,
             child: AspectRatio(
               aspectRatio: 4/3,
               child: ClipRRect(
