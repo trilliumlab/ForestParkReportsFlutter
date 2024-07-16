@@ -18,6 +18,7 @@ import 'package:path/path.dart';
 export 'package:flutter_uploader/flutter_uploader.dart' show UploadMethod;
 
 /// Handler for background network requests using flutter_uploader
+@pragma('vm:entry-point')
 void backgroundRequestsHandler() {
   // Needed so that plugin communication works.
   WidgetsFlutterBinding.ensureInitialized();
