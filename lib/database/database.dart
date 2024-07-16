@@ -28,6 +28,9 @@ class HazardsTable extends Table {
   IntColumn get node => integer()();
   RealColumn get lat => real()();
   RealColumn get long => real()();
+  BoolColumn get offline => boolean()();
+  TextColumn get blurHash => text().nullable()();
+  TextColumn get image => text().nullable().unique()();
 
   @override
   Set<Column> get primaryKey => {uuid};
@@ -39,6 +42,7 @@ class HazardUpdatesTable extends Table {
   TextColumn get hazard => text().references(HazardsTable, #uuid)();
   DateTimeColumn get time => dateTime()();
   BoolColumn get active => boolean()();
+  BoolColumn get offline => boolean()();
   TextColumn get blurHash => text().nullable()();
   TextColumn get image => text().nullable().unique()();
 
@@ -61,6 +65,7 @@ class QueueTable extends Table {
   TextColumn get taskId => text()();
   TextColumn get requestType => textEnum<QueuedRequestType>()();
   TextColumn get filePath => text()();
+  TextColumn get associatedUuid => text()();
 
   @override
   Set<Column> get primaryKey => {taskId};

@@ -15,6 +15,7 @@ class QueuedRequestModel
     required String taskId,
     required QueuedRequestType requestType,
     required String filePath,
+    required String associatedUuid,
   }) = _QueuedRequestModel;
 
   /// Maps a [QueuedRequestModel] to a database [QueueTable] row.
@@ -24,6 +25,7 @@ class QueuedRequestModel
         taskId: drift.Value(taskId),
         requestType: drift.Value(requestType),
         filePath: drift.Value(filePath),
+        associatedUuid: drift.Value(associatedUuid)
       ).toColumns(nullToAbsent);
 
   factory QueuedRequestModel.fromJson(Map<String, dynamic> json) =>

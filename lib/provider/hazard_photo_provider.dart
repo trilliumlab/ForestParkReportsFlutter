@@ -21,15 +21,16 @@ class HazardPhoto extends _$HazardPhoto {
     if (kIsWeb) {
       data = await _fetch(uuid);
     } else {
+      final imageName = "$uuid.jpeg";
       // Read all cached image filenames and see if any match the uuid we need.
       final imageDir = (await ref.watch(directoryProvider(kImageDirectory).future))!;
-      final hasImage = await imageDir.list().any((f) => f.uri.pathSegments.last == uuid);
+      final hasImage = await imageDir.list().any((f) => f.uri.pathSegments.last == imageName);
       // If image doesn't exist in cache (or path exists but is not a File) fetch from server.
       if (!hasImage) {
         data = await _fetch(uuid);
       } else {
         // Otherwise load image from cache
-        final imageFile = File(join(imageDir.path, uuid));
+        final imageFile = File(join(imageDir.path, imageName));
         data = await imageFile.readAsBytes();
       }
     }
@@ -56,7 +57,7 @@ class HazardPhoto extends _$HazardPhoto {
   Future<void> _saveImage(String uuid, Uint8List data) async {
     // Get image path and ensure exists.
     final imageDir = (await ref.read(directoryProvider(kImageDirectory).future))!;
-    final imageFile = File(join(imageDir.path, uuid));
+    final imageFile = File(join(imageDir.path, "$uuid.jpeg"));
     await imageFile.create();
     // Write data.
     await imageFile.writeAsBytes(data);

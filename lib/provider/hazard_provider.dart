@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/model/hazard_new_response.dart';
+import 'package:forest_park_reports/model/hazard_type.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
+import 'package:forest_park_reports/model/snapped_latlng.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
@@ -57,30 +60,33 @@ class ActiveHazard extends _$ActiveHazard {
     state = AsyncData(await _fetch());
   }
 
-  Future<void> createHazard(HazardRequestModel request, {XFile? imageFile}) async {
-    img.Image? image;
-
+  Future<void> createHazard({
+    required HazardType hazard,
+    required SnappedLatLng location,
+    XFile? imageFile
+  }) async {
     // If we're passed an image, decode it.
+    img.Image? image;
     if (imageFile != null) {
       final cmd = img.Command()
         ..decodeNamedImage(imageFile.path, await imageFile.readAsBytes());
       image = await cmd.getImageThread();
     }
 
-    // If decoding successful, generate blurHash and add to hazard request.
-    if (image != null) {
-      request = request.copyWith(
-          image: kUuidGen.v1(),
-          blurHash: await image.getBlurHash(),
-      );
-    }
+    final hazardRequest = HazardModel.create(
+      hazard: hazard,
+      location: location,
+      image: image != null ? kUuidGen.v1() : null,
+      blurHash: image != null ? await image.getBlurHash() : null,
+    );
 
     // Queue new hazard request.
     OfflineUploader().enqueueJson(
       method: UploadMethod.POST,
       requestType: QueuedRequestType.newHazard,
+      associatedUuid: hazardRequest.uuid,
       url: "$kApiUrl/hazard/new",
-      data: request.toJson(),
+      data: hazardRequest.toJson(),
     );
 
     // Now we try to upload the image if we have one
@@ -88,57 +94,67 @@ class ActiveHazard extends _$ActiveHazard {
       return;
     }
     // Compress and save image to file.
-    final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
-    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
+    final imageDir = (await ref.read(directoryProvider(kImageDirectory).future))!;
+    final imagePath = join(imageDir.path, "${hazardRequest.image!}.jpeg");
     await image.compressToFile(filePath: imagePath);
 
     // Queue image upload
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
       requestType: QueuedRequestType.imageUpload,
-      url: "$kApiUrl/hazard/image/${request.image!}",
+      associatedUuid: hazardRequest.uuid,
+      url: "$kApiUrl/hazard/image/${hazardRequest.image!}",
       multipart: true,
       filePath: imagePath,
     );
   }
 
-  Future<void> handleCreateResponse(HazardModel hazard) async {
-    print("Handling hazard create response: $hazard");
+  Future<void> handleCreateResponse(HazardNewResponseModel response) async {
+    print("Handling hazard create response: $response");
 
     // Add new HazardModel to state and db
     state = AsyncData([
       if (state.hasValue)
         ...state.requireValue,
-      hazard
+      response.hazard
     ]);
     final db = ref.read(databaseProvider);
-    await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
+    await db.into(db.hazardsTable).insertOnConflictUpdate(response.hazard);
+
+    // Add new update to hazard updates
+    final updatesNotifier = ref.read(hazardUpdatesProvider(response.hazard.uuid).notifier);
+    for (final update in response.updates) {
+      await updatesNotifier.addHazardUpdate(update);
+    }
   }
 
-  Future updateHazard(HazardUpdateRequestModel request, {XFile? imageFile}) async {
-    img.Image? image;
-
+  Future updateHazard({
+    required String hazard,
+    required bool active,
+    XFile? imageFile
+  }) async {
     // If we're passed an image, decode it.
+    img.Image? image;
     if (imageFile != null) {
       final cmd = img.Command()
         ..decodeNamedImage(imageFile.path, await imageFile.readAsBytes());
       image = await cmd.getImageThread();
     }
 
-    // If decoding successful, generate blurHash and add to hazard update request.
-    if (image != null) {
-      request = request.copyWith(
-        image: kUuidGen.v1(),
-        blurHash: await image.getBlurHash(),
-      );
-    }
+    final hazardUpdateRequest = HazardUpdateModel.create(
+      hazard: hazard,
+      active: active,
+      image: image != null ? kUuidGen.v1() : null,
+      blurHash: image != null ? await image.getBlurHash() : null,
+    );
 
     // Queue new hazard update request.
     OfflineUploader().enqueueJson(
       method: UploadMethod.POST,
       requestType: QueuedRequestType.updateHazard,
+      associatedUuid: hazardUpdateRequest.uuid,
       url: "$kApiUrl/hazard/update",
-      data: request.toJson(),
+      data: hazardUpdateRequest.toJson(),
     );
 
     // Now we try to upload the image if we have one
@@ -146,15 +162,16 @@ class ActiveHazard extends _$ActiveHazard {
       return;
     }
     // Compress and save image to file.
-    final queueDir = await ref.read(directoryProvider(kQueueDirectory).future);
-    final imagePath = join(queueDir!.path, "${request.image!}.jpeg");
+    final imageDir = (await ref.read(directoryProvider(kImageDirectory).future))!;
+    final imagePath = join(imageDir.path, "${hazardUpdateRequest.image!}.jpeg");
     await image.compressToFile(filePath: imagePath);
 
     // Queue image upload
     await OfflineUploader().enqueueFile(
       method: UploadMethod.PUT,
       requestType: QueuedRequestType.imageUpload,
-      url: "$kApiUrl/hazard/image/${request.image!}",
+      associatedUuid: hazardUpdateRequest.uuid,
+      url: "$kApiUrl/hazard/image/${hazardUpdateRequest.image!}",
       multipart: true,
       filePath: imagePath,
     );
@@ -163,7 +180,7 @@ class ActiveHazard extends _$ActiveHazard {
   Future<void> handleUpdateResponse(HazardUpdateModel hazardUpdate) async {
     print("Handling hazard update create response: $hazardUpdate");
 
-    // Add new hazard to hazard updates
+    // Add new update to hazard updates
     await ref.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)
         .addHazardUpdate(hazardUpdate);
   }
@@ -184,10 +201,7 @@ class HazardUpdates extends _$HazardUpdates {
 
   Future<HazardUpdateList> _fetch() async {
     final res = await ref.read(dioProvider).get("/hazard/$hazard");
-    final updates = HazardUpdateList([
-      for (final val in res.data)
-        HazardUpdateModel.fromJson(val)
-    ]);
+    final updates = HazardUpdateList.fromJson(res.data);
     updates.sort((a, b) => a.time.millisecondsSinceEpoch - b.time.millisecondsSinceEpoch);
 
     final db = ref.read(databaseProvider);
