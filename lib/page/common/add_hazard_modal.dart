@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';
+import 'package:forest_park_reports/page/common/alert_banner.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
@@ -81,6 +83,12 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
       hazard: _selectedHazard!,
       location: snappedLoc.location,
     ), imageFile: _image);
+
+    showAlertBanner(
+      child: const Text("Your report has been queued"),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+    );
+
     _close();
   }
 

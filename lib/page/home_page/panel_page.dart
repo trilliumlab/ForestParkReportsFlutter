@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/main.dart';
+import 'package:forest_park_reports/page/common/alert_banner.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
@@ -76,6 +78,11 @@ class PanelPage extends ConsumerWidget {
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
+
+                    showAlertBanner(
+                      child: const Text("Your report has been queued"),
+                      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+                    );
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -107,6 +114,11 @@ class PanelPage extends ConsumerWidget {
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
+
+                    showAlertBanner(
+                      child: const Text("Your report has been queued"),
+                      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+                    );
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
