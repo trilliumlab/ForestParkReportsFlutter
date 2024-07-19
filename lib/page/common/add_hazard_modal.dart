@@ -244,6 +244,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                       ),
                     ),
                   ),
+                  SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
                 ],
               ),
               Align(

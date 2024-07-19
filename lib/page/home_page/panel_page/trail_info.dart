@@ -39,14 +39,18 @@ class _TrailInfoWidgetState extends State<TrailInfoWidget> {
               children: [
                 if (widget.title != null)
                   SizedBox(
+                    height: PanelValues.safeCollapsedHeight(context),
                     width: MediaQuery.of(context).size.width,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 14, right: 14, top: 16, bottom: 10),
-                      child: Text(
-                        widget.title!,
-                        style: Theme.of(context).textTheme.titleLarge,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 14, right: 14, top: 16, bottom: 10),
+                        child: Text(
+                          widget.title!,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ),
