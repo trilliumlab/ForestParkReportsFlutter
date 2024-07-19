@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:forest_park_reports/page/common/alert_banner.dart';
 import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:forest_park_reports/provider/align_position_provider.dart';
