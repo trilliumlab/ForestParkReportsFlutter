@@ -168,14 +168,17 @@ class PanelPage extends ConsumerWidget {
               ),
             ),
           // TODO move this out of here
-          Card(
-            elevation: 1,
-            shadowColor: Colors.transparent,
-            margin: EdgeInsets.zero,
-            child: Column(
-              children: hazardUpdates?.map((update) => UpdateInfoWidget(
-                update: update,
-              )).toList() ?? [],
+          Opacity(
+            opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
+            child: Card(
+              elevation: 1,
+              shadowColor: Colors.transparent,
+              margin: EdgeInsets.zero,
+              child: Column(
+                children: hazardUpdates?.map((update) => UpdateInfoWidget(
+                  update: update,
+                )).toList() ?? [],
+              ),
             ),
           ),
           // Container(

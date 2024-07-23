@@ -35,31 +35,23 @@ class _TrailInfoWidgetState extends State<TrailInfoWidget> {
             - MediaQueryData.fromView(View.of(context)).padding.bottom,
         child: Column(
           children: [
-            Stack(
-              children: [
-                if (widget.title != null)
-                  SizedBox(
-                    height: PanelValues.safeCollapsedHeight(context),
-                    width: MediaQuery.of(context).size.width,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 14, right: 14, top: 16, bottom: 10),
-                        child: Text(
-                          widget.title!,
-                          style: Theme.of(context).textTheme.titleLarge,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                const Align(
-                  alignment: Alignment.topCenter,
-                  child: PlatformPill(),
-                ),
-              ],
+            const Align(
+              alignment: Alignment.topCenter,
+              child: PlatformPill(),
             ),
+            if (widget.title != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
+              child: Text(
+                widget.title!,
+                style: Theme.of(context).textTheme.titleLarge,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+                ),
+              ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),

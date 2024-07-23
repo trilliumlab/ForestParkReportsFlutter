@@ -6,10 +6,14 @@ class PanelValues {
   static const double _kOpenFraction = 0.85;
 
   /// The minimum visible height of the panel (can go below when hidden)
-  static const double _kCollapsedHeight = 90;
+  static const double _kCollapsedHeight = 100;
 
   /// Fraction of the distance between the open and collapsed states to which the panel should snap
   static const double _kSnapPoint = 0.5;
+
+  static double panelBottomPadding(BuildContext context) => MediaQuery.of(context).viewPadding.bottom > 30
+      ? MediaQuery.of(context).viewPadding.bottom
+      : MediaQuery.of(context).viewPadding.bottom / 2;
   
   /// The open height of the panel in pixels
   /// 
@@ -19,11 +23,11 @@ class PanelValues {
   /// The collapsed height of the panel as a fraction of the maximum panel height
   /// 
   /// ALWAYS USE THIS IN a BUILD METHOD. This value may change when the BuildContext changes
-  static double collapsedFraction (BuildContext context) => (_kCollapsedHeight + MediaQuery.of(context).viewPadding.bottom) / openHeight(context);
+  static double collapsedFraction (BuildContext context) => collapsedHeight(context) / openHeight(context);
   /// The collapsed height of the panel in pixels
   /// 
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  static double collapsedHeight (BuildContext context) => _kCollapsedHeight + MediaQuery.of(context).viewPadding.bottom;
+  static double collapsedHeight (BuildContext context) => _kCollapsedHeight + panelBottomPadding(context);
   
   /// The collapsed height of the panel in pixels
   /// 
@@ -37,6 +41,6 @@ class PanelValues {
   /// The snapped height of the panel in pixels
   /// 
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  static double snapHeight (BuildContext context) =>  _kSnapPoint * (openHeight(context) - _kCollapsedHeight - MediaQuery.of(context).viewPadding.bottom)
-      + _kCollapsedHeight + MediaQuery.of(context).viewPadding.bottom;
+  static double snapHeight (BuildContext context) =>  _kSnapPoint * (openHeight(context) - collapsedHeight(context))
+      + collapsedHeight(context);
 }
