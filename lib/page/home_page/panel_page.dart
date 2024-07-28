@@ -4,8 +4,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/page/common/alert_banner.dart';
+import 'package:forest_park_reports/page/common/test_location_too_far.dart';
+import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
@@ -20,6 +23,7 @@ import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_elevation_graph.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// The sliding-up modal with info on the current selected trail or hazard on the map
@@ -68,6 +72,19 @@ class PanelPage extends ConsumerWidget {
                     ))) {
                       return;
                     }
+                    final locationData = ref.read(locationProvider);
+                    if (!locationData.hasValue) {
+                      // TODO actually handle location errors
+                      return;
+                    }
+                    
+                    if (context.mounted && !await testLocationTooFar(context, ref,
+                      actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
+                      title: "Too far from hazard",
+                      content: "Hazard updates must be made in proximity to the hazard",
+                      overrideEnabled: kLocationOverrideEnabled)) {
+                      return;
+                    }
 
                     ref.read(activeHazardProvider.notifier).updateHazard(
                       hazard: selectedHazard.uuid,
@@ -100,6 +117,14 @@ class PanelPage extends ConsumerWidget {
                         content: "Please make sure the hazard is still present.",
                         affirmative: "Yes"
                     ))) {
+                      return;
+                    }
+
+                    if (context.mounted && !await testLocationTooFar(context, ref,
+                      actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
+                      title: "Too far from hazard",
+                      content: "Hazard updates must be made in proximity to the hazard",
+                      overrideEnabled: kLocationOverrideEnabled)) {
                       return;
                     }
 
@@ -143,14 +168,17 @@ class PanelPage extends ConsumerWidget {
               ),
             ),
           // TODO move this out of here
-          Card(
-            elevation: 1,
-            shadowColor: Colors.transparent,
-            margin: EdgeInsets.zero,
-            child: Column(
-              children: hazardUpdates?.map((update) => UpdateInfoWidget(
-                update: update,
-              )).toList() ?? [],
+          Opacity(
+            opacity: ((panelController.panelPosition - PanelValues.collapsedFraction(context)) / (PanelValues.snapFraction(context) - PanelValues.collapsedFraction(context))).clamp(0, 1),
+            child: Card(
+              elevation: 1,
+              shadowColor: Colors.transparent,
+              margin: EdgeInsets.zero,
+              child: Column(
+                children: hazardUpdates?.map((update) => UpdateInfoWidget(
+                  update: update,
+                )).toList() ?? [],
+              ),
             ),
           ),
           // Container(

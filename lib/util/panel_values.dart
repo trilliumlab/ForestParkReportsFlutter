@@ -10,6 +10,10 @@ class PanelValues {
 
   /// Fraction of the distance between the open and collapsed states to which the panel should snap
   static const double _kSnapPoint = 0.5;
+
+  static double panelBottomPadding(BuildContext context) => MediaQuery.of(context).viewPadding.bottom > 30
+      ? MediaQuery.of(context).viewPadding.bottom
+      : MediaQuery.of(context).viewPadding.bottom / 2;
   
   /// The open height of the panel in pixels
   /// 
@@ -19,11 +23,16 @@ class PanelValues {
   /// The collapsed height of the panel as a fraction of the maximum panel height
   /// 
   /// ALWAYS USE THIS IN a BUILD METHOD. This value may change when the BuildContext changes
-  static double collapsedFraction (BuildContext context) => _kCollapsedHeight / openHeight(context);
+  static double collapsedFraction (BuildContext context) => collapsedHeight(context) / openHeight(context);
   /// The collapsed height of the panel in pixels
   /// 
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  static double collapsedHeight (BuildContext context) => _kCollapsedHeight;
+  static double collapsedHeight (BuildContext context) => _kCollapsedHeight + panelBottomPadding(context);
+  
+  /// The collapsed height of the panel in pixels
+  /// 
+  /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
+  static double safeCollapsedHeight (BuildContext context) => _kCollapsedHeight;
   
   /// The snapped height of the panel as a fraction of the maximum panel height
   /// 
@@ -32,5 +41,6 @@ class PanelValues {
   /// The snapped height of the panel in pixels
   /// 
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
-  static double snapHeight (BuildContext context) =>  _kSnapPoint * (openHeight(context) - _kCollapsedHeight) + _kCollapsedHeight;
+  static double snapHeight (BuildContext context) =>  _kSnapPoint * (openHeight(context) - collapsedHeight(context))
+      + collapsedHeight(context);
 }

@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
-import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';
 import 'package:forest_park_reports/page/common/alert_banner.dart';
+import 'package:forest_park_reports/page/common/test_location_too_far.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
@@ -45,37 +46,16 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     }
     final location = locationData.requireValue;
     var snappedLoc = await ref.read(trailsProvider.notifier).snapLocation(location.latLng()!);
-
-    final continueCompleter = Completer<bool>();
-    if (snappedLoc.distance > 10+(location.accuracy) && mounted) {
-      showPlatformDialog(context: context, builder: (context) => PlatformAlertDialog(
-        title: const Text('Too far from trail'),
-        content: const Text('Reports must be made on a marked Forest Park trail'),
-        actions: [
-          PlatformDialogAction(
-              onPressed: () {
-                Navigator.pop(context);
-                continueCompleter.complete(false);
-              },
-              child: PlatformText('OK')
-          ),
-          PlatformDialogAction(
-              onPressed: () {
-                Navigator.pop(context);
-                continueCompleter.complete(true);
-              },
-              child: PlatformText('Override')
-          ),
-        ],
-      ));
-    } else {
-      continueCompleter.complete(true);
-    }
-
-    if (!await continueCompleter.future) {
-      setState(() => _inProgress = false);
-      return;
-    }
+    
+    if (snappedLoc.distance > kLocationTolerance + (location.accuracy) && mounted) {
+      if (!await testLocationTooFar(context, ref, actionLocation: snappedLoc.location,
+          title: "Too far from trail",
+          content: "Reports must be made on a marked Forest Park trail",
+          overrideEnabled: kLocationOverrideEnabled)) {
+        setState(() => _inProgress = false);
+        return;
+      }
+    } 
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
@@ -264,6 +244,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                       ),
                     ),
                   ),
+                  SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
                 ],
               ),
               Align(
