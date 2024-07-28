@@ -20,7 +20,7 @@ const kPlatformOverride = null;
 const bool kLocationOverrideEnabled = true;
 
 // Tolerance in meters used when 
-const double kLocationTolerance = 10;
+const double kLocationTolerance = 25;
 
 // Example: 11:53 AM July 12 2022
 final DateFormat kDisplayDateFormat = DateFormat('hh:mm a MMMM dd y');
