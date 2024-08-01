@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
@@ -7,32 +8,44 @@ import 'package:forest_park_reports/util/outline_box_shadow.dart';
 
 const double kAlertBannerHeight = 40;
 const double kCupertinoAlertCornerRadius = 14.0;
-const kAlertAnimationDuration = Duration(milliseconds: 750);
+const kAlertAnimationDuration = Duration(milliseconds: 3000);
+
+final Map<Key, Widget Function(BuildContext)> _alertChildren = {};
+final Map<Key, OverlayEntry> _alertEntries = {};
 
 void showAlertBanner({
   required Widget child,
   required Color color,
+  Key? key,
   Duration duration = const Duration(seconds: 3),
 }) {
   if (homeKey.currentContext == null) {
     return;
   }
-  final key = UniqueKey();
-  late final OverlayEntry overlayEntry;
-  overlayEntry = OverlayEntry(
-    builder: (context) => _AlertBanner(
-      key: key,
-      waitDuration: duration,
-      onDismissed: () {
-        overlayEntry.remove();
-      },
-      child: _AlertBannerContent(
-        color: color,
-        child: child,
-      ),
+  final overlayKey = key ?? UniqueKey();
+
+  final shouldInsert = !_alertChildren.containsKey(overlayKey);
+  _alertChildren[overlayKey] = (context) => _AlertBanner(
+    key: overlayKey,
+    waitDuration: duration,
+    onDismissed: () {
+      _alertEntries.remove(overlayKey)?.remove();
+      _alertChildren.remove(overlayKey);
+    },
+    child: _AlertBannerContent(
+      color: color,
+      child: child,
     ),
   );
-  Overlay.of(homeKey.currentContext!).insert(overlayEntry);
+
+  if (shouldInsert) {
+    _alertEntries[overlayKey] = OverlayEntry(
+        builder: (context) => _alertChildren[overlayKey]!(context)
+    );
+    Overlay.of(homeKey.currentContext!).insert(_alertEntries[overlayKey]!);
+  } else {
+    _alertEntries[overlayKey]?.markNeedsBuild();
+  }
 }
 
 class _AlertBanner extends StatefulWidget {
@@ -52,6 +65,7 @@ class _AlertBanner extends StatefulWidget {
 }
 
 class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderStateMixin {
+  int _alertUpdates = 0;
   late final AnimationController _controller = AnimationController(
       vsync: this,
     duration: kAlertAnimationDuration,
@@ -72,10 +86,34 @@ class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderSta
     _animate();
   }
 
+  @override
+  void didUpdateWidget(covariant _AlertBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the alert is updated we should reset the timer
+    // velocity < 0 means notification is closing, we should reverse animation
+    ++_alertUpdates;
+    if (_controller.velocity < 0) {
+      _cancelClose();
+    }
+  }
+
+  Future<void> _cancelClose() async {
+    // Smoothly animate turn around
+    await _controller.animateWith(FrictionSimulation(0.1, _controller.value, _controller.velocity, constantDeceleration: 1));
+    await _controller.forward();
+    _waitClose();
+  }
+
   Future<void> _animate() async {
     await _controller.forward();
+    _waitClose();
+  }
+
+  Future<void> _waitClose() async {
+    int updates = _alertUpdates;
     await Future.delayed(widget.waitDuration);
-    if (mounted && !_dismissed) {
+    // If no new updates then this timer is valid
+    if (updates == _alertUpdates && mounted && !_dismissed) {
       await _controller.reverse();
       widget.onDismissed();
     }
