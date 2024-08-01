@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
@@ -8,31 +9,44 @@ import 'package:forest_park_reports/util/outline_box_shadow.dart';
 const double kAlertBannerHeight = 40;
 const double kCupertinoAlertCornerRadius = 14.0;
 const kAlertAnimationDuration = Duration(milliseconds: 750);
+const kAlertUpdateDuration = Duration(milliseconds: 200);
+
+final Map<Key, Widget Function(BuildContext)> _alertChildren = {};
+final Map<Key, OverlayEntry> _alertEntries = {};
 
 void showAlertBanner({
   required Widget child,
   required Color color,
+  Key? key,
   Duration duration = const Duration(seconds: 3),
 }) {
   if (homeKey.currentContext == null) {
     return;
   }
-  final key = UniqueKey();
-  late final OverlayEntry overlayEntry;
-  overlayEntry = OverlayEntry(
-    builder: (context) => _AlertBanner(
-      key: key,
-      waitDuration: duration,
-      onDismissed: () {
-        overlayEntry.remove();
-      },
-      child: _AlertBannerContent(
-        color: color,
-        child: child,
-      ),
+  final overlayKey = key ?? UniqueKey();
+
+  final shouldInsert = !_alertChildren.containsKey(overlayKey);
+  _alertChildren[overlayKey] = (context) => _AlertBanner(
+    key: overlayKey,
+    waitDuration: duration,
+    onDismissed: () {
+      _alertEntries.remove(overlayKey)?.remove();
+      _alertChildren.remove(overlayKey);
+    },
+    child: _AlertBannerContent(
+      color: color,
+      child: child,
     ),
   );
-  Overlay.of(homeKey.currentContext!).insert(overlayEntry);
+
+  if (shouldInsert) {
+    _alertEntries[overlayKey] = OverlayEntry(
+        builder: (context) => _alertChildren[overlayKey]!(context)
+    );
+    Overlay.of(homeKey.currentContext!).insert(_alertEntries[overlayKey]!);
+  } else {
+    _alertEntries[overlayKey]?.markNeedsBuild();
+  }
 }
 
 class _AlertBanner extends StatefulWidget {
@@ -52,6 +66,7 @@ class _AlertBanner extends StatefulWidget {
 }
 
 class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderStateMixin {
+  int _alertUpdates = 0;
   late final AnimationController _controller = AnimationController(
       vsync: this,
     duration: kAlertAnimationDuration,
@@ -72,10 +87,34 @@ class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderSta
     _animate();
   }
 
+  @override
+  void didUpdateWidget(covariant _AlertBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the alert is updated we should reset the timer
+    _maybeCancelClose();
+  }
+
+  Future<void> _maybeCancelClose() async {
+    ++_alertUpdates;
+    // velocity < 0 means notification is closing, we should reverse animation
+    if (_controller.velocity < 0) {
+      // Smoothly animate turn around
+      await _controller.animateWith(FrictionSimulation(0.1, _controller.value, _controller.velocity, constantDeceleration: 1));
+      await _controller.forward();
+    }
+    _waitClose();
+  }
+
   Future<void> _animate() async {
     await _controller.forward();
+    _waitClose();
+  }
+
+  Future<void> _waitClose() async {
+    int updates = _alertUpdates;
     await Future.delayed(widget.waitDuration);
-    if (mounted && !_dismissed) {
+    // If no new updates then this timer is valid
+    if (updates == _alertUpdates && mounted && !_dismissed) {
       await _controller.reverse();
       widget.onDismissed();
     }
@@ -164,10 +203,13 @@ class _AlertBannerContent extends StatelessWidget {
   final Color color;
   final Widget child;
 
+  static final offset1 = Tween(begin: const Offset(1, 0), end: const Offset(0, 0));
+  static final offset2 = Tween(begin: const Offset(-1, 0), end: const Offset(0, 0));
+
   const _AlertBannerContent({
     required this.color,
     required this.child,
-    super.key
+    super.key,
   });
 
   @override
@@ -175,17 +217,40 @@ class _AlertBannerContent extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(2.5)),
-            color: color
+        AnimatedSwitcher(
+          duration: kAlertUpdateDuration,
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          transitionBuilder: (child, animation) => (animation.value != 1 ? SizeTransition(
+            axis: Axis.vertical,
+            sizeFactor: animation,
+            child: child,
+          ) : child),
+          child: Container(
+            key: Key(color.toString()),
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(2.5)),
+                color: color
+            ),
+            height: kAlertBannerHeight,
+            width: 5,
           ),
-          height: kAlertBannerHeight,
-          width: 5,
         ),
         Expanded(
           child: Center(
-            child: child,
+            child: AnimatedSwitcher(
+              duration: kAlertUpdateDuration,
+              switchInCurve: Curves.easeInOut,
+              switchOutCurve: Curves.easeInOut,
+              transitionBuilder: (child, animation) => SlideTransition(
+                position: (animation.value == 1? offset1 : offset2).animate(animation),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+              ),
+              child: child,
+            ),
           ),
         ),
       ],

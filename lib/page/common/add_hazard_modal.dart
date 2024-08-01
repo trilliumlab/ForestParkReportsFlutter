@@ -29,6 +29,7 @@ class AddHazardModal extends ConsumerStatefulWidget {
 
 class _AddHazardModalState extends ConsumerState<AddHazardModal> {
   final _picker = ImagePicker();
+  final String _uuid = kUuidGen.v1();
   HazardType? _selectedHazard;
   XFile? _image;
   bool _inProgress = false;
@@ -39,6 +40,7 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
 
   Future _submit() async {
     setState(() => _inProgress = true);
+
     final locationData = ref.read(locationProvider);
     if (!locationData.hasValue) {
       // TODO actually handle location errors
@@ -47,30 +49,29 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     final location = locationData.requireValue;
     var snappedLoc = await ref.read(trailsProvider.notifier).snapLocation(location.latLng()!);
     
-    if (snappedLoc.distance > kLocationTolerance + (location.accuracy) && mounted) {
-      if (!await testLocationTooFar(context, ref, actionLocation: snappedLoc.location,
+    if (snappedLoc.distance > kAddLocationTolerance + (location.accuracy) && mounted) {
+      if (!await testLocationTooFar(context, ref,
+          tolerance: kAddLocationTolerance,
+          actionLocation: snappedLoc.location,
           title: "Too far from trail",
           content: "Reports must be made on a marked Forest Park trail",
           overrideEnabled: kLocationOverrideEnabled)) {
         setState(() => _inProgress = false);
         return;
       }
-    } 
+    }
+
+    // Now close the modal so we don't submit more hazards
+    _close();
 
     final activeHazardNotifier = ref.read(activeHazardProvider.notifier);
 
     await activeHazardNotifier.createHazard(
+      uuid: _uuid,
       hazard: _selectedHazard!,
       location: snappedLoc.location,
       imageFile: _image
     );
-
-    showAlertBanner(
-      child: const Text("Your report has been queued"),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
-    );
-
-    _close();
   }
 
   Future _onSubmit() async {
@@ -239,7 +240,9 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                         ),
                       ),
                       material: (context, _) => FilledButton(
-                        onPressed: _selectedHazard == null ? null : _onSubmit,
+                        onPressed: _selectedHazard == null || _inProgress
+                            ? null
+                            : _onSubmit,
                         child: const Text('Submit'),
                       ),
                     ),
@@ -268,13 +271,6 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                   ),
                 ),
               ),
-              if (_inProgress)
-                const Align(
-                  alignment: Alignment.topCenter,
-                  child: LinearProgressIndicator(
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
             ],
           ),
         ),

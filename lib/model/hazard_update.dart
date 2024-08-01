@@ -54,10 +54,11 @@ class HazardUpdateModel with _$HazardUpdateModel implements drift.Insertable<Haz
   factory HazardUpdateModel.create({
     required String hazard,
     required bool active,
+    String? uuid,
     String? blurHash,
     String? image,
   }) => HazardUpdateModel(
-    uuid: kUuidGen.v1(),
+    uuid: uuid ?? kUuidGen.v1(),
     hazard: hazard,
     time: DateTime.now(),
     active: active,

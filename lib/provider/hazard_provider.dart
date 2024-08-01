@@ -1,10 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard_new_response.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/model/snapped_latlng.dart';
+import 'package:forest_park_reports/page/common/alert_banner.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
@@ -69,10 +74,18 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> createHazard({
+    required String uuid,
     required HazardType hazard,
     required SnappedLatLng location,
     XFile? imageFile
   }) async {
+    // Show alert that upload queued
+    showAlertBanner(
+      key: Key(uuid),
+      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+    );
+
     // If we're passed an image, decode it.
     img.Image? image;
     if (imageFile != null) {
@@ -82,6 +95,7 @@ class ActiveHazard extends _$ActiveHazard {
     }
 
     final hazardRequest = HazardModel.create(
+      uuid: uuid,
       hazard: hazard,
       location: location,
       image: image != null ? kUuidGen.v1() : null,
@@ -121,7 +135,12 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> handleCreateResponse(HazardNewResponseModel response) async {
-    print("Handling hazard create response: $response");
+    // Show success notification
+    showAlertBanner(
+      key: Key(response.hazard.uuid),
+      child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+    );
 
     _addHazard(response.hazard);
 
@@ -144,10 +163,18 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future updateHazard({
+    required String uuid,
     required String hazard,
     required bool active,
     XFile? imageFile
   }) async {
+    // Show alert that update queued
+    showAlertBanner(
+      key: Key(uuid),
+      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+    );
+
     // If we're passed an image, decode it.
     img.Image? image;
     if (imageFile != null) {
@@ -157,6 +184,7 @@ class ActiveHazard extends _$ActiveHazard {
     }
 
     final hazardUpdateRequest = HazardUpdateModel.create(
+      uuid: uuid,
       hazard: hazard,
       active: active,
       image: image != null ? kUuidGen.v1() : null,
@@ -193,7 +221,12 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> handleUpdateResponse(HazardUpdateModel hazardUpdate) async {
-    print("Handling hazard update create response: $hazardUpdate");
+    // Show success notification
+    showAlertBanner(
+      key: Key(hazardUpdate.uuid),
+      child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+    );
 
     // Add new update to hazard updates
     await ref.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)

@@ -19,8 +19,9 @@ const kPlatformOverride = null;
 // Allows a user to submit hazards and updates without appropriate proximity.
 const bool kLocationOverrideEnabled = true;
 
-// Tolerance in meters used when 
-const double kLocationTolerance = 25;
+// Tolerance in meters used when creating/updating a hazard
+const double kAddLocationTolerance = 25;
+const double kUpdateLocationTolerance = 50;
 
 // Example: 11:53 AM July 12 2022
 final DateFormat kDisplayDateFormat = DateFormat('hh:mm a MMMM dd y');

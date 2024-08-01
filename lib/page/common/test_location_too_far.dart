@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 Future<bool> testLocationTooFar(BuildContext context, WidgetRef ref, {
-  required LatLng actionLocation, 
-    String title = "Location is too far",
-    String? content,
-    String acceptText = "Ok",
-    bool overrideEnabled = false,
-    String overrideText = "Override",
+  required LatLng actionLocation,
+  required double tolerance,
+  String title = "Location is too far",
+  String? content,
+  String acceptText = "Ok",
+  bool overrideEnabled = false,
+  String overrideText = "Override",
 }) {
   
   final locationData = ref.read(locationProvider);
@@ -30,7 +30,7 @@ Future<bool> testLocationTooFar(BuildContext context, WidgetRef ref, {
   final location = locationData.requireValue; 
   if (context.mounted && 
       const DistanceVincenty().as(LengthUnit.Meter, LatLng(location.latitude, location.longitude), actionLocation)
-      <= kLocationTolerance + (location.accuracy)) {
+      <= tolerance + (location.accuracy)) {
     continueCompleter.complete(true);
     return continueCompleter.future;
   }
