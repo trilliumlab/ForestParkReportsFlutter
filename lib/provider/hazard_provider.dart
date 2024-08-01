@@ -1,10 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:forest_park_reports/consts.dart';
+import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard_new_response.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
 import 'package:forest_park_reports/model/snapped_latlng.dart';
+import 'package:forest_park_reports/page/common/alert_banner.dart';
 import 'package:forest_park_reports/provider/directory_provider.dart';
 import 'package:forest_park_reports/util/image_extensions.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
@@ -123,7 +128,12 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> handleCreateResponse(HazardNewResponseModel response) async {
-    print("Handling hazard create response: $response");
+    // Show success notification
+    showAlertBanner(
+      key: Key(response.hazard.uuid),
+      child: const Text("Report uploaded successfully"),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+    );
 
     _addHazard(response.hazard);
 

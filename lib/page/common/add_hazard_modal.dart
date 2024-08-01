@@ -72,8 +72,9 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     );
 
     showAlertBanner(
+      key: Key(_uuid),
       child: const Text("Your report has been queued"),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
     );
   }
 

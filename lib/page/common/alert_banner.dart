@@ -8,7 +8,8 @@ import 'package:forest_park_reports/util/outline_box_shadow.dart';
 
 const double kAlertBannerHeight = 40;
 const double kCupertinoAlertCornerRadius = 14.0;
-const kAlertAnimationDuration = Duration(milliseconds: 3000);
+const kAlertAnimationDuration = Duration(milliseconds: 750);
+const kAlertUpdateDuration = Duration(milliseconds: 200);
 
 final Map<Key, Widget Function(BuildContext)> _alertChildren = {};
 final Map<Key, OverlayEntry> _alertEntries = {};
@@ -90,17 +91,17 @@ class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderSta
   void didUpdateWidget(covariant _AlertBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If the alert is updated we should reset the timer
-    // velocity < 0 means notification is closing, we should reverse animation
-    ++_alertUpdates;
-    if (_controller.velocity < 0) {
-      _cancelClose();
-    }
+    _maybeCancelClose();
   }
 
-  Future<void> _cancelClose() async {
-    // Smoothly animate turn around
-    await _controller.animateWith(FrictionSimulation(0.1, _controller.value, _controller.velocity, constantDeceleration: 1));
-    await _controller.forward();
+  Future<void> _maybeCancelClose() async {
+    ++_alertUpdates;
+    // velocity < 0 means notification is closing, we should reverse animation
+    if (_controller.velocity < 0) {
+      // Smoothly animate turn around
+      await _controller.animateWith(FrictionSimulation(0.1, _controller.value, _controller.velocity, constantDeceleration: 1));
+      await _controller.forward();
+    }
     _waitClose();
   }
 
@@ -202,10 +203,13 @@ class _AlertBannerContent extends StatelessWidget {
   final Color color;
   final Widget child;
 
+  static final offset1 = Tween(begin: const Offset(1, 0), end: const Offset(0, 0));
+  static final offset2 = Tween(begin: const Offset(-1, 0), end: const Offset(0, 0));
+
   const _AlertBannerContent({
     required this.color,
     required this.child,
-    super.key
+    super.key,
   });
 
   @override
@@ -213,17 +217,40 @@ class _AlertBannerContent extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(2.5)),
-            color: color
+        AnimatedSwitcher(
+          duration: kAlertUpdateDuration,
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          transitionBuilder: (child, animation) => (animation.value != 1 ? SizeTransition(
+            axis: Axis.vertical,
+            sizeFactor: animation,
+            child: child,
+          ) : child),
+          child: Container(
+            key: Key(color.toString()),
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(2.5)),
+                color: color
+            ),
+            height: kAlertBannerHeight,
+            width: 5,
           ),
-          height: kAlertBannerHeight,
-          width: 5,
         ),
         Expanded(
           child: Center(
-            child: child,
+            child: AnimatedSwitcher(
+              duration: kAlertUpdateDuration,
+              switchInCurve: Curves.easeInOut,
+              switchOutCurve: Curves.easeInOut,
+              transitionBuilder: (child, animation) => SlideTransition(
+                position: (animation.value == 1? offset1 : offset2).animate(animation),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+              ),
+              child: child,
+            ),
           ),
         ),
       ],
