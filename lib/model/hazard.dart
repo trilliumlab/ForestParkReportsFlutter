@@ -26,10 +26,11 @@ class HazardModel with _$HazardModel implements drift.Insertable<HazardModel> {
   factory HazardModel.create({
     required HazardType hazard,
     required SnappedLatLng location,
+    String? uuid,
     String? blurHash,
     String? image,
   }) => HazardModel(
-    uuid: kUuidGen.v1(),
+    uuid: uuid ?? kUuidGen.v1(),
     time: DateTime.now(),
     hazard: hazard,
     location: location,

@@ -69,6 +69,7 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> createHazard({
+    required String uuid,
     required HazardType hazard,
     required SnappedLatLng location,
     XFile? imageFile
@@ -82,6 +83,7 @@ class ActiveHazard extends _$ActiveHazard {
     }
 
     final hazardRequest = HazardModel.create(
+      uuid: uuid,
       hazard: hazard,
       location: location,
       image: image != null ? kUuidGen.v1() : null,
