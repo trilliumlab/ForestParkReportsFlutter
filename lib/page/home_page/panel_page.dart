@@ -81,6 +81,7 @@ class PanelPage extends ConsumerWidget {
                     }
                     
                     if (context.mounted && !await testLocationTooFar(context, ref,
+                      tolerance: kUpdateLocationTolerance,
                       actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
                       title: "Too far from hazard",
                       content: "Hazard updates must be made in proximity to the hazard",
@@ -119,6 +120,7 @@ class PanelPage extends ConsumerWidget {
                     }
 
                     if (context.mounted && !await testLocationTooFar(context, ref,
+                      tolerance: kUpdateLocationTolerance,
                       actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
                       title: "Too far from hazard",
                       content: "Hazard updates must be made in proximity to the hazard",

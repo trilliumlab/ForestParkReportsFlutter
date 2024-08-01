@@ -49,8 +49,10 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
     final location = locationData.requireValue;
     var snappedLoc = await ref.read(trailsProvider.notifier).snapLocation(location.latLng()!);
     
-    if (snappedLoc.distance > kLocationTolerance + (location.accuracy) && mounted) {
-      if (!await testLocationTooFar(context, ref, actionLocation: snappedLoc.location,
+    if (snappedLoc.distance > kAddLocationTolerance + (location.accuracy) && mounted) {
+      if (!await testLocationTooFar(context, ref,
+          tolerance: kAddLocationTolerance,
+          actionLocation: snappedLoc.location,
           title: "Too far from trail",
           content: "Reports must be made on a marked Forest Park trail",
           overrideEnabled: kLocationOverrideEnabled)) {
