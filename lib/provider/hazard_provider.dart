@@ -48,7 +48,7 @@ class ActiveHazard extends _$ActiveHazard {
     ];
 
     final db = ref.read(databaseProvider);
-    await db.delete(db.hazardsTable).go();
+    await (db.delete(db.hazardsTable)..where((t) => t.offline.equals(false))).go();
     await db.batch((batch) {
       batch.insertAllOnConflictUpdate(db.hazardsTable, hazards);
     });
@@ -57,7 +57,15 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> refresh() async {
-    state = AsyncData(await _fetch());
+    final newHazards = await _fetch();
+    final newUuids = newHazards.map((h) => h.uuid);
+    state = AsyncData([
+      if (state.hasValue)
+        for (final hazard in state.value!)
+          if (hazard.offline && !newUuids.contains(hazard.uuid))
+            hazard,
+      ...newHazards,
+    ]);
   }
 
   Future<void> createHazard({
@@ -79,6 +87,9 @@ class ActiveHazard extends _$ActiveHazard {
       image: image != null ? kUuidGen.v1() : null,
       blurHash: image != null ? await image.getBlurHash() : null,
     );
+
+    // Add offline hazard to app
+    _addHazard(hazardRequest);
 
     // Queue new hazard request.
     OfflineUploader().enqueueJson(
@@ -112,20 +123,24 @@ class ActiveHazard extends _$ActiveHazard {
   Future<void> handleCreateResponse(HazardNewResponseModel response) async {
     print("Handling hazard create response: $response");
 
-    // Add new HazardModel to state and db
-    state = AsyncData([
-      if (state.hasValue)
-        ...state.requireValue,
-      response.hazard
-    ]);
-    final db = ref.read(databaseProvider);
-    await db.into(db.hazardsTable).insertOnConflictUpdate(response.hazard);
+    _addHazard(response.hazard);
 
     // Add new update to hazard updates
     final updatesNotifier = ref.read(hazardUpdatesProvider(response.hazard.uuid).notifier);
     for (final update in response.updates) {
       await updatesNotifier.addHazardUpdate(update);
     }
+  }
+
+  Future<void> _addHazard(HazardModel hazard) async {
+    // Add new HazardModel to state and db
+    state = AsyncData([
+      if (state.hasValue)
+        ...state.requireValue,
+      hazard
+    ]);
+    final db = ref.read(databaseProvider);
+    await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
   }
 
   Future updateHazard({
