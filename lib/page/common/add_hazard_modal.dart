@@ -70,12 +70,6 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
       location: snappedLoc.location,
       imageFile: _image
     );
-
-    showAlertBanner(
-      key: Key(_uuid),
-      child: const Text("Your report has been queued"),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
-    );
   }
 
   Future _onSubmit() async {

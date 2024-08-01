@@ -79,6 +79,13 @@ class ActiveHazard extends _$ActiveHazard {
     required SnappedLatLng location,
     XFile? imageFile
   }) async {
+    // Show alert that upload queued
+    showAlertBanner(
+      key: Key(uuid),
+      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+    );
+
     // If we're passed an image, decode it.
     img.Image? image;
     if (imageFile != null) {
@@ -131,7 +138,7 @@ class ActiveHazard extends _$ActiveHazard {
     // Show success notification
     showAlertBanner(
       key: Key(response.hazard.uuid),
-      child: const Text("Report uploaded successfully"),
+      child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
       color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
     );
 
@@ -156,10 +163,18 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future updateHazard({
+    required String uuid,
     required String hazard,
     required bool active,
     XFile? imageFile
   }) async {
+    // Show alert that update queued
+    showAlertBanner(
+      key: Key(uuid),
+      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+    );
+
     // If we're passed an image, decode it.
     img.Image? image;
     if (imageFile != null) {
@@ -169,6 +184,7 @@ class ActiveHazard extends _$ActiveHazard {
     }
 
     final hazardUpdateRequest = HazardUpdateModel.create(
+      uuid: uuid,
       hazard: hazard,
       active: active,
       image: image != null ? kUuidGen.v1() : null,
@@ -205,7 +221,12 @@ class ActiveHazard extends _$ActiveHazard {
   }
 
   Future<void> handleUpdateResponse(HazardUpdateModel hazardUpdate) async {
-    print("Handling hazard update create response: $hazardUpdate");
+    // Show success notification
+    showAlertBanner(
+      key: Key(hazardUpdate.uuid),
+      child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
+      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+    );
 
     // Add new update to hazard updates
     await ref.read(hazardUpdatesProvider(hazardUpdate.hazard).notifier)

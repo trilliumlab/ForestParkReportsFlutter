@@ -50,6 +50,8 @@ class PanelPage extends ConsumerWidget {
       lastImage = hazardUpdates?.lastImage;
     }
 
+    final updateUuid = kUuidGen.v1();
+
     return Panel(
       // panel for when a hazard is selected
       child: selectedHazard != null ? TrailInfoWidget(
@@ -87,17 +89,13 @@ class PanelPage extends ConsumerWidget {
                     }
 
                     ref.read(activeHazardProvider.notifier).updateHazard(
+                      uuid: updateUuid,
                       hazard: selectedHazard.uuid,
                       active: false,
                     );
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
-
-                    showAlertBanner(
-                      child: const Text("Your report has been queued"),
-                      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
-                    );
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -129,6 +127,7 @@ class PanelPage extends ConsumerWidget {
                     }
 
                     ref.read(activeHazardProvider.notifier).updateHazard(
+                      uuid: updateUuid,
                       hazard: selectedHazard.uuid,
                       active: true,
                     );
@@ -137,7 +136,7 @@ class PanelPage extends ConsumerWidget {
                     ref.read(activeHazardProvider.notifier).refresh();
 
                     showAlertBanner(
-                      child: const Text("Your report has been queued"),
+                      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
                       color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
                     );
                   },
