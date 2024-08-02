@@ -96,7 +96,6 @@ class PanelPage extends ConsumerWidget {
                     );
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
-                    ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -135,7 +134,6 @@ class PanelPage extends ConsumerWidget {
                     );
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
-                    ref.read(activeHazardProvider.notifier).refresh();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
