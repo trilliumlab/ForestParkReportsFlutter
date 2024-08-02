@@ -60,7 +60,7 @@ class HazardUpdateModel with _$HazardUpdateModel implements drift.Insertable<Haz
   }) => HazardUpdateModel(
     uuid: uuid ?? kUuidGen.v1(),
     hazard: hazard,
-    time: DateTime.now(),
+    time: DateTime.now().toUtc(),
     active: active,
     offline: true,
     blurHash: blurHash,
