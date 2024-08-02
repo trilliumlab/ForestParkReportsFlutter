@@ -31,7 +31,7 @@ class HazardModel with _$HazardModel implements drift.Insertable<HazardModel> {
     String? image,
   }) => HazardModel(
     uuid: uuid ?? kUuidGen.v1(),
-    time: DateTime.now(),
+    time: DateTime.now().toUtc(),
     hazard: hazard,
     location: location,
     offline: true,
