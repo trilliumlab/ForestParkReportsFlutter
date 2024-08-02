@@ -155,8 +155,10 @@ class ActiveHazard extends _$ActiveHazard {
     // Add new HazardModel to state and db
     state = AsyncData([
       if (state.hasValue)
-        ...state.requireValue,
-      hazard
+        for (final HazardModel existing in state.value ?? [])
+          if (existing.uuid != hazard.uuid)
+            existing,
+      hazard,
     ]);
     final db = ref.read(databaseProvider);
     await db.into(db.hazardsTable).insertOnConflictUpdate(hazard);
@@ -190,6 +192,19 @@ class ActiveHazard extends _$ActiveHazard {
       image: image != null ? kUuidGen.v1() : null,
       blurHash: image != null ? await image.getBlurHash() : null,
     );
+
+    // Add offline hazard update to app
+    await ref.read(hazardUpdatesProvider(hazard).notifier)
+        .addHazardUpdate(hazardUpdateRequest);
+    // If it's a cleared report, remove hazard
+    if (!active) {
+      state = AsyncData([
+        if (state.hasValue)
+          for (final HazardModel existing in state.value ?? [])
+            if (existing.uuid != hazard)
+              existing,
+      ]);
+    }
 
     // Queue new hazard update request.
     OfflineUploader().enqueueJson(
@@ -269,8 +284,10 @@ class HazardUpdates extends _$HazardUpdates {
     // Add HazardUpdateModel to state and db
     state = AsyncData(HazardUpdateList([
       if (state.hasValue)
-        ...state.requireValue,
-      hazardUpdate
+        for (final HazardUpdateModel existing in state.value ?? [])
+          if (existing.uuid != hazardUpdate.uuid)
+            existing,
+      hazardUpdate,
     ]));
     final db = ref.read(databaseProvider);
     await db.into(db.hazardUpdatesTable).insertOnConflictUpdate(hazardUpdate);

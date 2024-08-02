@@ -136,11 +136,6 @@ class PanelPage extends ConsumerWidget {
                     ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
                     ref.read(selectedHazardProvider.notifier).deselect();
                     ref.read(activeHazardProvider.notifier).refresh();
-
-                    showAlertBanner(
-                      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
-                      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
-                    );
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(

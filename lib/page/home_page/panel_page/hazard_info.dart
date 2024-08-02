@@ -24,9 +24,11 @@ class UpdateInfoWidget extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(2.5)),
-                  color: update.active
-                      ? CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)
-                      : CupertinoDynamicColor.resolve(CupertinoColors.systemGreen, context),
+                  color: update.offline
+                      ? CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context)
+                      : update.active
+                          ? CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)
+                          : CupertinoDynamicColor.resolve(CupertinoColors.systemGreen, context),
                 ),
                 height: kImageHeight,
                 width: 5,
