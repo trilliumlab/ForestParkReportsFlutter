@@ -190,38 +190,48 @@ class _AddHazardModalState extends ConsumerState<AddHazardModal> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(isCupertino(context) ? 8 : 18)),
-                          child: PlatformWidgetBuilder(
-                              cupertino: (context, child, __) => CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: _cameraSelect,
-                                color: CupertinoDynamicColor.resolve(CupertinoColors.quaternarySystemFill, context),
-                                child: child!,
-                              ),
-                              material: (context, child, __) => Card(
-                                elevation: 1,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                shadowColor: Colors.transparent,
+                      child: PlatformWidgetBuilder(
+                        cupertino: (context, child, __) => CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: _cameraSelect,
+                          color: CupertinoDynamicColor.resolve(CupertinoColors.quaternarySystemFill, context),
+                          child: child!,
+                        ),
+                        material: (context, child, __) => OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18)
+                            )
+                          ),
+                          onPressed: null,
+                          // onPressed: _cameraSelect,
+                          child: Stack(
+                            children: [
+                              child!,
+                              Material(
+                                color: Colors.transparent,
                                 child: InkWell(
                                   onTap: _cameraSelect,
                                   borderRadius: BorderRadius.circular(18),
-                                  child: child,
                                 ),
                               ),
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints.expand(),
-                                child: _image == null ? Icon(
-                                  CupertinoIcons.camera,
-                                  color: isCupertino(context) ? CupertinoTheme.of(context).primaryColor : theme.colorScheme.primary,
-                                ) : Image.file(
-                                  File(_image!.path),
-                                  fit: BoxFit.cover,
-                                ),
-                              )
+                            ],
                           )
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints.expand(),
+                          child: _image == null ? Icon(
+                            CupertinoIcons.camera,
+                            color: isCupertino(context) ? CupertinoTheme.of(context).primaryColor : theme.colorScheme.primary,
+                          ) : ClipRRect(
+                            borderRadius: BorderRadius.circular(isCupertino(context) ? 8 : 18),
+                            child: Image.file(
+                              File(_image!.path),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
