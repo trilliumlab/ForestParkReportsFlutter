@@ -51,9 +51,7 @@ createHazardUpdateModal(BuildContext context, HazardModel selectedHazard, bool i
                   active: isPresent,
                   imageFile: image,
                 );
-                ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
-                ref.read(selectedHazardProvider.notifier).deselect();
-                ref.read(activeHazardProvider.notifier).refresh();
+                ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
                 return true;
             },
           ),

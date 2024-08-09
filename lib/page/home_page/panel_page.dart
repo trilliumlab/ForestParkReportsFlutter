@@ -59,7 +59,6 @@ class PanelPage extends ConsumerWidget {
                 child: PlatformTextButton(
                   onPressed: () async {
                     createHazardUpdateModal(context, selectedHazard, false);
-                    panelController.collapse();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -75,7 +74,6 @@ class PanelPage extends ConsumerWidget {
                 child: PlatformTextButton(
                   onPressed: () async {
                     createHazardUpdateModal(context, selectedHazard, true);
-                    panelController.collapse();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
