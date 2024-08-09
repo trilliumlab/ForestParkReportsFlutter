@@ -27,18 +27,8 @@ class MapFabs extends ConsumerWidget {
               return PlatformFAB(
                   heroTag: "add_hazard_fab",
                   opacity: opacity,
-                  onPressed: () async {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return Dismissible(
-                            direction: DismissDirection.down,
-                            key: const Key('key'),
-                            onDismissed: (_) => Navigator.of(context).pop(),
-                            child: const AddHazardModal()
-                        );
-                      },
-                    );
+                  onPressed: () async { 
+                    createHazardAddModal(context);
                   },
                   child: PlatformWidget(
                     cupertino: (_, __) => Icon(
@@ -101,7 +91,9 @@ class MapFabs extends ConsumerWidget {
                 material: (_, __) => Icon(
                   followOnLocationTarget == AlignPositionTargetState.forestPark
                       ? Icons.park
-                      : Icons.my_location_rounded,
+                      : followOnLocationTarget == AlignPositionTargetState.currentLocation
+                      ? Icons.my_location
+                      : Icons.location_searching,
                   color: followOnLocationTarget == AlignPositionTargetState.none
                       ? theme.colorScheme.onSurface
                       : theme.colorScheme.primary,

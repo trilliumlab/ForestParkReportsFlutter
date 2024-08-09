@@ -88,7 +88,11 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
     ref.listen(alignPositionTargetProvider, (prev, next) {
       if (next==AlignPositionTargetState.forestPark){
         _alignPositionStreamController.add(null);
+        _animatedMapController.animatedRotateReset();
         _animatedMapController.centerOnPoint(kHomeCameraPosition.center, zoom: kHomeCameraPosition.zoom);
+      } else if (next == AlignPositionTargetState.currentLocation) {
+        _animatedMapController.centerOnPoint(ref.watch(locationProvider).requireValue.latLng()!);
+
       }
     });
 

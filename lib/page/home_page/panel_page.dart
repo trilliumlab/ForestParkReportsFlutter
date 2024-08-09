@@ -4,17 +4,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/main.dart';
-import 'package:forest_park_reports/page/common/alert_banner.dart';
-import 'package:forest_park_reports/page/common/test_location_too_far.dart';
-import 'package:forest_park_reports/provider/location_provider.dart';
+import 'package:forest_park_reports/page/common/hazard_update_modal.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
-import 'package:forest_park_reports/page/common/confirmation.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
-import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
@@ -23,7 +17,6 @@ import 'package:forest_park_reports/page/home_page/panel_page/trail_info.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_elevation_graph.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/trail_hazards_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// The sliding-up modal with info on the current selected trail or hazard on the map
@@ -50,15 +43,13 @@ class PanelPage extends ConsumerWidget {
       lastImage = hazardUpdates?.lastImage;
     }
 
-    final updateUuid = kUuidGen.v1();
-
     return Panel(
       // panel for when a hazard is selected
       child: selectedHazard != null ? TrailInfoWidget(
         scrollController: scrollController,
         panelController: panelController,
         // TODO fetch trail name
-        title: "${selectedHazard.hazard.displayName} on ${hazardRelation!.tags["name"]}",
+        title: "${selectedHazard.hazard.displayName} on ${hazardRelation!.tags["name"] ?? "Unnamed Trail"}",
         bottomWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -67,36 +58,8 @@ class PanelPage extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 20, right: 10),
                 child: PlatformTextButton(
                   onPressed: () async {
-                    if (!await showConfirmationDialog(context, ConfirmationInfo(
-                      title: "Report hazard cleared?",
-                      content: "Please make sure the hazard is gone.",
-                      affirmative: "Yes"
-                    ))) {
-                      return;
-                    }
-                    final locationData = ref.read(locationProvider);
-                    if (!locationData.hasValue) {
-                      // TODO actually handle location errors
-                      return;
-                    }
-                    
-                    if (context.mounted && !await testLocationTooFar(context, ref,
-                      tolerance: kUpdateLocationTolerance,
-                      actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
-                      title: "Too far from hazard",
-                      content: "Hazard updates must be made in proximity to the hazard",
-                      overrideEnabled: kLocationOverrideEnabled)) {
-                      return;
-                    }
-
-                    ref.read(activeHazardProvider.notifier).updateHazard(
-                      uuid: updateUuid,
-                      hazard: selectedHazard.uuid,
-                      active: false,
-                    );
-                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
-                    ref.read(selectedHazardProvider.notifier).deselect();
-                    ref.read(activeHazardProvider.notifier).refresh();
+                    createHazardUpdateModal(context, selectedHazard, false);
+                    panelController.collapse();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -111,36 +74,8 @@ class PanelPage extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 10, right: 20),
                 child: PlatformTextButton(
                   onPressed: () async {
-                    if (!await showConfirmationDialog(context, ConfirmationInfo(
-                        title: "Report hazard present?",
-                        content: "Please make sure the hazard is still present.",
-                        affirmative: "Yes"
-                    ))) {
-                      return;
-                    }
-
-                    if (context.mounted && !await testLocationTooFar(context, ref,
-                      tolerance: kUpdateLocationTolerance,
-                      actionLocation: LatLng(selectedHazard.location.latitude, selectedHazard.location.longitude),
-                      title: "Too far from hazard",
-                      content: "Hazard updates must be made in proximity to the hazard",
-                      overrideEnabled: kLocationOverrideEnabled)) {
-                      return;
-                    }
-
-                    ref.read(activeHazardProvider.notifier).updateHazard(
-                      uuid: updateUuid,
-                      hazard: selectedHazard.uuid,
-                      active: true,
-                    );
-                    ref.read(panelPositionProvider.notifier).move(PanelState.HIDDEN);
-                    ref.read(selectedHazardProvider.notifier).deselect();
-                    ref.read(activeHazardProvider.notifier).refresh();
-
-                    showAlertBanner(
-                      child: const Text("Your report has been queued", key: Key("Your report has been queued")),
-                      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
-                    );
+                    createHazardUpdateModal(context, selectedHazard, true);
+                    panelController.collapse();
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(

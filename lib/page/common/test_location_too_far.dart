@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
+import 'package:forest_park_reports/util/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -27,14 +28,49 @@ Future<bool> testLocationTooFar(BuildContext context, WidgetRef ref, {
       _badLocationAlert(context, "Invalid location", "No location was found", acceptText, overrideEnabled, overrideText)
     );
   }
-  final location = locationData.requireValue; 
+  final location = locationData.requireValue;
   if (context.mounted && 
-      const DistanceVincenty().as(LengthUnit.Meter, LatLng(location.latitude, location.longitude), actionLocation)
+      DistanceVincenty().as(LengthUnit.Meter, location.latLng()!, actionLocation)
       <= tolerance + (location.accuracy)) {
     continueCompleter.complete(true);
-    return continueCompleter.future;
+  } else {
+    continueCompleter.complete(_badLocationAlert(context, title, content, acceptText, overrideEnabled, overrideText));
   }
-  continueCompleter.complete(_badLocationAlert(context, title, content, acceptText, overrideEnabled, overrideText));
+  return continueCompleter.future;
+}
+
+Future<bool> testLocationTooFarDynamic(BuildContext context, WidgetRef ref, {
+    required Future<LatLng> Function(BuildContext, WidgetRef, LatLng) actionLocationGetter,
+    required double tolerance,
+    String title = "Location is to far",
+    String? content,
+    String acceptText = "Ok",
+    bool overrideEnabled = false,
+    String overrideText = "Override",
+}) {
+  
+  final locationData = ref.read(locationProvider);
+  
+  
+  final continueCompleter = Completer<bool>();
+  if (!locationData.hasValue) {
+    // TODO should we just alert the user like we are, or throw an error?
+    continueCompleter.complete(
+      _badLocationAlert(context, "Invalid location", "No location was found", acceptText, overrideEnabled, overrideText)
+    );
+  }
+  final location = locationData.requireValue;
+
+  
+  actionLocationGetter(context, ref, location.latLng()!).then( (actionLocation) {
+    if (context.mounted && 
+        DistanceVincenty().as(LengthUnit.Meter, location.latLng()!, actionLocation)
+        <= tolerance + (location.accuracy)) {
+      continueCompleter.complete(true);
+    } else {
+      continueCompleter.complete(_badLocationAlert(context, title, content, acceptText, overrideEnabled, overrideText));
+    }
+  });
   return continueCompleter.future;
 }
 

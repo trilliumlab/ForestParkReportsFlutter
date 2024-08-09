@@ -45,6 +45,7 @@ class App extends ConsumerStatefulWidget {
 class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
   // we listen to brightness changes (IE light to dark mode) and
   // rebuild the entire widget tree when it's changed
+  // ignore: unused_field
   Brightness _brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
   @override
   void initState() {
@@ -102,34 +103,47 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         // In case we can't get a system theme, we need a fallback theme.
         // Material themes
-        final materialLightTheme = ThemeData.light(useMaterial3: true).copyWith(
-          colorScheme: lightDynamic,
-        );
-        final materialDarkTheme = ThemeData.dark(useMaterial3: true).copyWith(
-          colorScheme: darkDynamic,
-        );
+        final materialLightTheme = (lightDynamic != null) 
+          ? ThemeData.light(useMaterial3: true).copyWith(
+            colorScheme: // lightDynamic
+              ColorScheme.fromSeed(
+                seedColor: kMaterialAppPrimaryColor,
+                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+              )
+          ) : ThemeData.light(useMaterial3: true);
+        final materialDarkTheme = (darkDynamic != null) 
+          ? ThemeData.dark(useMaterial3: true).copyWith(
+            colorScheme: // darkDynamic 
+              ColorScheme.fromSeed(
+                brightness: Brightness.dark,
+                seedColor: kMaterialAppPrimaryColor,
+                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+              )
+          ) : ThemeData.dark(useMaterial3: true);
 
         // Cupertino themes
-        const lightDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.light);
+        final lightDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.light, primaryColor: kCupertinoAppPrimaryColor);
         final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
           materialTheme: materialLightTheme.copyWith(
             cupertinoOverrideTheme:  CupertinoThemeData(
               brightness: Brightness.light,
               barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
+              primaryColor: kCupertinoAppPrimaryColor,
               textTheme: CupertinoTextThemeData(
-                navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialLightTheme.colorScheme.primary)
+                navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
               ),
             ),
           ),
         );
-        const darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark);
+        final darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark, primaryColor: kCupertinoAppPrimaryColor);
         final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
           materialTheme: materialDarkTheme.copyWith(
             cupertinoOverrideTheme: CupertinoThemeData(
               brightness: Brightness.dark,
+              primaryColor: kCupertinoAppPrimaryColor,
               barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
               textTheme: CupertinoTextThemeData(
-                  navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: materialDarkTheme.colorScheme.primary)
+                  navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
               ),
             ),
           ),
