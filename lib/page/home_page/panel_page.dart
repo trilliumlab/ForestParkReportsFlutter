@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/page/common/hazard_update_modal.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/relation.dart';
@@ -58,7 +59,9 @@ class PanelPage extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 20, right: 10),
                 child: PlatformTextButton(
                   onPressed: () async {
-                    createHazardUpdateModal(context, selectedHazard, false);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.COLLAPSED);
+                    await createHazardUpdateModal(context, selectedHazard, false);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(
@@ -73,7 +76,9 @@ class PanelPage extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 10, right: 20),
                 child: PlatformTextButton(
                   onPressed: () async {
-                    createHazardUpdateModal(context, selectedHazard, true);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.COLLAPSED);
+                    await createHazardUpdateModal(context, selectedHazard, true);
+                    ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
                   },
                   padding: EdgeInsets.zero,
                   child: const Text(

@@ -14,8 +14,8 @@ import 'package:latlong2/latlong.dart';
 
 /// The additional modal with the ui for reporting a trail hazard 
 
-createHazardAddModal(BuildContext context) {
-  showCupertinoModalPopup(
+createHazardAddModal(BuildContext context) async {
+  await showCupertinoModalPopup(
     context: context,
     builder: (context) {
       return Dismissible(
