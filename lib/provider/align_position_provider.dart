@@ -5,7 +5,7 @@ part 'align_position_provider.g.dart';
 
 enum AlignPositionTargetState {
   none(AlignOnUpdate.never),
-  currentLocation(AlignOnUpdate.always),
+  currentLocation(AlignOnUpdate.never),
   forestPark(AlignOnUpdate.never);
 
   final AlignOnUpdate update;

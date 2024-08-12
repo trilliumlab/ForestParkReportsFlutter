@@ -39,19 +39,18 @@ class _TrailInfoWidgetState extends State<TrailInfoWidget> {
               alignment: Alignment.topCenter,
               child: PlatformPill(),
             ),
-            if (widget.title != null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
-              child: Text(
-                widget.title!,
-                style: Theme.of(context).textTheme.titleLarge,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
+            child: Text(
+              widget.title ?? "Unnamed Trail",
+              style: Theme.of(context).textTheme.titleLarge,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
               ),
-                ),
-              ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),

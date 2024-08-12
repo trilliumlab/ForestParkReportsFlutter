@@ -33,6 +33,10 @@ dependencies:
   collection: ^1.17.1
   intl: ^0.19.0
   dynamic_color: ^1.7.0
+  # dynamic_color: 
+  #   git:
+  #     url: https://github.com/hasali19/material-foundation-flutter-packages.git
+      # path: packages/dynamic_color
   cupertino_icons: ^1.0.5
   latlong2: ^0.9.0
   geolocator: ^12.0.0

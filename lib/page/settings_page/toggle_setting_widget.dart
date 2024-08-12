@@ -28,14 +28,6 @@ class ToggleSettingWidget extends StatelessWidget {
       ),
       title: Text(name),
       trailing: PlatformSwitch(
-        material: (_, __) => MaterialSwitchData(
-          thumbIcon: WidgetStateProperty.resolveWith((states) {
-            return states.contains(WidgetState.selected)
-                ? const Icon(Icons.check)
-                : const Icon(Icons.close);
-          },
-          ),
-        ),
         value: value,
         onChanged: onChanged,
       ),

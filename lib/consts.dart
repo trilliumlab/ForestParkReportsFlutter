@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/model/camera_position.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,9 @@ const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
 const kPlatformOverride = null;
 // const kPlatformOverride = TargetPlatform.android;
 // const kPlatformOverride = TargetPlatform.iOS;
+
+final kMaterialAppPrimaryColor = Colors.green.shade700;
+final kCupertinoAppPrimaryColor = CupertinoColors.systemGreen.highContrastColor;
 
 // Allows a user to submit hazards and updates without appropriate proximity.
 const bool kLocationOverrideEnabled = true;

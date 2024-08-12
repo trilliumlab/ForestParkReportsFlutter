@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
-import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/model/hazard_new_response.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
