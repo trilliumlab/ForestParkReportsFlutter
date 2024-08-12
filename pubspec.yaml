@@ -74,6 +74,7 @@ dependencies:
     git:
       url: https://github.com/orestesgaolin/flutter_uploader.git
       ref: update-to-dart-3
+  flutter_compass: ^0.8.0
 
 dev_dependencies:
   flutter_test:
