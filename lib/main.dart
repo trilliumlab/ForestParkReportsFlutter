@@ -99,65 +99,54 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     // DynamicColorBuilder allows us to get the system theme on android, macos, and windows.
     // On android the colorScheme will be the material you color palette,
     // on macos and windows, this will be derived from the system accent color.
-    return DynamicColorBuilder(
-      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        // In case we can't get a system theme, we need a fallback theme.
-        // Material themes
-        final materialLightTheme = (lightDynamic != null) 
-          ? ThemeData.light(useMaterial3: true).copyWith(
-            colorScheme: // lightDynamic
-              ColorScheme.fromSeed(
-                seedColor: kMaterialAppPrimaryColor,
-                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-              )
-          ) : ThemeData.light(useMaterial3: true);
-        final materialDarkTheme = (darkDynamic != null) 
-          ? ThemeData.dark(useMaterial3: true).copyWith(
-            colorScheme: // darkDynamic 
-              ColorScheme.fromSeed(
-                brightness: Brightness.dark,
-                seedColor: kMaterialAppPrimaryColor,
-                dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
-              )
-          ) : ThemeData.dark(useMaterial3: true);
+    final materialLightTheme = ThemeData.from(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: kMaterialAppPrimaryColor,
+        brightness: Brightness.light,
+      )
+    );
+    final materialDarkTheme = ThemeData.from(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: kMaterialAppPrimaryColor,
+        brightness: Brightness.dark,
+      )
+    );
 
-        // Cupertino themes
-        final lightDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.light, primaryColor: kCupertinoAppPrimaryColor);
-        final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
-          materialTheme: materialLightTheme.copyWith(
-            cupertinoOverrideTheme:  CupertinoThemeData(
-              brightness: Brightness.light,
-              barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
-              primaryColor: kCupertinoAppPrimaryColor,
-              textTheme: CupertinoTextThemeData(
-                navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
-              ),
-            ),
+    // Cupertino themes
+    final lightDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.light, primaryColor: kCupertinoAppPrimaryColor);
+    final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
+      materialTheme: materialLightTheme.copyWith(
+        cupertinoOverrideTheme:  CupertinoThemeData(
+          brightness: Brightness.light,
+          barBackgroundColor: lightDefaultCupertinoTheme.barBackgroundColor,
+          primaryColor: kCupertinoAppPrimaryColor,
+          textTheme: CupertinoTextThemeData(
+            navActionTextStyle: lightDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
           ),
-        );
-        final darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark, primaryColor: kCupertinoAppPrimaryColor);
-        final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
-          materialTheme: materialDarkTheme.copyWith(
-            cupertinoOverrideTheme: CupertinoThemeData(
-              brightness: Brightness.dark,
-              primaryColor: kCupertinoAppPrimaryColor,
-              barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
-              textTheme: CupertinoTextThemeData(
-                  navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
-              ),
-            ),
+        ),
+      ),
+    );
+    final darkDefaultCupertinoTheme = CupertinoThemeData(brightness: Brightness.dark, primaryColor: kCupertinoAppPrimaryColor);
+    final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
+      materialTheme: materialDarkTheme.copyWith(
+        cupertinoOverrideTheme: CupertinoThemeData(
+          brightness: Brightness.dark,
+          primaryColor: kCupertinoAppPrimaryColor,
+          barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
+          textTheme: CupertinoTextThemeData(
+              navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(color: kCupertinoAppPrimaryColor)
           ),
-        );
+        ),
+      ),
+    );
 
-        return PlatformTheme(
-          themeMode: ref.watch(settingsProvider.select((s) => s.colorTheme)).value,
-          materialLightTheme: materialLightTheme,
-          materialDarkTheme: materialDarkTheme,
-          cupertinoLightTheme: cupertinoLightTheme,
-          cupertinoDarkTheme: cupertinoDarkTheme,
-          builder: builder,
-        );
-      },
+    return PlatformTheme(
+      themeMode: ref.watch(settingsProvider.select((s) => s.colorTheme)).value,
+      materialLightTheme: materialLightTheme,
+      materialDarkTheme: materialDarkTheme,
+      cupertinoLightTheme: cupertinoLightTheme,
+      cupertinoDarkTheme: cupertinoDarkTheme,
+      builder: builder,
     );
   }
 }
