@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:forest_park_reports/consts.dart';
 
 /// A settings widget for boolean options.
 class ToggleSettingWidget extends StatelessWidget {
@@ -28,14 +29,6 @@ class ToggleSettingWidget extends StatelessWidget {
       ),
       title: Text(name),
       trailing: PlatformSwitch(
-        material: (_, __) => MaterialSwitchData(
-          thumbIcon: WidgetStateProperty.resolveWith((states) {
-            return states.contains(WidgetState.selected)
-                ? const Icon(Icons.check)
-                : const Icon(Icons.close);
-          },
-          ),
-        ),
         value: value,
         onChanged: onChanged,
       ),
