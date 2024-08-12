@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -76,24 +75,25 @@ Future<bool> testLocationTooFarDynamic(BuildContext context, WidgetRef ref, {
 
 Future<bool> _badLocationAlert(BuildContext context, String title, String? content, String acceptText, bool overrideEnabled, String overrideText) {
   final continueCompleter = Completer<bool>(); 
-  showPlatformDialog(context: context, builder: (context) => PlatformAlertDialog(
-    title: PlatformText(title),
-    content: (content == null) ? null : PlatformText(content),
+  showDialog(context: context, builder: (context) => AlertDialog(
+    title: Text(title),
+    content: (content == null) ? null : Text(content),
     actions: [
-      PlatformDialogAction(
-          onPressed: () {
-            Navigator.pop(context);
-            continueCompleter.complete(false);
-          },
-          child: PlatformText(acceptText)
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+          continueCompleter.complete(false);
+        },
+        child: Text(acceptText)
       ),
-      if (overrideEnabled) PlatformDialogAction(
+      if (overrideEnabled)
+        TextButton(
           onPressed: () {
             Navigator.pop(context);
             continueCompleter.complete(true);
           },
-          child: PlatformText(overrideText)
-      ),
+          child: Text(overrideText)
+        ),
     ],
   ));
   return continueCompleter.future;

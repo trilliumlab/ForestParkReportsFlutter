@@ -1,21 +1,20 @@
-import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// UI to request location
 showMissingPermissionDialog(BuildContext context, String title, String message) {
-  showPlatformDialog(
+  showDialog(
     context: context,
-    builder: (context) => PlatformAlertDialog(
+    builder: (context) => AlertDialog(
       title: Text(title),
       content: Text(message),
       actions: [
-        PlatformDialogAction(
-          child: PlatformText("Cancel"),
+        TextButton(
+          child: const Text("Cancel"),
           onPressed: () => Navigator.pop(context),
         ),
-        PlatformDialogAction(
-          child: PlatformText("Go To Settings"),
+        TextButton(
+          child: const Text("Go To Settings"),
           onPressed: () {
             Geolocator.openAppSettings();
             Navigator.pop(context);

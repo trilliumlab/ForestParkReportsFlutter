@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
@@ -153,7 +151,7 @@ class _AlertBannerState extends State<_AlertBanner> with SingleTickerProviderSta
   }
 }
 
-class _AlertBannerBackground extends PlatformWidgetBase {
+class _AlertBannerBackground extends StatelessWidget {
   final Widget child;
 
   const _AlertBannerBackground({
@@ -162,31 +160,7 @@ class _AlertBannerBackground extends PlatformWidgetBase {
   });
 
   @override
-  Widget createCupertinoWidget(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kCupertinoAlertCornerRadius),
-        boxShadow: [
-          OutlineBoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: CupertinoPopupSurface(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: kFabPadding,
-            vertical: kFabPadding,
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget createMaterialWidget(BuildContext context) {
+  Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(

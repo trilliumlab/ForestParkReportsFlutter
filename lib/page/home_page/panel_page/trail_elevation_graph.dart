@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/map_cursor_provider.dart';
@@ -24,8 +23,8 @@ class TrailElevationGraph extends ConsumerWidget {
   });
 
   Widget _loading() {
-    return Center(
-        child: PlatformCircularProgressIndicator()
+    return const Center(
+        child: CircularProgressIndicator()
     );
   }
 

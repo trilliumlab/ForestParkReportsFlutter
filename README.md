@@ -149,7 +149,7 @@ rendered icon, and [background.png](assets/icon/background.png) and
 [foreground.png](assets/icon/foreground.png) are separated bg/fg layers
 (used by android adaptive icons).
 
-Custom icon symbols go in the [assets/icons](assets/icons) directory (svgs only). The icons are
+Custom icon symbols go in the [assets/icons](assets/svg_icons) directory (svgs only). The icons are
 loaded in flutter using a font file. To generate the font file and the dart icon class, run:
 
 ```bash

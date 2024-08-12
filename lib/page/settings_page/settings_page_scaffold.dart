@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:forest_park_reports/page/common/animated_app_bar_scaffold.dart';
+import 'package:flutter/material.dart';
 
 import 'package:forest_park_reports/page/settings_page/settings_section.dart';
 
@@ -30,17 +30,16 @@ class _SettingsPageScaffoldState extends State<SettingsPageScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedAppBarScaffold(
-      // Pass the scroll controller to AnimatedAppBarScaffold so it knows when to show and hide.
-      scrollController: _scrollController,
-      title: widget.title,
-      previousPageTitle: widget.previousPageTitle,
-      body: ListView(
-        // Allows bouncing even when content doesn't fill up the screen
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: _scrollController,
-        children: widget.children
-      ),
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: ListView(
+          // Allows bouncing even when content doesn't fill up the screen
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _scrollController,
+          children: widget.children
+        ),
     );
   }
 }

@@ -1,5 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:forest_park_reports/model/settings.dart';
 import 'package:forest_park_reports/page/settings_page/settings_page_scaffold.dart';
 
@@ -22,16 +21,13 @@ class SelectionSettingWidget<T extends SelectionOption> extends StatelessWidget 
 
   @override
   Widget build(BuildContext context) {
-    return PlatformListTile(
+    return ListTile(
       title: Text(name),
-      trailing: const CupertinoListTileChevron(),
-      cupertino: (_, __) => CupertinoListTileData(
-        additionalInfo: Text(selectedOption.displayName),
-      ),
+      // TODO: material alternative - trailing: const CupertinoListTileChevron(),
+      trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () async {
         await Navigator.of(context).push(
-          platformPageRoute(
-            context: context,
+          MaterialPageRoute(
             builder: (context) => _SelectionSettingWidgetPage(
               name: name,
               pageTitle: pageTitle,
@@ -81,7 +77,7 @@ class _SelectionSettingWidgetPageState extends State<_SelectionSettingWidgetPage
           SettingsSection(
             children: [
               for (final option in widget.options)
-                PlatformListTile(
+                ListTile(
                   title: Text(option.displayName),
                   onTap: () async {
                     final delay = Future.delayed(const Duration(milliseconds: 100));
@@ -91,9 +87,8 @@ class _SelectionSettingWidgetPageState extends State<_SelectionSettingWidgetPage
                     });
                     await delay;
                   },
-                  trailing: option == selected ? Icon(
-                    CupertinoIcons.checkmark,
-                    size: CupertinoTheme.of(context).textTheme.textStyle.fontSize,
+                  trailing: option == selected ? const Icon(
+                    Icons.check_rounded,
                   ) : null,
                 ),
             ],

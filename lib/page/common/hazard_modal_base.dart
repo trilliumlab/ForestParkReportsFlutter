@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/page/common/permissions_dialog.dart';
 import 'package:forest_park_reports/page/home_page/panel_page.dart';
@@ -73,18 +71,18 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
       return;
     }
 
-    showPlatformDialog(context: context, builder: (_) => PlatformAlertDialog(
+    showDialog(context: context, builder: (_) => AlertDialog(
       title: const Text('No photo submitted'),
       content: const Text('Are you sure you\'d like to submit this hazard without a photo?'),
       actions: [
-        PlatformDialogAction(
-          child: PlatformText('Cancel'),
+        TextButton(
+          child: const Text('Cancel'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        PlatformDialogAction(
-          child: PlatformText('Yes'),
+        TextButton(
+          child: const Text('Yes'),
           onPressed: () {
             Navigator.pop(context);
             _submit();
@@ -112,13 +110,9 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Panel(
-      child: PlatformWidgetBuilder(
-        cupertino: (_, child, __) => child,
-        material: (_, child, __) => Material(
-          color: Colors.transparent,
-          child: child
-        ),
-        child: SizedBox(
+      child: Material(
+        color: Colors.transparent,
+        child:  SizedBox(
           height: 500,
           // height: PanelValues.snapHeight(context),
           child: Stack(
@@ -131,111 +125,76 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
                     padding: const EdgeInsets.only(left: 16, top: 10),
                     child: Text(
                       widget.title,
-                      style: isCupertino(context)
-                        ? CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(fontSize: 28)
-                        : theme.textTheme.titleLarge!.copyWith(fontSize: 28),
+                      style: theme.textTheme.titleLarge!.copyWith(fontSize: 28),
                     ),
                   ),
-                  
+
                   if (widget.options != null) Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
-                    child: PlatformWidget(
-                      cupertino: (context, _) => CupertinoSlidingSegmentedControl(
-                        groupValue: _selectedOption,
-                        onValueChanged: (dynamic value) => setState(() {
-                          _selectedOption = value;
-                        }),
-                        children: widget.options!,
-                      ),
-
-                      material: (context, _) => SizedBox(
-                        height: 40,
-                        child: SegmentedButton(
-                          emptySelectionAllowed: true,
-                          showSelectedIcon: false,
-                          selected: {
-                            if (_selectedOption != null)
-                              _selectedOption
-                          },
-                          onSelectionChanged: (selection) {
-                            if (selection.length == 1) {
-                              setState(() => _selectedOption = selection.first);
-                            }
-                          },
-                          segments: [
-                            for (final option in widget.options!.entries)
-                              ButtonSegment(
-                                value: option.key,
-                                label: Padding(
+                    child: SizedBox(
+                      height: 40,
+                      child: SegmentedButton(
+                        emptySelectionAllowed: true,
+                        showSelectedIcon: false,
+                        selected: {
+                          if (_selectedOption != null)
+                            _selectedOption
+                        },
+                        onSelectionChanged: (selection) {
+                          if (selection.length == 1) {
+                            setState(() => _selectedOption = selection.first);
+                          }
+                        },
+                        segments: [
+                          for (final option in widget.options!.entries)
+                            ButtonSegment(
+                              value: option.key,
+                              label: Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: option.value
-                                ),
                               ),
-                          ]
-                        ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left:12, right: 12, top: 8),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(isCupertino(context) ? 8 : 18)),
-                        child: PlatformWidgetBuilder(
-                          cupertino: (context, child, _) => CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: _cameraSelect,
-                            color: CupertinoDynamicColor.resolve(CupertinoColors.quaternarySystemFill, context),
-                            child: child!,
-                          ),
-                          material: (context, child, _) => FilledButton(
-                            style: ButtonStyle(
-                              shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(isCupertino(context) ? 8 : 18))),
-                              backgroundColor: WidgetStatePropertyAll(theme.colorScheme.surfaceContainer),
-                              padding: const WidgetStatePropertyAll(EdgeInsets.only())
-                            ),
-                            onPressed: null,
-                            child: InkWell(
-                              onTap: _cameraSelect,
-                              child: child)
-                            ,
-                          ),
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints.expand(),
-                            child: _image == null ? Icon(
-                              CupertinoIcons.camera,
-                              color: isCupertino(context)
-                                ? CupertinoTheme.of(context).primaryColor
-                                : theme.colorScheme.primary
-                            ) : Image.file(
-                              File(_image!.path),
-                              fit: BoxFit.cover,
-                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left:12, right: 12, top: 8),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(18)),
+                          child: FilledButton(
+                              style: ButtonStyle(
+                                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+                                  backgroundColor: WidgetStatePropertyAll(theme.colorScheme.surfaceContainer),
+                                  padding: const WidgetStatePropertyAll(EdgeInsets.only())
+                              ),
+                              onPressed: null,
+                              child: InkWell(
+                                  onTap: _cameraSelect,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints.expand(),
+                                    child: _image == null ? Icon(
+                                        Icons.camera_alt_rounded,
+                                        color: theme.colorScheme.primary,
+                                    ) : Image.file(
+                                      File(_image!.path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                              ),
                           ),
                         ),
-                      ),
-                    )
+                      )
                   ),
 
                   Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 28),
-                    child: PlatformWidget(
-                      cupertino: (context, _) => CupertinoButton(
-                        color: CupertinoTheme.of(context).primaryColor,
-                        onPressed: (widget.options != null && _selectedOption == null) || _inProgress
+                    child: FilledButton(
+                      onPressed: (widget.options != null && _selectedOption == null) || _inProgress
                           ? null
                           : _onSubmit,
-                        child: Text(
-                          'Submit',
-                          style: CupertinoTheme.of(context).textTheme.textStyle,
-                        ),
-                      ),
-                      material: (context, _) => FilledButton(
-                        onPressed: (widget.options != null && _selectedOption == null) || _inProgress
-                          ? null
-                          : _onSubmit,
-                        child: const Text('Submit'),
-                      ),
+                      child: const Text('Submit'),
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
@@ -248,15 +207,12 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
                   child: SizedBox(
                     width: 24,
                     height: 24,
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      borderRadius: const BorderRadius.all(Radius.circular(100)),
-                      color: CupertinoDynamicColor.resolve(CupertinoColors.secondarySystemFill, context),
+                    child: IconButton(
                       onPressed: _close,
-                      child: Icon(
+                      icon: const Icon(
                         Icons.close_rounded,
                         size: 20,
-                        color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context),
+                        // color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context),
                       ),
                     ),
                   ),

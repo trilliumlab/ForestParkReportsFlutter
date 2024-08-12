@@ -1,7 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/util/outline_box_shadow.dart';
 
@@ -26,18 +23,8 @@ class HazardInfoPopup extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: radius,
-        child: PlatformWidgetBuilder(
-          cupertino: (context, child, _) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-            child: Container(
-              color: CupertinoDynamicColor.resolve(CupertinoColors.secondarySystemBackground, context).withAlpha(210),
-              child: child,
-            ),
-          ),
-          material: (_, child, __) => Container(
-            color: theme.colorScheme.surface,
-            child: child,
-          ),
+        child: Container(
+          color: theme.colorScheme.surface,
           child: IntrinsicWidth(
             child: Column(
               mainAxisSize: MainAxisSize.min,
