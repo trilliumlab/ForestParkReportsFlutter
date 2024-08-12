@@ -11,7 +11,7 @@ class PanelValues {
   /// Fraction of the distance between the open and collapsed states to which the panel should snap
   static const double _kSnapPoint = 0.5;
 
-  static double panelBottomPadding(BuildContext context) => MediaQuery.of(context).viewPadding.bottom > 30
+  static double panelBottomPadding(BuildContext context) => (MediaQuery.of(context).viewPadding.bottom > 40)
       ? MediaQuery.of(context).viewPadding.bottom
       : MediaQuery.of(context).viewPadding.bottom / 2;
   

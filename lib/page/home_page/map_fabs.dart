@@ -5,7 +5,7 @@ import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:forest_park_reports/page/common/permissions_dialog.dart';
-import 'package:forest_park_reports/page/common/add_hazard_modal.dart';
+import 'package:forest_park_reports/page/common/hazard_add_modal.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

@@ -132,7 +132,7 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
                     child: Text(
                       widget.title,
                       style: isCupertino(context)
-                        ? CupertinoTheme.of(context).textTheme.navTitleTextStyle
+                        ? CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(fontSize: 28)
                         : theme.textTheme.titleLarge!.copyWith(fontSize: 28),
                     ),
                   ),
@@ -185,6 +185,7 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
                           cupertino: (context, child, _) => CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: _cameraSelect,
+                            color: CupertinoDynamicColor.resolve(CupertinoColors.quaternarySystemFill, context),
                             child: child!,
                           ),
                           material: (context, child, _) => FilledButton(
@@ -220,6 +221,7 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
                     padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 28),
                     child: PlatformWidget(
                       cupertino: (context, _) => CupertinoButton(
+                        color: CupertinoTheme.of(context).primaryColor,
                         onPressed: (widget.options != null && _selectedOption == null) || _inProgress
                           ? null
                           : _onSubmit,
