@@ -78,14 +78,14 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
         colorScheme: ColorScheme.fromSeed(
           seedColor: kMaterialAppPrimaryColor,
           brightness: Brightness.light,
-          dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+          dynamicSchemeVariant: DynamicSchemeVariant.rainbow,
         )
     );
     final darkTheme = ThemeData.from(
         colorScheme: ColorScheme.fromSeed(
           seedColor: kMaterialAppPrimaryColor,
           brightness: Brightness.dark,
-          dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+          dynamicSchemeVariant: DynamicSchemeVariant.rainbow,
         )
     );
 
