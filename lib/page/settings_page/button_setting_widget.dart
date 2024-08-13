@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:forest_park_reports/page/common/confirmation.dart';
 
 /// Styles for [ButtonSettingWidget].
@@ -37,13 +38,13 @@ class ButtonSettingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyle = switch(buttonStyle) {
       ButtonSettingStyle.none => null,
-      ButtonSettingStyle.danger => CupertinoTheme.of(context).textTheme.actionTextStyle.copyWith(
-        color: CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context),
+      ButtonSettingStyle.danger => TextStyle(
+        color: Theme.of(context).colorScheme.error,
       ),
-      ButtonSettingStyle.button => CupertinoTheme.of(context).textTheme.actionTextStyle,
+      ButtonSettingStyle.button => null,
     };
 
-    return PlatformListTile(
+    return ListTile(
       title: Text(
           name,
           style: textStyle

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -50,8 +49,8 @@ class HazardMarkerLayer extends ConsumerWidget {
           child: MapIcon(
             Icons.fmd_bad_rounded,
             color: hazard.offline
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.destructiveRed,
+                ? Colors.grey
+                : Colors.red,
           ),
         )
       );

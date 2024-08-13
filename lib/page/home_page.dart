@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -12,7 +11,6 @@ import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/page/settings_page.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/page/common/statusbar_blur.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/page/home_page/map_fabs.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/page/home_page/map_page.dart';
@@ -43,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // make the height of the panel when open 80% of the screen
     final theme = Theme.of(context);
 
-    return PlatformScaffold(
+    return Scaffold(
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -120,24 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       heroTag: "settings_fab",
                       onPressed: () async {
                         Navigator.of(context).push(
-                          platformPageRoute(
-                            context: context,
+                          MaterialPageRoute(
                             builder: (_) => const SettingsPage(),
                           ),
                         );
                       },
-                      child: PlatformWidget(
-                        cupertino: (_, __) => Icon(
-                          // Fix for bug in cupertino_icons package, should be CupertinoIcons.location
-                            CupertinoIcons.gear,
-                            color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                                ? CupertinoColors.systemGrey.highContrastColor
-                                : CupertinoColors.systemGrey.darkHighContrastColor
-                        ),
-                        material: (_, __) => Icon(
-                          Icons.settings,
-                          color: theme.colorScheme.onSurface,
-                        ),
+                      child: Icon(
+                        Icons.settings,
+                        color: theme.colorScheme.onSurface,
                       ),
                     );
                   }
@@ -162,8 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           // status bar blur
-          if (isCupertino(context))
-            const StatusBarBlur(),
+          const StatusBarBlur(),
         ],
       ),
     );

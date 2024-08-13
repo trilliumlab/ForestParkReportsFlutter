@@ -37,7 +37,7 @@ class _TrailInfoWidgetState extends State<TrailInfoWidget> {
           children: [
             const Align(
               alignment: Alignment.topCenter,
-              child: PlatformPill(),
+              child: PanelPill(),
             ),
             Align(
               alignment: Alignment.centerLeft,

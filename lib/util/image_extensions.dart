@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:blurhash_ffi/blurhash.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 extension CompressImage on img.Image {

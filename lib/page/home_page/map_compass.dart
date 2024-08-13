@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/provider/map_position_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -89,25 +87,17 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
             children: [
               Transform.rotate(
                 angle: degToRadian(camera.rotation + widget.rotationOffset),
-                child: widget.icon ?? PlatformWidget(
-                  cupertino: (_, __) => SizedBox(height: 50, child: Image(image: Theme.of(context).brightness == Brightness.light
-                  ? const AssetImage("assets/image/cupertino_compass.png")
-                  : const AssetImage("assets/image/cupertino_compass_dark.png"))),
-                  material: (_, __) => Transform.rotate(
-                    angle: degToRadian(-45.0),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(CupertinoIcons.compass, color: Colors.red, size: 50),
-                        Icon(CupertinoIcons.compass_fill, color: theme.colorScheme.surface, size: 50),
-                        Icon(CupertinoIcons.circle, color: theme.colorScheme.surface, size: 52),
-                      ],
-                    ),
+                child: widget.icon ?? Transform.rotate(
+                  angle: degToRadian(135.0),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(Icons.circle, color: theme.colorScheme.surface, size: 48),
+                      Image.asset('assets/icons/compass.png', width: 20),
+                    ],
                   ),
                 ),
               ),
-              // Show cardinal dir letter if default iOS compass or if custom compass and showCardDir enabled
-              if (widget.icon == null && isCupertino(context) || widget.icon != null && widget.showCardDir) cardDirText(camera, context)
             ]
           ),
           onPressed:
@@ -115,26 +105,6 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
         ),
       ),
     );
-  }
-
-  Widget cardDirText(MapCamera camera, BuildContext context) {
-    // Shift camera rotation, clamp from 0 to 360, 
-    // then perform integer division based on 90 degree chunks
-    int dir = ((camera.rotation + 45) % 360) ~/ 90;
-    
-    String letter = 
-        dir == 0 ? 'N' :
-        dir == 1 ? 'W' :
-        dir == 2 ? 'S' :
-        'E'; 
-    Brightness mode = View.of(context).platformDispatcher.platformBrightness;
-    Color color = isCupertino(context) ?
-      mode == Brightness.light
-        ? CupertinoColors.systemGrey.highContrastColor 
-        : CupertinoColors.systemGrey.darkHighContrastColor
-      : Theme.of(context).colorScheme.onSurface; 
-
-    return Text(letter, style: TextStyle(color: color, fontSize: 20), textAlign: TextAlign.center);
   }
 
   void _resetRotation(MapCamera camera) {

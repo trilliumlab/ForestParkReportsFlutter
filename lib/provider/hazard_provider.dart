@@ -1,10 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
-import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard_new_response.dart';
 import 'package:forest_park_reports/model/hazard_type.dart';
 import 'package:forest_park_reports/model/queued_request.dart';
@@ -83,7 +80,7 @@ class ActiveHazard extends _$ActiveHazard {
     showAlertBanner(
       key: Key(uuid),
       child: const Text("Your report has been queued", key: Key("Your report has been queued")),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+      color: Colors.grey,
     );
 
     // If we're passed an image, decode it.
@@ -139,7 +136,7 @@ class ActiveHazard extends _$ActiveHazard {
     showAlertBanner(
       key: Key(response.hazard.uuid),
       child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+      color: Colors.green,
     );
 
     _addHazard(response.hazard);
@@ -174,7 +171,7 @@ class ActiveHazard extends _$ActiveHazard {
     showAlertBanner(
       key: Key(uuid),
       child: const Text("Your report has been queued", key: Key("Your report has been queued")),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, homeKey.currentContext!),
+      color: Colors.green,
     );
 
     // If we're passed an image, decode it.
@@ -240,7 +237,7 @@ class ActiveHazard extends _$ActiveHazard {
     showAlertBanner(
       key: Key(hazardUpdate.uuid),
       child: const Text("Report uploaded successfully", key: Key("Report uploaded successfully")),
-      color: CupertinoDynamicColor.resolve(CupertinoColors.activeGreen, homeKey.currentContext!),
+      color: Colors.green,
     );
 
     // Add new update to hazard updates
