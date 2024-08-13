@@ -18,20 +18,20 @@ class StatusBarBlur extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: Stack(
         children: [
-          for (int i = 0; i < kBlurSteps; ++i)
-            Positioned(
+          for (int i = 0; i < kBlurSteps; ++i) () {
+            final sigma = (1-(i.toDouble()/kBlurSteps))*kMaxSigma;
+            return Positioned(
               top: i * stepHeight,
               left: 0,
               right: 0,
               child: ClipRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: (1-(i.toDouble()/kBlurSteps))*kMaxSigma, sigmaY: (1-(i.toDouble()/kBlurSteps))*kMaxSigma),
-                  child: Container(
-                    height: stepHeight + kOverlap,
-                  ),
+                  filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+                  child: Container(height: stepHeight + kOverlap),
                 ),
               ),
-            ),
+            );
+          }()
         ],
       )
     );
