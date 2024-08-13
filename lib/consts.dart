@@ -10,12 +10,6 @@ const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
 // const kApiUrl = "http://192.168.0.247:8000";
 // const kApiUrl = "http://localhost:8000/";
 
-// This is for development only.
-// TODO Maybe move this over to the settings page or only set on debug
-// const kPlatformOverride = null;
-const kPlatformOverride = TargetPlatform.android;
-// const kPlatformOverride = TargetPlatform.iOS;
-
 final kMaterialAppPrimaryColor = Colors.green.shade700;
 
 // Allows a user to submit hazards and updates without appropriate proximity.
