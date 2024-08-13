@@ -68,6 +68,14 @@ dependencies:
       url: https://github.com/orestesgaolin/flutter_uploader.git
       ref: update-to-dart-3
 
+dependency_overrides:
+  # Fork that sets compileSdkVersion to 34 - revert once fixed upstream
+  # https://github.com/hemanthrajv/flutter_compass/issues/112
+  flutter_compass:
+    git:
+      url: https://github.com/amxDusT/flutter_compass.git
+      ref: 135ec412dd11ca800a52c7f792312882d5a04172
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
