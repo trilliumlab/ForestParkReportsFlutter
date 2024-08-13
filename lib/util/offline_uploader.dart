@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:forest_park_reports/consts.dart';
 import 'package:forest_park_reports/main.dart';
 import 'package:forest_park_reports/model/hazard_new_response.dart';

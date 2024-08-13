@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 /// An assortment of calculated values regarding the panel  
 class PanelValues {

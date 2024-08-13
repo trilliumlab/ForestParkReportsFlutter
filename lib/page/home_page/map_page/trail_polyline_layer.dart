@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:forest_park_reports/model/relation.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
@@ -71,14 +71,14 @@ class TrailPolylineLayer extends ConsumerWidget {
               hitValue: trail.id,
               points: trail.geometry,
               strokeWidth: 1.0,
-              borderColor: CupertinoColors.activeGreen.withAlpha(80),
+              borderColor: Colors.green.withAlpha(80),
               borderStrokeWidth: 8.0,
-              color: CupertinoColors.activeGreen,
+              color: Colors.green,
             ) : Polyline(
               hitValue: trail.id,
               points: trail.geometry,
               strokeWidth: 1.0,
-              color: CupertinoColors.activeOrange,
+              color: Colors.orange,
             );
           }).whereNotNull().toList()..sort((a, b) {
             // sorts the list to have selected polylines at the top

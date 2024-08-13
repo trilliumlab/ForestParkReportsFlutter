@@ -109,118 +109,109 @@ class _HazardModalState<T> extends ConsumerState<HazardModal<T>> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Panel(
-      child: Material(
-        color: Colors.transparent,
-        child:  SizedBox(
-          height: 500,
-          // height: PanelValues.snapHeight(context),
-          child: Stack(
-            fit: StackFit.expand,
+    return SizedBox(
+      height: 500,
+      // height: PanelValues.snapHeight(context),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16, top: 10),
-                    child: Text(
-                      widget.title,
-                      style: theme.textTheme.titleLarge!.copyWith(fontSize: 28),
-                    ),
-                  ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, top: 10),
+                child: Text(
+                  widget.title,
+                  style: theme.textTheme.titleLarge!.copyWith(fontSize: 28),
+                ),
+              ),
 
-                  if (widget.options != null) Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
-                    child: SizedBox(
-                      height: 40,
-                      child: SegmentedButton(
-                        emptySelectionAllowed: true,
-                        showSelectedIcon: false,
-                        selected: {
-                          if (_selectedOption != null)
-                            _selectedOption
-                        },
-                        onSelectionChanged: (selection) {
-                          if (selection.length == 1) {
-                            setState(() => _selectedOption = selection.first);
-                          }
-                        },
-                        segments: [
-                          for (final option in widget.options!.entries)
-                            ButtonSegment(
-                              value: option.key,
-                              label: Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: option.value
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left:12, right: 12, top: 8),
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.all(Radius.circular(18)),
-                          child: FilledButton(
-                              style: ButtonStyle(
-                                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
-                                  backgroundColor: WidgetStatePropertyAll(theme.colorScheme.surfaceContainer),
-                                  padding: const WidgetStatePropertyAll(EdgeInsets.only())
-                              ),
-                              onPressed: null,
-                              child: InkWell(
-                                  onTap: _cameraSelect,
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints.expand(),
-                                    child: _image == null ? Icon(
-                                        Icons.camera_alt_rounded,
-                                        color: theme.colorScheme.primary,
-                                    ) : Image.file(
-                                      File(_image!.path),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                              ),
+              if (widget.options != null) Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
+                child: SizedBox(
+                  height: 40,
+                  child: SegmentedButton(
+                    emptySelectionAllowed: true,
+                    showSelectedIcon: false,
+                    selected: {
+                      if (_selectedOption != null)
+                        _selectedOption
+                    },
+                    onSelectionChanged: (selection) {
+                      if (selection.length == 1) {
+                        setState(() => _selectedOption = selection.first);
+                      }
+                    },
+                    segments: [
+                      for (final option in widget.options!.entries)
+                        ButtonSegment(
+                          value: option.key,
+                          label: Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: option.value
                           ),
                         ),
-                      )
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 28),
-                    child: FilledButton(
-                      onPressed: (widget.options != null && _selectedOption == null) || _inProgress
-                          ? null
-                          : _onSubmit,
-                      child: const Text('Submit'),
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
-                ],
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: IconButton(
-                      onPressed: _close,
-                      icon: const Icon(
-                        Icons.close_rounded,
-                        size: 20,
-                        // color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
               ),
+              Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left:12, right: 12, top: 8),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(18)),
+                      child: FilledButton(
+                          style: ButtonStyle(
+                              shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+                              backgroundColor: WidgetStatePropertyAll(theme.colorScheme.surfaceContainer),
+                              padding: const WidgetStatePropertyAll(EdgeInsets.only())
+                          ),
+                          onPressed: null,
+                          child: InkWell(
+                              onTap: _cameraSelect,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints.expand(),
+                                child: _image == null ? Icon(
+                                    Icons.camera_alt_rounded,
+                                    color: theme.colorScheme.primary,
+                                ) : Image.file(
+                                  File(_image!.path),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                          ),
+                      ),
+                    ),
+                  )
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 28),
+                child: FilledButton(
+                  onPressed: (widget.options != null && _selectedOption == null) || _inProgress
+                      ? null
+                      : _onSubmit,
+                  child: const Text('Submit'),
+                ),
+              ),
+              SizedBox(height: MediaQuery.of(context).viewPadding.bottom),
             ],
           ),
-        ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: IconButton(
+                onPressed: _close,
+                icon: const Icon(
+                  Icons.close_rounded,
+                  // size: 20,
+                  // color: CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 enum HazardType {
-  tree("Fallen Tree", CupertinoIcons.tree),
+  tree("Fallen Tree", Icons.park_outlined),
   flood("Flooded Trail", Icons.flood_rounded),
-  other("Other Hazard", CupertinoIcons.question_diamond_fill);
+  other("Other Hazard", Icons.help_outline_outlined);
 
   const HazardType(this.displayName, this.icon);
   final String displayName;

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/model/camera_position.dart';
@@ -18,7 +17,6 @@ const kPlatformOverride = TargetPlatform.android;
 // const kPlatformOverride = TargetPlatform.iOS;
 
 final kMaterialAppPrimaryColor = Colors.green.shade700;
-final kCupertinoAppPrimaryColor = CupertinoColors.systemGreen.highContrastColor;
 
 // Allows a user to submit hazards and updates without appropriate proximity.
 const bool kLocationOverrideEnabled = true;
@@ -58,9 +56,3 @@ const kBackgroundRequestPortName = "backgroundRequestPort";
 
 // Uuid generator
 const kUuidGen = Uuid();
-
-// Colors
-const kDialogColor = CupertinoDynamicColor.withBrightness(
-  color: Color(0xCCF2F2F2),
-  darkColor: Color(0xBF1E1E1E),
-);
