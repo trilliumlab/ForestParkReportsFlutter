@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 /// An assortment of calculated values regarding the panel  
 class PanelValues {
@@ -43,4 +44,14 @@ class PanelValues {
   /// ALWAYS USE THIS IN A BUILD METHOD. This value may change when the BuildContext changes
   static double snapHeight (BuildContext context) =>  _kSnapPoint * (openHeight(context) - collapsedHeight(context))
       + collapsedHeight(context);
+
+  static double? positionHeight(BuildContext context, PanelState position) {
+    return switch(position) {
+      PanelState.HIDDEN => 0,
+      PanelState.COLLAPSED => collapsedHeight(context), 
+      PanelState.SNAPPED => snapHeight(context),
+      PanelState.OPEN => openHeight(context),
+      PanelState.NONE => null
+    };
+  }
 }

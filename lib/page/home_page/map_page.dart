@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:forest_park_reports/provider/map_position_provider.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -87,12 +88,13 @@ class _MapPageState extends ConsumerState<MapPage> with WidgetsBindingObserver, 
     final locationStatus = ref.watch(locationPermissionStatusProvider);
     ref.listen(alignPositionTargetProvider, (prev, next) {
       if (next==AlignPositionTargetState.forestPark){
-        _alignPositionStreamController.add(null);
-        _animatedMapController.animatedRotateReset();
-        _animatedMapController.centerOnPoint(kHomeCameraPosition.center, zoom: kHomeCameraPosition.zoom);
+        _animatedMapController.animateTo(dest: kHomeCameraPosition.center, zoom: kHomeCameraPosition.zoom, rotation: 0,
+          offset: Offset(0, -(PanelValues.positionHeight(context, ref.read(panelPositionProvider).position) ?? 0) / 2)
+        );
       } else if (next == AlignPositionTargetState.currentLocation) {
-        _animatedMapController.centerOnPoint(ref.watch(locationProvider).requireValue.latLng()!);
-
+        _animatedMapController.animateTo(dest: ref.watch(locationProvider).requireValue.latLng()!,
+          offset: Offset(0, -(PanelValues.positionHeight(context, ref.read(panelPositionProvider).position) ?? 0) / 2)
+        );
       }
     });
 

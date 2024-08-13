@@ -38,26 +38,24 @@ class HazardInfoPopup extends StatelessWidget {
             color: theme.colorScheme.surface,
             child: child,
           ),
-          child: IntrinsicWidth(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
-                  child: Text(
-                    hazard.hazard.displayName,
-                    style: theme.textTheme.titleLarge,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
+                child: Text(
+                  hazard.hazard.displayName,
+                  style: theme.textTheme.titleLarge,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4),
-                  child: Text(
-                    hazard.timeString(),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4),
+                child: Text(
+                  hazard.timeString(),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
