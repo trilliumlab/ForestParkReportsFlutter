@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:forest_park_reports/provider/settings_provider.dart';
 import 'package:forest_park_reports/util/offline_uploader.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:forest_park_reports/consts.dart';
@@ -90,6 +91,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
 
     return MaterialApp(
       title: 'Trail Eyes',
+      themeMode: ref.watch(settingsProvider.select((s) => s.colorTheme)).value,
       theme: lightTheme,
       darkTheme: darkTheme,
       home: HomeScreen(key: homeKey),
