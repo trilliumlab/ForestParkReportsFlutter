@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/page/common/platform_fab.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
@@ -6,7 +5,6 @@ import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
 import 'package:forest_park_reports/page/common/permissions_dialog.dart';
 import 'package:forest_park_reports/page/common/hazard_add_modal.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The floating action buttons used on the map page. Holds the location and add hazard [PlatformFAB].
@@ -25,23 +23,15 @@ class MapFabs extends ConsumerWidget {
         Consumer(
             builder: (context, ref, child) {
               return PlatformFAB(
-                  heroTag: "add_hazard_fab",
-                  opacity: opacity,
-                  onPressed: () async { 
-                    createHazardAddModal(context);
-                  },
-                  child: PlatformWidget(
-                    cupertino: (_, __) => Icon(
-                        CupertinoIcons.add,
-                        color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                            ? CupertinoColors.systemGrey.highContrastColor
-                            : CupertinoColors.systemGrey.darkHighContrastColor
-                    ),
-                    material: (_, __) => Icon(
-                      Icons.add,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  )
+                heroTag: "add_hazard_fab",
+                opacity: opacity,
+                onPressed: () async {
+                  createHazardAddModal(context);
+                },
+                child: Icon(
+                  Icons.add,
+                  color: theme.colorScheme.onSurface,
+                ),
               );
             }
         ),
@@ -74,30 +64,15 @@ class MapFabs extends ConsumerWidget {
                   );
                 }
               },
-              child: PlatformWidget(
-                cupertino: (_, __) => Icon(
-                  switch (followOnLocationTarget) {
-                    AlignPositionTargetState.currentLocation =>
-                      CupertinoIcons.location_fill,
-                    AlignPositionTargetState.none =>
-                      CupertinoIcons.location,
-                    AlignPositionTargetState.forestPark =>
-                      Icons.park,
-                  },
-                  color: View.of(context).platformDispatcher.platformBrightness == Brightness.light
-                      ? CupertinoColors.systemGrey.highContrastColor
-                      : CupertinoColors.systemGrey.darkHighContrastColor
-                ),
-                material: (_, __) => Icon(
-                  followOnLocationTarget == AlignPositionTargetState.forestPark
-                      ? Icons.park
-                      : followOnLocationTarget == AlignPositionTargetState.currentLocation
-                      ? Icons.my_location
-                      : Icons.location_searching,
-                  color: followOnLocationTarget == AlignPositionTargetState.none
-                      ? theme.colorScheme.onSurface
-                      : theme.colorScheme.primary,
-                ),
+              child: Icon(
+                followOnLocationTarget == AlignPositionTargetState.forestPark
+                    ? Icons.park
+                    : followOnLocationTarget == AlignPositionTargetState.currentLocation
+                    ? Icons.my_location
+                    : Icons.location_searching,
+                color: followOnLocationTarget == AlignPositionTargetState.none
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.primary,
               ),
             );
           }

@@ -1,7 +1,5 @@
 import 'package:blurhash_ffi/blurhash_ffi.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/page/common/fade_in_widget.dart';
 import 'package:forest_park_reports/provider/hazard_photo_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -40,8 +38,8 @@ class HazardImage extends ConsumerWidget {
             ),
           )
         else
-          Center(
-            child: PlatformCircularProgressIndicator(),
+          const Center(
+            child: CircularProgressIndicator(),
           ),
       ],
     );

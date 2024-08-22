@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// A settings widget for boolean options.
 class ToggleSettingWidget extends StatelessWidget {
@@ -19,15 +17,12 @@ class ToggleSettingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformListTile(
-      material: (_, __) => MaterialListTileData(
-        // Allow clicking the entire tile on Android.
-        onTap: () {
-          onChanged(!value);
-        }
-      ),
+    return ListTile(
       title: Text(name),
-      trailing: PlatformSwitch(
+      onTap: () {
+        onChanged(!value);
+      },
+      trailing: Switch(
         value: value,
         onChanged: onChanged,
       ),

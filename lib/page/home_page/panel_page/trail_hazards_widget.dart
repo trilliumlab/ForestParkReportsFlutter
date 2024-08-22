@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/model/hazard.dart';
 import 'package:forest_park_reports/page/home_page/panel_page/hazard_image.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
@@ -45,8 +44,8 @@ class TrailHazardsWidget extends ConsumerWidget {
                   HazardInfoWidget(
                     hazard: hazard,
                   )).toList(),
-              ) : Center(
-                child: PlatformCircularProgressIndicator(),
+              ) : const Center(
+                child: CircularProgressIndicator(),
               ),
           ),
         ),
@@ -65,13 +64,13 @@ class HazardInfoWidget extends ConsumerWidget {
     final hazardUpdates = ref.watch(hazardUpdatesProvider(hazard.uuid)).valueOrNull;
     final lastImage = hazardUpdates?.lastImage;
     final lastBlurHash = hazardUpdates?.lastBlurHash;
-    return PlatformTextButton(
+    return Padding(
       padding: const EdgeInsets.only(left: 12, right: 8, top: 8, bottom: 8),
-      onPressed: () {
-        ref.read(selectedRelationProvider.notifier).deselect();
-        ref.read(selectedHazardProvider.notifier).selectAndMove(hazard);
-      },
-      material: (_, __) => MaterialTextButtonData(
+      child: TextButton(
+        onPressed: () {
+          ref.read(selectedRelationProvider.notifier).deselect();
+          ref.read(selectedHazardProvider.notifier).selectAndMove(hazard);
+        },
         style: ButtonStyle(
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
@@ -79,35 +78,35 @@ class HazardInfoWidget extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                hazard.hazard.displayName,
-                style: theme.textTheme.titleLarge,
-              ),
-              Text(
-                  hazard.timeString(),
-                  style: theme.textTheme.titleMedium
-              )
-            ],
-          ),
-          if (lastImage != null)
-            SizedBox(
-                height: 80,
-                child: AspectRatio(
-                  aspectRatio: 4/3,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: HazardImage(lastImage, blurHash: lastBlurHash),
-                  ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  hazard.hazard.displayName,
+                  style: theme.textTheme.titleLarge,
+                ),
+                Text(
+                    hazard.timeString(),
+                    style: theme.textTheme.titleMedium
                 )
-            )
-        ],
+              ],
+            ),
+            if (lastImage != null)
+              SizedBox(
+                  height: 80,
+                  child: AspectRatio(
+                    aspectRatio: 4/3,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child: HazardImage(lastImage, blurHash: lastBlurHash),
+                    ),
+                  )
+              )
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import 'package:flutter/material.dart';
 
 /// Holds information for showing a confirmation dialog.
 class ConfirmationInfo {
@@ -21,20 +21,20 @@ class ConfirmationInfo {
 }
 
 Future<bool> showConfirmationDialog(BuildContext context, ConfirmationInfo confirmation) async {
-  return await showPlatformDialog(
+  return await showDialog(
     context: context,
-    builder: (context) => PlatformAlertDialog(
+    builder: (context) => AlertDialog(
       title: Text(confirmation.title),
       content: Text(confirmation.content),
       actions: [
-        PlatformDialogAction(
-          child: PlatformText(confirmation.negative),
+        TextButton(
+          child: Text(confirmation.negative),
           onPressed: () {
             Navigator.of(context).pop(false);
           },
         ),
-        PlatformDialogAction(
-          child: PlatformText(confirmation.affirmative),
+        TextButton(
+          child: Text(confirmation.affirmative),
           onPressed: () {
             Navigator.of(context).pop(true);
           },

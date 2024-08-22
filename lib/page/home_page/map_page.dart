@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:forest_park_reports/provider/map_position_provider.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:http/io_client.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';

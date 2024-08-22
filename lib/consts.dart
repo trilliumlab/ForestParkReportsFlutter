@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:forest_park_reports/model/camera_position.dart';
@@ -11,14 +10,7 @@ const kApiUrl = "https://forestpark.cecs.pdx.edu/staging/v1";
 // const kApiUrl = "http://192.168.0.247:8000";
 // const kApiUrl = "http://localhost:8000/";
 
-// This is for development only.
-// TODO Maybe move this over to the settings page or only set on debug
-const kPlatformOverride = null;
-// const kPlatformOverride = TargetPlatform.android;
-// const kPlatformOverride = TargetPlatform.iOS;
-
 final kMaterialAppPrimaryColor = Colors.green.shade700;
-final kCupertinoAppPrimaryColor = CupertinoColors.systemGreen.highContrastColor;
 
 // Allows a user to submit hazards and updates without appropriate proximity.
 const bool kLocationOverrideEnabled = true;
@@ -58,9 +50,3 @@ const kBackgroundRequestPortName = "backgroundRequestPort";
 
 // Uuid generator
 const kUuidGen = Uuid();
-
-// Colors
-const kDialogColor = CupertinoDynamicColor.withBrightness(
-  color: Color(0xCCF2F2F2),
-  darkColor: Color(0xBF1E1E1E),
-);

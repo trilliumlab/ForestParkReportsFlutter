@@ -1,9 +1,6 @@
 import 'dart:math';
-import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:forest_park_reports/page/common/hazard_update_modal.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/util/panel_values.dart';
@@ -57,16 +54,15 @@ class PanelPage extends ConsumerWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 10),
-                child: PlatformTextButton(
+                child: TextButton(
                   onPressed: () async {
                     ref.read(panelPositionProvider.notifier).move(PanelState.COLLAPSED);
                     await createHazardUpdateModal(context, selectedHazard, false);
                     ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
                   },
-                  padding: EdgeInsets.zero,
-                  child: const Text(
+                  child: Text(
                     "Report Cleared",
-                    style: TextStyle(color: CupertinoColors.systemGreen),
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
               ),
@@ -74,16 +70,15 @@ class PanelPage extends ConsumerWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 20),
-                child: PlatformTextButton(
+                child: TextButton(
                   onPressed: () async {
                     ref.read(panelPositionProvider.notifier).move(PanelState.COLLAPSED);
                     await createHazardUpdateModal(context, selectedHazard, true);
                     ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
                   },
-                  padding: EdgeInsets.zero,
-                  child: const Text(
+                  child: Text(
                     "Report Present",
-                    style: TextStyle(color: CupertinoColors.destructiveRed),
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
               ),
@@ -183,7 +178,7 @@ class Panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final panelRadius = BorderRadius.vertical(top: Radius.circular(isCupertino(context) ? 8 : 18));
+    const panelRadius = BorderRadius.vertical(top: Radius.circular(18));
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -192,9 +187,9 @@ class Panel extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             borderRadius: panelRadius,
-            boxShadow: const [
+            boxShadow: [
               OutlineBoxShadow(
                 color: Colors.black26,
                 blurRadius: 4,
@@ -203,18 +198,9 @@ class Panel extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: panelRadius,
-            child: PlatformWidget(
-                cupertino: (context, _) => BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                  child: Container(
-                    color: CupertinoDynamicColor.resolve(CupertinoColors.secondarySystemBackground, context).withAlpha(210),
-                    child: child,
-                  ),
-                ),
-                material: (_, __) => Container(
-                  color: theme.colorScheme.surface,
-                  child: child,
-                )
+            child:Container(
+              color: theme.colorScheme.surface,
+              child: child,
             ),
           ),
         ),

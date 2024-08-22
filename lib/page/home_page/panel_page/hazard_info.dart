@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/model/hazard_update.dart';
 
@@ -25,10 +24,10 @@ class UpdateInfoWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(2.5)),
                   color: update.offline
-                      ? CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context)
+                      ? Colors.grey
                       : update.active
-                          ? CupertinoDynamicColor.resolve(CupertinoColors.destructiveRed, context)
-                          : CupertinoDynamicColor.resolve(CupertinoColors.systemGreen, context),
+                          ? Colors.red
+                          : Colors.green,
                 ),
                 height: kImageHeight,
                 width: 5,

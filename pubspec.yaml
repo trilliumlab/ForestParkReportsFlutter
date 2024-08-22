@@ -32,12 +32,6 @@ dependencies:
   meta: ^1.12.0
   collection: ^1.17.1
   intl: ^0.19.0
-  dynamic_color: ^1.7.0
-  # dynamic_color: 
-  #   git:
-  #     url: https://github.com/hasali19/material-foundation-flutter-packages.git
-      # path: packages/dynamic_color
-  cupertino_icons: ^1.0.5
   latlong2: ^0.9.0
   geolocator: ^12.0.0
   hooks_riverpod: ^2.3.6
@@ -45,7 +39,6 @@ dependencies:
   sliding_up_panel2:
     git:
       url: https://github.com/trilliumlab/sliding_up_panel.git
-  flutter_platform_widgets: ^7.0.0
   dio: ^5.2.1+1
   path: ^1.8.3
   path_provider: ^2.0.15
@@ -75,6 +68,14 @@ dependencies:
       url: https://github.com/orestesgaolin/flutter_uploader.git
       ref: update-to-dart-3
 
+dependency_overrides:
+  # Fork that sets compileSdkVersion to 34 - revert once fixed upstream
+  # https://github.com/hemanthrajv/flutter_compass/issues/112
+  flutter_compass:
+    git:
+      url: https://github.com/amxDusT/flutter_compass.git
+      ref: 135ec412dd11ca800a52c7f792312882d5a04172
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -103,6 +104,7 @@ flutter:
         - asset: assets/fonts/trail_eyes_icons.otf
   assets:
     - assets/image/
+    - assets/icons/
     - .env
 
 icons_launcher:
@@ -119,7 +121,7 @@ icons_launcher:
 
 # Generate icon class with `dart run icon_font_generator:generator`
 icon_font:
-  input_svg_dir: "assets/icons/"
+  input_svg_dir: "assets/svg_icons/"
   output_font_file: "assets/fonts/trail_eyes_icons.otf"
   output_class_file: "lib/util/trail_eyes_icons.dart"
   class_name: "TrailEyesIcons"
