@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forest_park_reports/page/common/platform_fab.dart';
+import 'package:forest_park_reports/page/common/hazard_volunteer_page.dart';
 import 'package:forest_park_reports/provider/location_provider.dart';
 import 'package:forest_park_reports/provider/align_position_provider.dart';
 import 'package:forest_park_reports/util/extensions.dart';
@@ -25,8 +26,11 @@ class MapFabs extends ConsumerWidget {
               return PlatformFAB(
                 heroTag: "add_hazard_fab",
                 opacity: opacity,
-                onPressed: () async {
-                  createHazardAddModal(context);
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HazardVolunteerPage())
+                  );
                 },
                 child: Icon(
                   Icons.add,
