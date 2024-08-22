@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:forest_park_reports/provider/map_position_provider.dart';
+import 'package:forest_park_reports/provider/panel_position_provider.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -130,7 +132,7 @@ class _MapCompassState extends ConsumerState<MapCompass> with TickerProviderStat
 
   void _handleAnimation() {
     final controller = widget.mapController;
-    controller.rotate(_rotationTween.evaluate(_rotateAnimation));
+    controller.rotateAroundPoint(_rotationTween.evaluate(_rotateAnimation), offset: Offset(0, -(PanelValues.positionHeight(context, ref.read(panelPositionProvider).position) ?? 0) / 2));
     ref.read(mapPositionProvider.notifier).update(controller.camera);
   }
 

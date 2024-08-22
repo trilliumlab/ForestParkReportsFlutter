@@ -47,7 +47,7 @@ class HazardInfoPopup extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      )
     );
   }
 }

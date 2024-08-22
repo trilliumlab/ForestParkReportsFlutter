@@ -9,6 +9,7 @@ import 'package:forest_park_reports/page/home_page/map_page/map_icon.dart';
 import 'package:forest_park_reports/provider/hazard_provider.dart';
 import 'package:forest_park_reports/provider/panel_position_provider.dart';
 import 'package:forest_park_reports/provider/relation_provider.dart';
+import 'package:forest_park_reports/util/panel_values.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
@@ -63,7 +64,8 @@ class HazardMarkerLayer extends ConsumerWidget {
       } else {
         _popupController.showPopupsOnlyFor(markers.where((e) => e.hazard == next.hazard).toList());
         if (next.moveCamera) {
-          _mapController.centerOnPoint(next.hazard!.location);
+          ref.read(panelPositionProvider.notifier).move(PanelState.SNAPPED);
+          _mapController.animateTo(dest: next.hazard!.location, offset: Offset(0, 24 - (PanelValues.positionHeight(context, PanelState.SNAPPED) ?? 0) / 2));
         }
       }
     });
